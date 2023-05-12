@@ -1,0 +1,133 @@
+prefix: "&7[&6TAG&7]"
+language: "en.yml"
+
+# Used to store player stats.
+database:
+  # If false, a local database will be generated in the plugins/TagGame folder
+  use-mysql: false
+  mysql:
+    name: "tag_stats"
+    host: "localhost"
+    port: "3306"
+    username: "root"
+    password: ""
+
+# If true, the player will be teleported to the lobby when he leaves the arena.
+# If false, he will be teleported to his location before joining the game.
+tp-to-lobby: true
+
+# The place where the player will be teleported once the arena ends.
+lobby: {}
+
+# If players should take damage when inside an arena (by lava, mobs...)
+# Does not apply to TNT or player hit. These cases are always canceled.
+prevent-damage: true
+
+# What to do if the player leaves the waiting or the game area.
+# NOTHING - The player can leave without anything happening.
+# LEAVE_GAME_TP - The player will leave the game and will be teleported to the lobby or his previous location (tp-to-lobby option).
+# LEAVE_GAME - The player will leave the game without being teleported to the lobby.
+# PREVENT - The move event will be canceled (the player won't be able to leave).
+borders-leave: PREVENT
+
+# Commands that will be run when the game ends.
+# %player% - The player
+commands-on-end:
+  # Commands ran for the losers (taggers on HIT and TNT modes or person with the highest tagging time in TIMED_TNT or TIMED_HIT):
+  losers:
+    - "say you lost %player%"
+  # Commands ran for the rest of the players:
+  winners:
+    - "say you won %player%"
+
+# Number of ticks after which the TNT will explode (only for TNT mode arenas)
+tnt-fuse-time: 50
+# Cooldown between TNT throws (in seconds)
+tnt-cooldown: 1.0
+
+# If scoreboards should be used or not.
+enable-scoreboards: true
+
+items:
+  # Leave item. Used to exit the arena.
+  leave-item:
+    item: RED_BED
+    name: "&cLeave the arena"
+    lore:
+      - "&7Right click to"
+      - "&7leave the arena"
+    glowing: false
+
+  # The item you use to tag people in the mode with unlimited time and HIT mode.
+  tag-item-unlimited:
+    item: STICK
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: true
+
+  # The item you use to tag people in the mode with limited time and HIT mode.
+  tag-item-limited:
+    item: CLOCK
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: true
+
+  # The item you use to tag people in the mode with unlimited time and TNT mode.
+  tnt-item-unlimited:
+    item: TNT
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: false
+
+  # The item you use to tag people in the mode with limited time and TNT mode.
+  tnt-item-limited:
+    item: TNT
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: true
+
+# The inventory the tagger will have.
+tagger-inventory:
+  helmet:
+    item: LEATHER_HELMET
+    color: 255;0;0
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: true
+
+  chestplate:
+    item: LEATHER_CHESTPLATE
+    color: 255;0;0
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: true
+
+  leggings:
+    item: LEATHER_LEGGINGS
+    color: 255;0;0
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: true
+
+  boots:
+    item: LEATHER_BOOTS
+    color: 255;0;0
+    name: "&cTag someone"
+    lore:
+      - "&7Hit somebody with this"
+      - "&7stick to tag them"
+    glowing: true

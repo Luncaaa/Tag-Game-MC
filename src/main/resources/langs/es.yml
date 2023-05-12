@@ -1,0 +1,157 @@
+commands:
+  # General
+  # %subcommand% - El nombre del subcomando. Ejemplo: /tag reload -> %command% será "reload"
+  command-not-found: "&c¡El comando &b%subcommand% &cno existe!"
+  # %subcommand% - El nombre del subcomando.
+  # %description% - La descripción.
+  # %usage% - Cómo usarlo.
+  # %minArguments% - El número de argumentos que se necesitan para ejecutar el comando. (no incluye el subcomando).
+  command-usage: "&7Uso correcto: &c%usage%"
+  use-help-command: "&cUtiliza &b/tag help &cpara ver la lista de comandos existentes."
+  not-enough-arguments: "&c¡Necesitas introducir más argumentos para ejecutar este comando!"
+  player-command-only: "&c¡Sólo jugadores pueden ejecutar este comando!"
+  no-permission: "&c¡No tienes permiso para ejecutar este comando!"
+
+  # Comando de recarga
+  reload-successful: "&aEl archivo de configuración ha sido recargado existosamente."
+
+  # Comando createArena
+  creation-success: "&aLa arena &e%arena% &aha sido creada exitosamente."
+  creation-failure: "&c¡La arena &b%arena% &cya existe!"
+
+  #Comando removeArena
+  removal-success: "&aLa arena &e%arena% &aha sido eliminada existosamente."
+  removal-failure: "&c¡La arena &b%arena% &cno existe!"
+
+  #Comandos setup y finishSetup
+  arena-not-found: "&c¡La arena &b%arena% &cno existe!"
+  missing-argument: "&c¡Debes introducir un ajuste válido (setFinishTime o setWorld)!"
+  started-setup: "&aAhora estás editando la arena &e%arena%&a. Usa &b/tag finishSetup &auna vez que hayas acabado."
+  not-setting-up: "&c¡No estás editando ninguna arena!" # Sin placeholders - %arena% no sirve aquí.
+  finish-setup: "&aYa no estás editando la arena &e%arena%&a."
+  # %number% - El número que no es válido.
+  invalid-number: "&b%number% &cno es un número válido."
+  # %time% - El nuevo tiempo de la arena.
+  changed-time: "&aCambiado el tiempo de fin de la arena &e%arena% &aa &e%time%&a."
+  # %number% - El número de pilladores.
+  changed-taggers-number: "&aCambiado el número de pilladores de la arena &e%arena% &aa &e%number%&a."
+  # %world% - El nuevo mundo de la arena.
+  set-world: "&aCambiado el mundo de la arena &e%arena% &aa &e%world%&a."
+
+  #Comando setLobby
+  lobby-set: "&aEl lobby ha sido establecido."
+
+  #Comandos join and leave
+  not-in-arena: "&cNo estás en una arena."
+  already-in-arena: "&cEstás en la arena &b%arena%&c. Salte de la arena para unirte a otra."
+  joined-arena: "&aTe has unido a la arena &e%arena%&a."
+  left-arena: "&cTe has salido de la arena &b%arena%&c."
+  arena-full: "&c¡La arena está llena!"
+  no-spawns: "&cEsta arena no tiene ningún spawn."
+
+  #Comando stop
+  stop-success: "&aLa arena &e%arena% &aha sido parada exitosamente."
+  arena-not-running: "&cLa arena &b%arena% &cno está en juego."
+
+# Mensajes enviados mientras que se configura una arena.
+# %arena% - El nombre de la arena.
+arenaSetup:
+  set-corner: "&7La esquina ha sido establecida."
+  add-spawn: "&aEl spawn ha sido añadido exitosamente."
+  remove-spawn: "&aEl spawn ha sido eliminado exitosamente."
+  block-is-spawn: "&cEste bloque ya es un spawn."
+  block-is-now-spawn: "&cEste bloque no es un spawn."
+
+# Mensajes enviados a los jugadores cuando están jugando.
+# Placeholders de la arena:
+# %prefix% - The plugin's prefix (from config.yml).
+# %arena% - The name of the arena.
+# %minPlayers% - The minimum number of players.
+# %maxPlayers% - The maximum number of players.
+# %taggersNumber% - The number of taggers.
+# %currentPlayers% - The number of players playing in this arena.
+# %mode% - The arena's mode (placeholders.arena-mode).
+# %time_mode% - The arena's time mode (placeholders.arena-time).
+# %finishTime% - The time until the game is ended (only if time_mode is limited).
+# %taggers% - Los pilladores.
+game:
+  # %player% - The player involved in the event.
+  in-game: "&c¡Esta arena está en medio de un juego!"
+  player-join: "&e%player% &ase ha unido al juego."
+  player-leave: "&b%player% &cse ha ido del juego."
+  game-join: "&aTe has unido a la arena &e%arena%"
+  game-leave: "&cTe has ido de la arena &b%arena%"
+  # %time% - El tiempo restante para empezar.
+  game-starting: "&6El juego comienza en &e%time% &6segundos."
+  selecting-tagger: "&6El pillador será elegido en &e%time% &6segundos."
+  not-enough-players: "&cEl juego ha sido parado porque no había suficiente jugadores."
+  # %player% - El nombre del jugador.
+  game-end: "&c¡El juego ha finalizado!"
+  lose: "&c¡Has perdido!"
+  win: "&a¡Has ganado!"
+
+  # %tagger% - La persona que ha pillado a alguien.
+  # %tagged% - La persona que ha sido pillada.
+  tagger-actionbar: "&c¡Eres el pillador!"
+  selected-tagger: "&c¡Eres el pillador!" # Al principio del juego, cuando el pillador es elegido.
+  # %taggers% - El nombre de los pilladores.
+  selected-tagger-announcement: "&c¡&b%taggers% &ces pillador!" # Al principio del juego, cuando UN pillador es elegido.
+  selected-taggers-announcement: "&c¡&b%taggers% &cson los pilladores!" # Al principio del juego, cuando VARIOS pilladores son elegidos.
+  victim-tagged: "&c¡Has sido pillado por &b%tagger%&c!"
+  tagger-tagged: "&a¡Has pillado a &e%tagged%&a!"
+  tagged-announcement: "&e%tagged% &6ha sido pillado por &e%attacker%&6!"
+
+# Para placeholders
+placeholders:
+  arena-time:
+    limited: "&cLIMITADO"
+    unlimited: "&aILIMITADO"
+
+  arena-mode:
+    hit: "&6Pega a jugadores"
+    timed-hit: "&6Golpes cronometrados"
+    tnt: "&eLanza TNT"
+    timed-tnt: "&eTNT cronometrado"
+
+  # Para el placeholder %finishGameCountdown%.
+  time:
+    unlimited: "&aIlimitado" # Si arena-time es unlimited.
+    waiting: "&cEsperando" # Si el tiempo todavía no ha empezado.
+
+# El formato de los carteles para unirse.
+# Placeholders de la arena + %finishGameCountdown% - El tiempo que falta hasta que se termine el juego.
+signs:
+  - "%prefix%"
+  - "%arena%"
+  - "&c%currentPlayers% &7/ &c%maxPlayers%"
+  - "&7%taggersNumber% pilladores"
+
+# Scoreboards.
+# Placeholders de la arena + %finishGameCountdown% - El tiempo que falta hasta que se termine el juego.
+scoreboards:
+  waiting: # Area de espera o juego inactivo
+    title: "%prefix%"
+    lines:
+      - "&aJugando en &e%arena%&a."
+      - "&7Jugadores: &c%currentPlayers% &7/ &c%maxPlayers%"
+      - ""
+      - "&7Tiempo: %time_mode%"
+      - "&7Modo: %mode%"
+      - ""
+      - "&cEsperanto a empezar..."
+
+  player: # Si el jugador no es un pillador.
+    title: "%prefix%"
+    lines:
+      - "&a¡Evita que te pillen!"
+      - "&cPilladores: &b%taggers%"
+      - ""
+      - "&6Faltan &e%finishGameCountdown% &6segundos."
+
+  tagger: # Si el jugador es un pillador.
+    title: "%prefix%"
+    lines:
+      - "&a¡Pilla a gente!"
+      - "&cPilladores: &b%taggers%"
+      - ""
+      - "&6Faltan &e%finishGameCountdown% &6segundos."

@@ -1,0 +1,46 @@
+main: me.lucaaa.tag.TagGame
+description: "Play tag in your Minecraft server!"
+name: "TagGame"
+version: 1.0
+softdepend: [PlaceholderAPI]
+author: Lucaaa
+prefix: TAG
+api-version: 1.16
+
+commands:
+  tag:
+    description: Main command.
+
+permissions:
+  tag.admin:
+    description: Admin permission - Allows everything
+    default: op
+    children:
+      tag.join: true
+      tag.stop: true
+      tag.setup: true
+      tag.createarema: true
+      tag.removearena: true
+      tag.setlobby: true
+      tag.reload: true
+  tag.join:
+    description: Permission to join an arena
+    default: op
+  tag.stop:
+    description: Permission to stop an arena that is running
+    default: op
+  tag.setup:
+    description: Permission to setup an arena
+    default: op
+  tag.createarena:
+    description: Permission to create an arena
+    default: op
+  tag.removeearena:
+    description: Permission to remove an arena
+    default: op
+  tag.setlobby:
+    description: Permission to set the main lobby
+    default: op
+  tag.reload:
+    description: Permission to reload the plugin
+    default: op

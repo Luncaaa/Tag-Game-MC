@@ -1,0 +1,157 @@
+commands:
+  # General
+  # %subcommand% - The mame of the subcommand. Example: /tag reload -> %command% will be "reload"
+  command-not-found: "&cThe command &b%subcommand% &cdoes not exist!"
+  # %subcommand% - The mame of the subcommand.
+  # %description% - The description.
+  # %usage% - How to use it.
+  # %minArguments% - The number of arguments that are needed to execute the command (does not include the subcommand).
+  command-usage: "&7Correct usage: &c%usage%"
+  use-help-command: "&cUse &b/tag help &cto see the list of existing commands"
+  not-enough-arguments: "&cYou need to enter more arguments to run this command!"
+  player-command-only: "&cOnly players can execute this command!"
+  no-permission: "&cYou don't have permission to execute this command!"
+
+  # Reload command
+  reload-successful: "&aThe configuration file has been reloaded successfully."
+
+  # createArena command
+  creation-success: "&aThe arena &e%arena% &ahas been created successfully."
+  creation-failure: "&cThe arena &b%arena% &calready exists!"
+
+  #removeArena command
+  removal-success: "&aThe arena &e%arena% &ahas been removed successfully."
+  removal-failure: "&cThe arena &b%arena% &cdoes not exist!"
+
+  #setup and finishSetup commands
+  arena-not-found: "&cThe arena &b%arena% &cdoes not exist!"
+  missing-argument: "&cYou need to enter a valid setting (setFinishTime or setWorld)!"
+  started-setup: "&aYou are now editing the arena &e%arena%&a. Use &b/tag finishSetup &aonce you have finished."
+  not-setting-up: "&cYou are not setting up any arena!" # No placeholders - %arena% does not work here.
+  finish-setup: "&aYou are no longer editing the arena &e%arena%&a."
+  # %number% - The number that is not valid.
+  invalid-number: "&b%number% &cis not a valid number."
+  # %time% - The new ending time of the arena.
+  changed-time: "&aChanged &e%arena%&a's ending time to &e%time%&a."
+  # %number% - The number of taggers.
+  changed-taggers-number: "&aChanged the number of taggers of the arena &e%arena% &ato &e%number%&a."
+  # %world% - The name of the arena's new world.
+  set-world: "&aChanged &e%arena%&a's world to &e%world%&a."
+
+  #setlobby command
+  lobby-set: "&aThe lobby has been set."
+
+  #join and leave commands
+  not-in-arena: "&cYou are not in an arena."
+  already-in-arena: "&cYou are in the arena &b%arena%&c. Exit the arena to join another."
+  joined-arena: "&aYou have joined the arena &e%arena%&a."
+  left-arena: "&cYou have left the arena &b%arena%&c."
+  arena-full: "&cThe arena is full!"
+  no-spawns: "&cThis arena does not have any spawn."
+
+  #stop command
+  stop-success: "&aThe arena &e%arena% &ahas been stopped successfully."
+  arena-not-running: "&cThe arena &b%arena% &cis not running."
+
+# Messages sent while setting up and arena.
+# %arena% - The name of the arena.
+arenaSetup:
+  set-corner: "&7The corner has been set."
+  add-spawn: "&aThe spawn has been successfully added."
+  remove-spawn: "&aThe spawn has been successfully removed."
+  block-is-spawn: "&cThis block is already a spawn."
+  block-is-not-spawn: "&cThis block is not a spawn."
+
+# Messages sent to the players while playing.
+# Arena placeholders:
+# %prefix% - The plugin's prefix (from config.yml).
+# %arena% - The name of the arena.
+# %minPlayers% - The minimum number of players.
+# %maxPlayers% - The maximum number of players.
+# %taggersNumber% - The number of taggers.
+# %currentPlayers% - The number of players playing in this arena.
+# %mode% - The arena's mode (placeholders.arena-mode).
+# %time_mode% - The arena's time mode (placeholders.arena-time).
+# %finishTime% - The time until the game is ended (only if time_mode is limited).
+# %taggers% - The taggers.
+game:
+  # %player% - The player involved in the event.
+  in-game: "&c¡This arena is in the middle of a game!"
+  player-join: "&e%player% &ahas joined the game."
+  player-leave: "&b%player% &chas left the game."
+  game-join: "&aYou have joined the arena &e%arena%"
+  game-leave: "&cYou have left the arena &b%arena%"
+  # %time% - The time left for the game to start.
+  game-starting: "&6The game is starting in &e%time% &6seconds."
+  selecting-tagger: "&6The tagger will be selected in &e%time% &6seconds."
+  not-enough-players: "&cThe game was stopped because there were not enough players."
+  # %player% - The name of the player.
+  game-end: "&cThe game has ended!"
+  lose: "&cYou have lost!"
+  win: "&aYou have won!"
+
+  # %tagger% - The person who tagged somebody.
+  # %tagged% - The person that was tagged.
+  tagger-actionbar: "&cYou are the tagger!"
+  selected-tagger: "&cYou are the tagger!" # At the beginning of the game, when the tagger is chosen.
+  # %taggers% - The name of the taggers.
+  selected-tagger-announcement: "&b%taggers% &cis the tagger!" # At the beginning of the game, when ONE tagger is chosen.
+  selected-taggers-announcement: "&b%taggers% &care the taggers!" # At the beginning of the game, when MULTIPLE taggers are chosen.
+  victim-tagged: "&cYou have been tagged by &b%tagger%&c!"
+  tagger-tagged: "&aYou have tagged &e%tagged%&a!"
+  tagged-announcement: "&e%tagged% &6has been tagged by &e%tagger%&6!"
+
+# For placeholders
+placeholders:
+  arena-time:
+    limited: "&cLIMITED"
+    unlimited: "&aUNLIMITED"
+
+  arena-mode:
+    hit: "&6Hit players"
+    timed-hit: "&6Timed hit"
+    tnt: "&eThrow TNT"
+    timed-tnt: "&eTimed TNT"
+
+  # For the %finishGameCountdown% placeholder.
+  time:
+    unlimited: "&aUnlimited" # If arena-time is unlimited.
+    waiting: "&cWaiting" # If the time hasn't started yet.
+
+# The format of the join signs.
+# Arena placeholders + %finishGameCountdown% - The time that is left until the game ends.
+signs:
+  - "%prefix%"
+  - "%arena%"
+  - "&c%currentPlayers% &7/ &c%maxPlayers%"
+  - "&7%taggersNumber% taggers"
+
+# Scoreboards.
+# Arena placeholders + %finishGameCountdown% - The time that is left until the game ends.
+scoreboards:
+  waiting: # Waiting area or inactive game
+    title: "%prefix%"
+    lines:
+      - "&aPlaying in &e%arena%&a."
+      - "&7Players: &c%currentPlayers% &7/ &c%maxPlayers%"
+      - ""
+      - "&7Time: %time_mode%"
+      - "&7Mode: %mode%"
+      - ""
+      - "&cWaiting to start..."
+
+  player: # If the player is nit tagger.
+    title: "%prefix%"
+    lines:
+      - "&a¡Avoid being tagged!"
+      - "&cTaggers: &b%taggers%"
+      - ""
+      - "&e%finishGameCountdown% &6seconds are left."
+
+  tagger: # If the player is a tagger,
+    title: "%prefix%"
+    lines:
+      - "&a¡Tag people!"
+      - "&cTaggers: &b%taggers%"
+      - ""
+      - "&e%finishGameCountdown% &6seconds are left."
