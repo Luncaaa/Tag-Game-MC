@@ -48,11 +48,11 @@ public class TagGame extends JavaPlugin {
         databaseManager = new DatabaseManager(mainConfig.getConfig().getBoolean("database.use-mysql"));
         messagesManager = new MessagesManager(langConfig.getConfig());
         signsManager = new SignsManager();
-        if (playersManager != null) playersManager.removeEveryone();
-        playersManager = new PlayersManager();
         itemsManager = new ItemsManager(mainConfig);
         if (arenasManager != null) arenasManager.stopAllArenas();
         arenasManager = new ArenasManager(plugin);
+        if (playersManager != null) playersManager.removeEveryone();
+        playersManager = new PlayersManager();
     }
 
     // If the config files do not exist, create them.
@@ -104,8 +104,9 @@ public class TagGame extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
 
         // Registers the main command and adds tab completions.
-        Objects.requireNonNull(this.getCommand("tag")).setExecutor(new MainCommand());
-        Objects.requireNonNull(this.getCommand("tag")).setTabCompleter(new MainCommand());
+        MainCommand commandHandler = new MainCommand();
+        Objects.requireNonNull(this.getCommand("tag")).setExecutor(commandHandler);
+        Objects.requireNonNull(this.getCommand("tag")).setTabCompleter(commandHandler);
 
         Logger.log(Level.INFO, "The plugin has been enabled.");
     }
