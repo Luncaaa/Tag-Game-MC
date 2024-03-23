@@ -65,5 +65,6 @@ body:
       label: Plugin version
       options:
         - "1.0"
+        - "1.1"
     validations:
       required: true
