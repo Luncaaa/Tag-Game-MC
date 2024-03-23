@@ -26,7 +26,7 @@ public class PlayerDamageListener implements Listener {
 
         event.setCancelled(true);
 
-        if ((event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) return;
+        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK && event.getCause() != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION && event.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION) return;
         if (!(event.getDamager() instanceof Player) && !(event.getDamager() instanceof TNTPrimed)) return;
 
         Arena arena = victimData.arena;
@@ -52,6 +52,8 @@ public class PlayerDamageListener implements Listener {
 
             arena.setTagger(TagGame.playersManager.getPlayerData(tagTNT.getPersistentDataContainer().get(new NamespacedKey(TagGame.getPlugin(), "PLAYER"), PersistentDataType.STRING)), victimData);
         }
+
+        victim.setVelocity(event.getDamager().getLocation().getDirection().multiply(TagGame.mainConfig.getConfig().getDouble("knockback")).setY(TagGame.mainConfig.getConfig().getDouble("height")));
     }
 
     @EventHandler

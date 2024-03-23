@@ -30,6 +30,12 @@ prevent-damage: true
 # PREVENT - The move event will be canceled (the player won't be able to leave).
 borders-leave: PREVENT
 
+# The knock back that tagging a player will produce. 0 will disable it.
+# The "height" setting controls how high the player will be pushed.
+# This is useful so that a player has enough time to run after tagging someone.
+knockback: 2.0
+height: 0.5
+
 # Commands that will be run when the game ends.
 # %player% - The player
 commands-on-end:
