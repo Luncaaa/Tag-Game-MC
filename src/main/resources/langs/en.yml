@@ -76,7 +76,7 @@ arenaSetup:
 # %taggers% - The taggers.
 game:
   # %player% - The player involved in the event.
-  in-game: "&c¡This arena is in the middle of a game!"
+  in-game: "&cThis arena is in the middle of a game!"
   player-join: "&e%player% &ahas joined the game."
   player-leave: "&b%player% &chas left the game."
   game-join: "&aYou have joined the arena &e%arena%"
@@ -143,7 +143,7 @@ scoreboards:
   player: # If the player is nit tagger.
     title: "%prefix%"
     lines:
-      - "&a¡Avoid being tagged!"
+      - "&aAvoid being tagged!"
       - "&cTaggers: &b%taggers%"
       - ""
       - "&e%finishGameCountdown% &6seconds are left."
@@ -151,7 +151,7 @@ scoreboards:
   tagger: # If the player is a tagger,
     title: "%prefix%"
     lines:
-      - "&a¡Tag people!"
+      - "&aTag people!"
       - "&cTaggers: &b%taggers%"
       - ""
       - "&e%finishGameCountdown% &6seconds are left."
