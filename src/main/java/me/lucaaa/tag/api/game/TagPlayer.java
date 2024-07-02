@@ -2,6 +2,7 @@ package me.lucaaa.tag.api.game;
 
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("unused")
 public interface TagPlayer {
     /**
      * Gets the Spigot player.

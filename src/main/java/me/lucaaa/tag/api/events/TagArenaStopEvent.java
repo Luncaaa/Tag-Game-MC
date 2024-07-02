@@ -7,6 +7,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /** Called when an arena stops. */
+@SuppressWarnings("unused")
 public class TagArenaStopEvent extends Event {
     private final TagArena arena;
     private final StopCause cause;

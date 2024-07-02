@@ -10,13 +10,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class PlayerMoveListener implements Listener {
+    private final TagGame plugin;
+
+    public PlayerMoveListener(TagGame plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        PlayerData playerData = TagGame.playersManager.getPlayerData(event.getPlayer().getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(event.getPlayer().getName());
         if (!playerData.isInArena()) return;
 
         Arena arena = playerData.arena;
-        AreaLeaveActions action = AreaLeaveActions.valueOf(TagGame.mainConfig.getConfig().getString("borders-leave"));
+        AreaLeaveActions action = AreaLeaveActions.valueOf(plugin.getMainConfig().getConfig().getString("borders-leave"));
         if (action == AreaLeaveActions.NOTHING) return;
 
         double highX;

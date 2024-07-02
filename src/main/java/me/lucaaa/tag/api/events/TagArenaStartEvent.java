@@ -6,6 +6,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /** Called when an arena starts (tagger countdown starts) */
+@SuppressWarnings("unused")
 public class TagArenaStartEvent extends Event {
     private final TagArena arena;
     private static final HandlerList handlerList = new HandlerList();

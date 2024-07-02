@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class JoinSubCommand extends SubCommandsFormat {
-    public JoinSubCommand() {
+    public JoinSubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "join";
         this.description = "Join an arena.";
         this.usage = "/tag join [arena]";
@@ -20,26 +21,26 @@ public class JoinSubCommand extends SubCommandsFormat {
 
     @Override
     public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
-        return new ArrayList<>(TagGame.arenasManager.arenas.keySet().stream().toList());
+        return new ArrayList<>(plugin.getArenasManager().arenas.keySet().stream().toList());
     }
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
-        if (TagGame.playersManager.getPlayerData(sender.getName()).arena != null) {
+        if (plugin.getPlayersManager().getPlayerData(sender.getName()).arena != null) {
             HashMap<String, String> placeholders = new HashMap<>();
-            placeholders.put("%arena%", TagGame.playersManager.getPlayerData(sender.getName()).arena.getName());
-            sender.sendMessage(TagGame.messagesManager.getMessage("commands.already-in-arena", placeholders, sender));
+            placeholders.put("%arena%", plugin.getPlayersManager().getPlayerData(sender.getName()).arena.getName());
+            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.already-in-arena", placeholders, sender));
             return;
         }
 
         HashMap<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
-        if (TagGame.arenasManager.arenas.get(args[1]) == null) {
-            sender.sendMessage(TagGame.messagesManager.getMessage("commands.arena-not-found", placeholders, sender));
+        if (plugin.getArenasManager().arenas.get(args[1]) == null) {
+            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.arena-not-found", placeholders, sender));
             return;
         }
 
-        TagGame.arenasManager.arenas.get(args[1]).playerJoin((Player) sender);
+        plugin.getArenasManager().arenas.get(args[1]).playerJoin((Player) sender);
     }
 }

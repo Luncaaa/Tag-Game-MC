@@ -10,9 +10,10 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Called when a player is tagged. <br>
+ * Called when a player is tagged.
  * WARNING! It Does not include initial taggers (selected when the game starts)
  */
+@SuppressWarnings("unused")
 public class TagPlayerTaggedEvent extends Event implements Cancellable {
     private final PlayerData tagged;
     private final PlayerData tagger;

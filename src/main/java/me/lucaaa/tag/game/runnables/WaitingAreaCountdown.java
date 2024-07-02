@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class WaitingAreaCountdown {
+    private final TagGame plugin;
     private final Arena arena;
     private final ArrayList<PlayerData> playersList;
     private final ArrayList<Location> spawnsList;
@@ -19,7 +20,8 @@ public class WaitingAreaCountdown {
     private final HashMap<String, String> placeholders;
     private final Random random = new Random();
 
-    public WaitingAreaCountdown(Arena arena, ArrayList<PlayerData> playersList, ArrayList<Location> spawnsList) {
+    public WaitingAreaCountdown(TagGame plugin, Arena arena, ArrayList<PlayerData> playersList, ArrayList<Location> spawnsList) {
+        this.plugin = plugin;
         this.arena = arena;
         this.playersList = playersList;
         this.spawnsList = spawnsList;
@@ -38,7 +40,7 @@ public class WaitingAreaCountdown {
                 if (countdown == 15 || countdown == 10 || (countdown <= 5 && countdown >= 1)) {
                     placeholders.put("%time%", String.valueOf(countdown));
                     for (PlayerData playerData : playersList) {
-                        playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.game-starting", placeholders, playerData.getPlayer()));
+                        playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.game-starting", placeholders, playerData.getPlayer()));
                     }
                 }
 
@@ -53,7 +55,7 @@ public class WaitingAreaCountdown {
                 }
                 countdown--;
             }
-        }.runTaskTimer(TagGame.getPlugin(), 0L, 20L);
+        }.runTaskTimer(plugin, 0L, 20L);
     }
 
     public void stop() {

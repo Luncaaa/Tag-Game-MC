@@ -1,114 +1,121 @@
 package me.lucaaa.tag;
 
+import me.lucaaa.tag.api.TagAPI;
 import me.lucaaa.tag.commands.MainCommand;
-import me.lucaaa.tag.commands.subCommands.SubCommandsFormat;
 import me.lucaaa.tag.listeners.*;
 import me.lucaaa.tag.managers.*;
 import me.lucaaa.tag.utils.Logger;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.logging.Level;
 
 public class TagGame extends JavaPlugin {
-    // An instance of the plugin.
-    private static Plugin plugin;
-    private static boolean isPAPIInstalled = false;
+    private boolean isPAPIInstalled = false;
 
-    // Subcommands for the HelpSubCommand class.
-    public static HashMap<String, SubCommandsFormat> subCommands = MainCommand.subCommands;
-
-    // Config & lang file.
-    public static ConfigManager mainConfig;
-    private static ConfigManager langConfig;
+    // Config file.
+    private ConfigManager mainConfig;
 
     // Managers.
-    public static DatabaseManager databaseManager;
-    public static MessagesManager messagesManager;
-    public static SignsManager signsManager;
-    public static PlayersManager playersManager;
-    public static ItemsManager itemsManager;
-    public static ArenasManager arenasManager;
+    private DatabaseManager databaseManager;
+    private MessagesManager messagesManager;
+    private SignsManager signsManager;
+    private PlayersManager playersManager;
+    private ItemsManager itemsManager;
+    private ArenasManager arenasManager;
 
     // Reload the config files.
-    public static void reloadConfigs() throws SQLException, IOException {
+    public void reloadConfigs() throws SQLException, IOException {
         // Creates the config and lang files.
         createConfigs();
-        mainConfig = new ConfigManager(plugin, "config.yml");
+        mainConfig = new ConfigManager(this, "config.yml");
 
         // Loads the lang file the user wants.
-        langConfig = new ConfigManager(plugin, "langs" + File.separator + mainConfig.getConfig().getString("language"));
+        ConfigManager langConfig = new ConfigManager(this, "langs" + File.separator + mainConfig.getConfig().getString("language"));
 
         // Managers
-        databaseManager = new DatabaseManager(mainConfig.getConfig().getBoolean("database.use-mysql"));
-        messagesManager = new MessagesManager(langConfig.getConfig());
+        databaseManager = new DatabaseManager(this, mainConfig.getConfig().getBoolean("database.use-mysql"));
+        messagesManager = new MessagesManager(langConfig.getConfig(), mainConfig.getConfig().getString("prefix"), this.isPAPIInstalled);
         signsManager = new SignsManager();
-        itemsManager = new ItemsManager(mainConfig);
+        itemsManager = new ItemsManager(this, mainConfig);
         if (arenasManager != null) arenasManager.stopAllArenas();
-        arenasManager = new ArenasManager(plugin);
+        arenasManager = new ArenasManager(this);
         if (playersManager != null) playersManager.removeEveryone();
-        playersManager = new PlayersManager();
+        playersManager = new PlayersManager(this);
     }
 
     // If the config files do not exist, create them.
-    private static void createConfigs() {
-        if (!new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "config.yml").exists())
-            plugin.saveResource("config.yml", false);
-        if (!new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "langs" + File.separator + "en.yml").exists())
-            plugin.saveResource("langs" + File.separator + "en.yml", false);
-        if (!new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "langs" + File.separator + "es.yml").exists())
-            plugin.saveResource("langs" + File.separator + "es.yml", false);
-    }
-
-    // Gets the plugin.
-    public static Plugin getPlugin() {
-        return plugin;
-    }
-
-    // Returns true if PAPI is installed
-    public static boolean isPAPIInstalled() {
-        return isPAPIInstalled;
+    private void createConfigs() {
+        if (!new File(getDataFolder().getAbsolutePath() + File.separator + "config.yml").exists())
+            saveResource("config.yml", false);
+        if (!new File(getDataFolder().getAbsolutePath() + File.separator + "langs" + File.separator + "en.yml").exists())
+            saveResource("langs" + File.separator + "en.yml", false);
+        if (!new File(getDataFolder().getAbsolutePath() + File.separator + "langs" + File.separator + "es.yml").exists())
+            saveResource("langs" + File.separator + "es.yml", false);
     }
 
     @Override
     public void onEnable() {
-        plugin = this;
+        // If PAPI is installed, register the placeholders.
+        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            isPAPIInstalled = true;
+            new PlaceholdersManager(this).register();
+        }
 
         // Set up files and managers.
         try {
             reloadConfigs();
         } catch (SQLException | IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
-        // If PAPI is installed, register the placeholders.
-        if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            isPAPIInstalled = true;
-            new PlaceholdersManager().register();
-        }
+        // Look for updates.
+        new UpdateManager(this).getVersion(v -> {
+            String[] spigotVerDivided = v.split("\\.");
+            double spigotVerMajor = Double.parseDouble(spigotVerDivided[0] + "." + spigotVerDivided[1]);
+            double spigotVerMinor = (spigotVerDivided.length > 2) ? Integer.parseInt(spigotVerDivided[2]) : 0;
+
+            String[] pluginVerDivided = getDescription().getVersion().split("\\.");
+            double pluginVerMajor = Double.parseDouble(pluginVerDivided[0] + "." + pluginVerDivided[1]);
+            double pluginVerMinor = (pluginVerDivided.length > 2) ? Integer.parseInt(pluginVerDivided[2]) : 0;
+
+            if (spigotVerMajor == pluginVerMajor && spigotVerMinor == pluginVerMinor) {
+                Bukkit.getConsoleSender().sendMessage(messagesManager.getColoredMessage("&aThe plugin is up to date! &7(v" + getDescription().getVersion() + ")", true));
+
+            } else if (spigotVerMajor > pluginVerMajor || (spigotVerMajor == pluginVerMajor && spigotVerMinor > pluginVerMinor)) {
+                Bukkit.getConsoleSender().sendMessage(messagesManager.getColoredMessage("&6There's a new update available on Spigot! &c" + getDescription().getVersion() + " &7-> &a" + v, true));
+                Bukkit.getConsoleSender().sendMessage(messagesManager.getColoredMessage("&6Download it at &7https://www.spigotmc.org/resources/advanceddisplays.110865/", true));
+
+            } else {
+                Bukkit.getConsoleSender().sendMessage(messagesManager.getColoredMessage("&6Your plugin version is newer than the Spigot version! &a" + getDescription().getVersion() + " &7-> &c" + v, true));
+                Bukkit.getConsoleSender().sendMessage(messagesManager.getColoredMessage("&6There may be bugs and/or untested features!", true));
+            }
+        });
 
         // Register events.
-        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
-        getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
-        getServer().getPluginManager().registerEvents(new RightClickListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerMoveListener(), this);
-        getServer().getPluginManager().registerEvents(new SignChangeListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerDamageListener(), this);
-        getServer().getPluginManager().registerEvents(new EntityExplodeListener(), this);
-        getServer().getPluginManager().registerEvents(new InventoryListener(), this);
+        getServer().getPluginManager().registerEvents(new InventoryListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(this), this);
+        getServer().getPluginManager().registerEvents(new BlockBreakListener(this), this);
+        getServer().getPluginManager().registerEvents(new RightClickListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerMoveListener(this), this);
+        getServer().getPluginManager().registerEvents(new SignChangeListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDamageListener(this), this);
+        getServer().getPluginManager().registerEvents(new EntityExplodeListener(this), this);
 
         // Registers the main command and adds tab completions.
-        MainCommand commandHandler = new MainCommand();
+        MainCommand commandHandler = new MainCommand(this);
         Objects.requireNonNull(this.getCommand("tag")).setExecutor(commandHandler);
         Objects.requireNonNull(this.getCommand("tag")).setTabCompleter(commandHandler);
 
-        Logger.log(Level.INFO, "The plugin has been enabled.");
+        // Enables the API.
+        TagAPI.setPlugin(this);
+
+        Bukkit.getConsoleSender().sendMessage(messagesManager.getColoredMessage("&aThe plugin has been successfully enabled! &7Version: " + this.getDescription().getVersion(), true));
     }
 
     @Override
@@ -119,5 +126,33 @@ public class TagGame extends JavaPlugin {
         playersManager.removeEveryone();
 
         Logger.log(Level.INFO, "The plugin has been disabled.");
+    }
+
+    public ConfigManager getMainConfig() {
+        return this.mainConfig;
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return this.databaseManager;
+    }
+
+    public MessagesManager getMessagesManager() {
+        return this.messagesManager;
+    }
+
+    public SignsManager getSignsManager() {
+        return this.signsManager;
+    }
+
+    public PlayersManager getPlayersManager() {
+        return this.playersManager;
+    }
+
+    public ItemsManager getItemsManager() {
+        return this.itemsManager;
+    }
+
+    public ArenasManager getArenasManager() {
+        return this.arenasManager;
     }
 }

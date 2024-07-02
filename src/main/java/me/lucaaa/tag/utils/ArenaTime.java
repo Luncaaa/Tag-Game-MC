@@ -1,17 +1,16 @@
 package me.lucaaa.tag.utils;
 
-import me.lucaaa.tag.TagGame;
-
 public enum ArenaTime {
-    LIMITED(TagGame.messagesManager.getMessage("placeholders.arena-time.limited", null, null, false)), UNLIMITED(TagGame.messagesManager.getMessage("placeholders.arena-time.unlimited", null, null, false));
+    LIMITED("placeholders.arena-time.limited"),
+    UNLIMITED("placeholders.arena-time.unlimited");
 
-    private final String customName;
+    private final String customNameKey;
 
-    ArenaTime(String customName) {
-        this.customName = customName;
+    ArenaTime(String customNameKey) {
+        this.customNameKey = customNameKey;
     }
 
-    public String getCustomName() {
-        return this.customName;
+    public String getCustomNameKey() {
+        return this.customNameKey;
     }
 }

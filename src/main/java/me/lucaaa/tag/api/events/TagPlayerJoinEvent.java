@@ -9,6 +9,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /** Called when a player joins an arena. */
+@SuppressWarnings("unused")
 public class TagPlayerJoinEvent extends Event implements Cancellable {
     private final TagPlayer player;
     private final TagArena arena;

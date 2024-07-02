@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class ReloadSubCommand extends SubCommandsFormat {
-    public ReloadSubCommand() {
+    public ReloadSubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "reload";
         this.description = "Reloads the plugin's configuration files.";
         this.usage = "/tag reload";
@@ -19,10 +20,10 @@ public class ReloadSubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         try {
-            TagGame.reloadConfigs();
+            plugin.reloadConfigs();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        sender.sendMessage(TagGame.messagesManager.getMessage("commands.reload-successful", null, sender));
+        sender.sendMessage(plugin.getMessagesManager().getMessage("commands.reload-successful", null, sender));
     }
 }

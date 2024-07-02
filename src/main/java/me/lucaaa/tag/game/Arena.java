@@ -33,6 +33,8 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class Arena implements TagArena {
+    private final TagGame plugin;
+    
     private final String name;
     private final HashMap<String, String> placeholders;
     private final YamlConfiguration arenaConfig;
@@ -66,11 +68,13 @@ public class Arena implements TagArena {
     private final WaitingAreaCountdown waitingAreaCountdown;
     private final SelectTaggerCountdown selectTaggerCountdown;
     private final FinishGameCountdown finishGameCountdown;
-    private final ActionBarRunnable actionBarRunnable = new ActionBarRunnable();
+    private final ActionBarRunnable actionBarRunnable;
 
     private boolean isRunning = false;
 
-    public Arena(String name, ConfigManager arenaConfig) {
+    public Arena(TagGame plugin, String name, ConfigManager arenaConfig) {
+        this.plugin = plugin;
+        
         this.name = name;
         this.arenaConfig = arenaConfig.getConfig();
         this.arenaFile = arenaConfig.getFile();
@@ -112,9 +116,10 @@ public class Arena implements TagArena {
             this.arenaAreaSpawns.add(new Location(this.getWorld(), Double.parseDouble(coordParts[0]), Double.parseDouble(coordParts[1]), Double.parseDouble(coordParts[2])));
         }
 
-        this.waitingAreaCountdown = new WaitingAreaCountdown(this, this.playersList, this.arenaAreaSpawns);
-        this.selectTaggerCountdown = new SelectTaggerCountdown(this, this.playersList);
-        this.finishGameCountdown = new FinishGameCountdown(this);
+        this.waitingAreaCountdown = new WaitingAreaCountdown(plugin, this, this.playersList, this.arenaAreaSpawns);
+        this.selectTaggerCountdown = new SelectTaggerCountdown(plugin, this, this.playersList);
+        this.finishGameCountdown = new FinishGameCountdown(plugin, this);
+        this.actionBarRunnable = new ActionBarRunnable(plugin);
 
         this.placeholders = this.getPlaceholders();
         //this.updateSigns()
@@ -128,15 +133,15 @@ public class Arena implements TagArena {
     public HashMap<String, String> getPlaceholders() {
         String finishTime;
         if (this.arenaTime == ArenaTime.UNLIMITED) finishTime = String.valueOf(this.timeBeforeEnding);
-        else finishTime = this.arenaTime.getCustomName();
+        else finishTime = plugin.getMessagesManager().getMessage(this.arenaTime.getCustomNameKey(), null, null, false, false);
 
         String timeLeft;
         if (this.arenaTime == ArenaTime.UNLIMITED) {
-            timeLeft = TagGame.messagesManager.getMessage("placeholders.time.unlimited", null, null, false);
+            timeLeft = plugin.getMessagesManager().getMessage("placeholders.time.unlimited", null, null, false, false);
         } else {
             // (this.finishGameCountdown != null) -> false when the getPlaceholders() function is called from the constructor.
             if (this.finishGameCountdown != null && this.finishGameCountdown.isRunning()) timeLeft = String.valueOf(this.finishGameCountdown.getTimeLeft());
-            else timeLeft = TagGame.messagesManager.getMessage("placeholders.time.waiting", null, null, false);
+            else timeLeft = plugin.getMessagesManager().getMessage("placeholders.time.waiting", null, null, false, false);
         }
 
         HashMap<String, String> placeholders = new HashMap<>();
@@ -145,8 +150,8 @@ public class Arena implements TagArena {
         placeholders.put("%maxPlayers%", String.valueOf(this.maxPlayers));
         placeholders.put("%taggersNumber%", String.valueOf(this.taggersNumber));
         placeholders.put("%currentPlayers%", String.valueOf(this.playersList.size()));
-        placeholders.put("%time_mode%", this.arenaTime.getCustomName());
-        placeholders.put("%mode%", this.arenaMode.getCustomName());
+        placeholders.put("%time_mode%", plugin.getMessagesManager().getMessage(this.arenaTime.getCustomNameKey(), null, null, false, false));
+        placeholders.put("%mode%", plugin.getMessagesManager().getMessage(this.arenaMode.getCustomNameKey(), null, null, false, false));
         placeholders.put("%finishTime%", String.valueOf(finishTime));
         placeholders.put("%taggers%", this.taggers.stream().map(it -> it.getPlayer().getName()).collect(Collectors.joining(", ")));
         placeholders.put("%finishGameCountdown%", timeLeft);
@@ -157,13 +162,13 @@ public class Arena implements TagArena {
     // -[ Signs ]-
     public void addSign(Location location) {
         this.signs.add(location);
-        TagGame.signsManager.addSign(location, this.name);
+        plugin.getSignsManager().addSign(location, this.name);
         this.updateConfigSigns();
     }
 
     public void removeSign(Location location) {
         this.signs.remove(location);
-        TagGame.signsManager.removeSign(location);
+        plugin.getSignsManager().removeSign(location);
         this.updateConfigSigns();
     }
 
@@ -183,7 +188,7 @@ public class Arena implements TagArena {
                 continue;
             }
             for (int index = 0; index < sign.getLines().length; index++) {
-                sign.setLine(index, TagGame.messagesManager.getMessageFromList("signs", index, this.getPlaceholders(), null));
+                sign.setLine(index, plugin.getMessagesManager().getMessageFromList("signs", index, this.getPlaceholders(), null));
             }
             sign.update();
         }
@@ -431,7 +436,7 @@ public class Arena implements TagArena {
             arenaTimeItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        arenaTimeItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "Arena time: "+this.arenaTime.getCustomName()));
+        arenaTimeItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "Arena time: " + plugin.getMessagesManager().getMessage(this.arenaTime.getCustomNameKey(), null, null, false, false)));
         arenaTimeItemMeta.setLore(Arrays.asList("If the time is limited, after x time the tagger will lose.", "If the time is unlimited, the game will never end.", "", "Note: The game can end before time if a player", "leaves and there are not enough players."));
         arenaTimeItem.setItemMeta(arenaTimeItemMeta);
 
@@ -461,7 +466,7 @@ public class Arena implements TagArena {
             arenaModeItemMeta.addEnchant(Enchantment.MENDING, 1 , false);
             arenaModeItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
-        arenaModeItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "Arena mode: "+this.arenaMode.getCustomName()));
+        arenaModeItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "Arena mode: " + plugin.getMessagesManager().getMessage(this.arenaMode.getCustomNameKey(), null, null, false, false)));
         arenaModeItemMeta.setLore(Arrays.asList("If the mode is hit, players will have to attack to tag", "If the mode is TNT, players will have to throw TNT to tag.", "If the mode is timed, the player who has been tagger for longer will lose.", "", "Note: Damage won't be dealt while in-game"));
         arenaModeItem.setItemMeta(arenaModeItemMeta);
 
@@ -473,13 +478,13 @@ public class Arena implements TagArena {
     @Override
     public void playerJoin(Player player) {
         if (this.playersList.size() >= this.maxPlayers) {
-            player.sendMessage(TagGame.messagesManager.getMessage("commands.arena-full", this.placeholders, player));
+            player.sendMessage(plugin.getMessagesManager().getMessage("commands.arena-full", this.placeholders, player));
             return;
         }
 
         if (this.isWaitingAreaEnabled()) {
             if (this.isRunning) {
-                player.sendMessage(TagGame.messagesManager.getMessage("game.in-game", this.placeholders, player));
+                player.sendMessage(plugin.getMessagesManager().getMessage("game.in-game", this.placeholders, player));
                 return;
             }
             if (!this.sendToWaitingArea(player)) return;
@@ -487,13 +492,13 @@ public class Arena implements TagArena {
             if (!this.sendToGame(player)) return;
         }
 
-        PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
         player.getInventory().clear();
 
-        ItemStack leaveItem = TagGame.itemsManager.getItem("leave-item");
+        ItemStack leaveItem = plugin.getItemsManager().getItem("leave-item");
         ItemMeta leaveItemMeta = leaveItem.getItemMeta();
         assert leaveItemMeta != null;
-        leaveItemMeta.getPersistentDataContainer().set(new NamespacedKey(TagGame.getPlugin(), "TAG"), PersistentDataType.STRING, "leave_item");
+        leaveItemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING, "leave_item");
         leaveItem.setItemMeta(leaveItemMeta);
         player.getInventory().setItem(8, leaveItem);
 
@@ -505,28 +510,28 @@ public class Arena implements TagArena {
 
         this.updateSigns();
         this.updateScoreboards();
-        player.sendMessage(TagGame.messagesManager.getMessage("commands.joined-arena", this.placeholders, player));
+        player.sendMessage(plugin.getMessagesManager().getMessage("commands.joined-arena", this.placeholders, player));
 
         HashMap<String, String> joinPlaceholders = new HashMap<>(this.placeholders);
         joinPlaceholders.put("%player%", player.getName());
         for (PlayerData playerDataInGame : this.playersList) {
-            if (playerDataInGame == TagGame.playersManager.getPlayerData(player.getName())) return;
-            playerDataInGame.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.player-join", joinPlaceholders, playerDataInGame.getPlayer()));
+            if (playerDataInGame == plugin.getPlayersManager().getPlayerData(player.getName())) return;
+            playerDataInGame.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.player-join", joinPlaceholders, playerDataInGame.getPlayer()));
         }
     }
 
     @Override
     public void playerLeave(Player player, boolean tp) {
-        PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
 
         if (tp) {
-            if (TagGame.mainConfig.getConfig().getBoolean("tp-to-lobby")) {
-                if (TagGame.mainConfig.getConfig().getLocation("lobby") == null) {
+            if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
+                if (plugin.getMainConfig().getConfig().getLocation("lobby") == null) {
                     Logger.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
                     player.teleport(playerData.getSavedLocation());
 
                 } else {
-                    player.teleport(Objects.requireNonNull(TagGame.mainConfig.getConfig().getLocation("lobby")));
+                    player.teleport(Objects.requireNonNull(plugin.getMainConfig().getConfig().getLocation("lobby")));
                 }
             }
             else player.teleport(playerData.getSavedLocation());
@@ -544,17 +549,17 @@ public class Arena implements TagArena {
         playerData.arena = null;
         playerData.tntThrowCooldown = 0L;
         player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
-        player.sendMessage(TagGame.messagesManager.getMessage("commands.left-arena", this.placeholders, player));
+        player.sendMessage(plugin.getMessagesManager().getMessage("commands.left-arena", this.placeholders, player));
 
         HashMap<String, String> leavePlaceholders = new HashMap<>(this.placeholders);
         leavePlaceholders.put("%player%", player.getName());
         for (PlayerData playerDataInGame : this.playersList) {
-            playerDataInGame.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.player-leave", leavePlaceholders, playerDataInGame.getPlayer()));
+            playerDataInGame.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.player-leave", leavePlaceholders, playerDataInGame.getPlayer()));
         }
 
         if (this.playersList.size() < this.minPlayers) {
             for (PlayerData playerDataInGame : this.playersList) {
-                playerDataInGame.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.not-enough-players", this.placeholders, playerDataInGame.getPlayer()));
+                playerDataInGame.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.not-enough-players", this.placeholders, playerDataInGame.getPlayer()));
             }
 
             if (this.isWaitingAreaEnabled()) {
@@ -565,7 +570,7 @@ public class Arena implements TagArena {
                 if (this.selectTaggerCountdown.isRunning()) this.selectTaggerCountdown.stop();
                 if (this.isRunning) {
                     this.isRunning = false;
-                    if (this.taggers.size() != 0) this.taggers.forEach(it -> {
+                    if (!this.taggers.isEmpty()) this.taggers.forEach(it -> {
                         it.getPlayer().getInventory().setArmorContents(null);
                         it.getPlayer().getInventory().setItem(0, new ItemStack(Material.AIR));
                     });
@@ -596,9 +601,9 @@ public class Arena implements TagArena {
 
     // Sends the player to the waiting lobby. Once there are enough players, the game will start.
     private boolean sendToWaitingArea(Player player) {
-        PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
-        if (this.waitingAreaSpawns.size() == 0) {
-            player.sendMessage(TagGame.messagesManager.getMessage("commands.no-spawns", this.placeholders, player));
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        if (this.waitingAreaSpawns.isEmpty()) {
+            player.sendMessage(plugin.getMessagesManager().getMessage("commands.no-spawns", this.placeholders, player));
             return false;
         }
 
@@ -626,9 +631,9 @@ public class Arena implements TagArena {
 
     // Sends the player to the arena if the waiting area is disabled.
     private boolean sendToGame(Player player) {
-        PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
-        if (this.arenaAreaSpawns.size() == 0) {
-            player.sendMessage(TagGame.messagesManager.getMessage("commands.no-spawns", this.placeholders, player));
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        if (this.arenaAreaSpawns.isEmpty()) {
+            player.sendMessage(plugin.getMessagesManager().getMessage("commands.no-spawns", this.placeholders, player));
             return false;
         }
 
@@ -687,13 +692,13 @@ public class Arena implements TagArena {
 
         if (cause == StopCause.RELOAD) {
             for (PlayerData playerData : this.playersList) {
-                if (TagGame.mainConfig.getConfig().getBoolean("tp-to-lobby")) {
-                    if (TagGame.mainConfig.getConfig().getLocation("lobby") == null) {
+                if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
+                    if (plugin.getMainConfig().getConfig().getLocation("lobby") == null) {
                         Logger.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
                         playerData.getPlayer().teleport(playerData.getSavedLocation());
 
                     } else {
-                        playerData.getPlayer().teleport(Objects.requireNonNull(TagGame.mainConfig.getConfig().getLocation("lobby")));
+                        playerData.getPlayer().teleport(Objects.requireNonNull(plugin.getMainConfig().getConfig().getLocation("lobby")));
                     }
                 }
                 else playerData.getPlayer().teleport(playerData.getSavedLocation());
@@ -708,7 +713,7 @@ public class Arena implements TagArena {
             return;
         }
 
-        ConfigurationSection commandsOnEnd = TagGame.mainConfig.getConfig().getConfigurationSection("commands-on-end");
+        ConfigurationSection commandsOnEnd = plugin.getMainConfig().getConfig().getConfigurationSection("commands-on-end");
         assert commandsOnEnd != null;
         ConsoleCommandSender consoleSender = Bukkit.getConsoleSender();
 
@@ -743,13 +748,13 @@ public class Arena implements TagArena {
             HashMap<String, String> playerPlaceholders = new HashMap<>(this.placeholders);
             playerPlaceholders.put("%player%", playerData.getPlayer().getName());
 
-            if (TagGame.mainConfig.getConfig().getBoolean("tp-to-lobby")) {
-                if (TagGame.mainConfig.getConfig().getLocation("lobby") == null) {
+            if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
+                if (plugin.getMainConfig().getConfig().getLocation("lobby") == null) {
                     Logger.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
                     playerData.getPlayer().teleport(playerData.getSavedLocation());
 
                 } else {
-                    playerData.getPlayer().teleport(Objects.requireNonNull(TagGame.mainConfig.getConfig().getLocation("lobby")));
+                    playerData.getPlayer().teleport(Objects.requireNonNull(plugin.getMainConfig().getConfig().getLocation("lobby")));
                 }
             }
             else playerData.getPlayer().teleport(playerData.getSavedLocation());
@@ -757,7 +762,7 @@ public class Arena implements TagArena {
             playerData.restoreSavedData();
             playerData.arena = null;
             playerData.getPlayer().setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
-            playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.game-end", playerPlaceholders, playerData.getPlayer()));
+            playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.game-end", playerPlaceholders, playerData.getPlayer()));
 
             if (losers.contains(playerData)) {
                 playerData.updateTimesLost(1);
@@ -766,7 +771,7 @@ public class Arena implements TagArena {
                         Bukkit.dispatchCommand(consoleSender, ChatColor.translateAlternateColorCodes('&', command.replace("%player%", playerData.getPlayer().getName())));
                     }
                 }
-                playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.lose", playerPlaceholders, playerData.getPlayer()));
+                playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.lose", playerPlaceholders, playerData.getPlayer()));
             } else {
                 playerData.updateTimesWon(1);
                 if (runCommands) {
@@ -774,7 +779,7 @@ public class Arena implements TagArena {
                         Bukkit.dispatchCommand(consoleSender, ChatColor.translateAlternateColorCodes('&', command.replace("%player%", playerData.getPlayer().getName())));
                     }
                 }
-                playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.win", playerPlaceholders, playerData.getPlayer()));
+                playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.win", playerPlaceholders, playerData.getPlayer()));
             }
         }
 
@@ -803,13 +808,13 @@ public class Arena implements TagArena {
             this.taggers.add(tagger);
             tagger.giveTaggerInventory();
             tagger.startTaggerTime = System.currentTimeMillis();
-            tagger.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.selected-tagger", taggersPlaceholders, tagger.getPlayer()));
+            tagger.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selected-tagger", taggersPlaceholders, tagger.getPlayer()));
         }
 
         for (PlayerData playerData : this.playersList) {
             if (this.taggers.contains(playerData)) continue;
-            if (this.taggersNumber > 1) playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.selected-taggers-announcement", taggersPlaceholders, playerData.getPlayer()));
-            else playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.selected-tagger-announcement", taggersPlaceholders, playerData.getPlayer()));
+            if (this.taggersNumber > 1) playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selected-taggers-announcement", taggersPlaceholders, playerData.getPlayer()));
+            else playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selected-tagger-announcement", taggersPlaceholders, playerData.getPlayer()));
         }
         this.updateSigns();
         this.updateScoreboards();
@@ -841,11 +846,11 @@ public class Arena implements TagArena {
         taggedPlaceholders.put("%tagger%", tagger.getPlayer().getName());
         tagger.getPlayer().getInventory().setArmorContents(null);
         tagger.getPlayer().getInventory().setItem(0, new ItemStack(Material.AIR));
-        tagger.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.tagger-tagged", taggedPlaceholders, tagger.getPlayer()));
-        tagged.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.victim-tagged", taggedPlaceholders, tagged.getPlayer()));
+        tagger.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.tagger-tagged", taggedPlaceholders, tagger.getPlayer()));
+        tagged.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.victim-tagged", taggedPlaceholders, tagged.getPlayer()));
         for (PlayerData playerData : this.playersList) {
             if (playerData == tagged || playerData == tagger) continue;
-            playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.tagged-announcement", taggedPlaceholders, playerData.getPlayer()));
+            playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.tagged-announcement", taggedPlaceholders, playerData.getPlayer()));
         }
 
         this.taggers.add(tagged);
@@ -862,7 +867,7 @@ public class Arena implements TagArena {
     }
 
     public void updateScoreboards() {
-        if (!TagGame.mainConfig.getConfig().getBoolean("enable-scoreboards")) return;
+        if (!plugin.getMainConfig().getConfig().getBoolean("enable-scoreboards")) return;
         if (this.isRunning) {
             for (PlayerData playerData : this.playersList) {
                 if (this.taggers.contains(playerData)) playerData.setScoreboard("tagger", this.getPlaceholders());
@@ -883,7 +888,7 @@ public class Arena implements TagArena {
         try {
             this.arenaConfig.save(this.arenaFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
     // ----------

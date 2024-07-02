@@ -14,24 +14,26 @@ import java.util.List;
 import java.util.Map;
 
 public class MainCommand implements CommandExecutor, TabCompleter {
-    public static final HashMap<String, SubCommandsFormat>  subCommands = new HashMap<>();
+    private final TagGame plugin;
+    private final HashMap<String, SubCommandsFormat> subCommands = new HashMap<>();
 
-    public MainCommand() {
-        subCommands.put("help", new HelpSubCommand());
-        subCommands.put("reload", new ReloadSubCommand());
-        subCommands.put("createArena", new CreateArenaSubCommand());
-        subCommands.put("removeArena", new RemoveArenaSubCommand());
-        subCommands.put("setup", new SetupSubCommand());
-        subCommands.put("finishSetup", new FinishSetupSubCommand());
-        subCommands.put("join", new JoinSubCommand());
-        subCommands.put("leave", new LeaveSubCommand());
-        subCommands.put("setLobby", new SetLobbySubCommand());
-        subCommands.put("stop", new StopArenaSubCommand());
+    public MainCommand(TagGame plugin) {
+        this.plugin = plugin;
+        subCommands.put("help", new HelpSubCommand(plugin, this.subCommands));
+        subCommands.put("reload", new ReloadSubCommand(plugin));
+        subCommands.put("createArena", new CreateArenaSubCommand(plugin));
+        subCommands.put("removeArena", new RemoveArenaSubCommand(plugin));
+        subCommands.put("setup", new SetupSubCommand(plugin));
+        subCommands.put("finishSetup", new FinishSetupSubCommand(plugin));
+        subCommands.put("join", new JoinSubCommand(plugin));
+        subCommands.put("leave", new LeaveSubCommand(plugin));
+        subCommands.put("setLobby", new SetLobbySubCommand(plugin));
+        subCommands.put("stop", new StopArenaSubCommand(plugin));
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        MessagesManager messagesManager = TagGame.messagesManager;
+        MessagesManager messagesManager = plugin.getMessagesManager();
 
         // If there are no arguments, show an error.
         if (args.length == 0) {
@@ -81,7 +83,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         try {
             subCommand.run(sender, args);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return true;
     }

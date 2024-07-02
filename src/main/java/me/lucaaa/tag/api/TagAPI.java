@@ -4,7 +4,20 @@ import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.api.game.TagArena;
 import me.lucaaa.tag.api.game.TagPlayer;
 
+@SuppressWarnings("unused")
 public class TagAPI {
+    private static TagGame plugin;
+
+    /**
+     * INTERNAL USE ONLY
+     *
+     * @hidden
+     * @param tagPlugin Tag plugin
+     */
+    public static void setPlugin(TagGame tagPlugin) {
+        plugin = tagPlugin;
+    }
+
     /**
      * Gets information about a player.
      *
@@ -12,7 +25,7 @@ public class TagAPI {
      * @return The player you want or null if it was not found.
      */
     public static TagPlayer getTagPlayer(String playerName) {
-        return TagGame.playersManager.getTagPlayer(playerName);
+        return plugin.getPlayersManager().getTagPlayer(playerName);
     }
 
     /**
@@ -22,6 +35,6 @@ public class TagAPI {
      * @return The arena you want or null if it was not found.
      */
     public static TagArena getTagArena(String arenaName) {
-        return TagGame.arenasManager.getTagArena(arenaName);
+        return plugin.getArenasManager().getTagArena(arenaName);
     }
 }

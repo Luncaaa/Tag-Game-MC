@@ -3,6 +3,8 @@ package me.lucaaa.tag.game;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.api.game.TagArena;
 import me.lucaaa.tag.api.game.TagPlayer;
+import me.lucaaa.tag.managers.DatabaseManager;
+import me.lucaaa.tag.managers.ItemsManager;
 import me.lucaaa.tag.utils.ArenaMode;
 import me.lucaaa.tag.utils.ArenaTime;
 import org.bukkit.*;
@@ -21,7 +23,10 @@ import java.util.List;
 import java.util.Objects;
 
 public class PlayerData implements TagPlayer {
+    private final TagGame plugin;
     private final Player player;
+    private final DatabaseManager db;
+
     public Long interactEventCooldown = 0L;
     public Long tntThrowCooldown = 0L;
     public Arena arena = null;
@@ -50,8 +55,10 @@ public class PlayerData implements TagPlayer {
     // Arena setup
     public Arena settingUpArena = null;
 
-    public PlayerData(Player player) {
+    public PlayerData(TagGame plugin, Player player) {
+        this.plugin = plugin;
         this.player = player;
+        this.db = plugin.getDatabaseManager();
     }
 
     @Override
@@ -175,45 +182,46 @@ public class PlayerData implements TagPlayer {
 
     // Gives the stick which he can use to tag other players
     public void giveTaggerInventory() {
+        ItemsManager itemsManager = plugin.getItemsManager();
         ItemStack taggingStick;
         if (this.arena.getArenaMode() == ArenaMode.HIT || this.arena.getArenaMode() == ArenaMode.TIMED_HIT) {
             if (this.arena.getArenaTimeMode() == ArenaTime.LIMITED) {
-                taggingStick = TagGame.itemsManager.getItem("tag-item-limited");
+                taggingStick = itemsManager.getItem("tag-item-limited");
             } else {
-                taggingStick = TagGame.itemsManager.getItem("tag-item-unlimited");
+                taggingStick = itemsManager.getItem("tag-item-unlimited");
             }
         } else {
             if (this.arena.getArenaTimeMode() == ArenaTime.LIMITED) {
-                taggingStick = TagGame.itemsManager.getItem("tnt-item-limited");
+                taggingStick = itemsManager.getItem("tnt-item-limited");
             } else {
-                taggingStick = TagGame.itemsManager.getItem("tnt-item-unlimited");
+                taggingStick = itemsManager.getItem("tnt-item-unlimited");
             }
         }
         ItemMeta taggingStickMeta = taggingStick.getItemMeta();
         assert taggingStickMeta != null;
-        taggingStickMeta.getPersistentDataContainer().set(new NamespacedKey(TagGame.getPlugin(), "TAG"), PersistentDataType.STRING, "tag_stick");
+        taggingStickMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING, "tag_stick");
         taggingStick.setItemMeta(taggingStickMeta);
 
         this.player.getInventory().setItem(0, taggingStick);
-        this.player.getInventory().setHelmet(TagGame.itemsManager.getItem("helmet"));
-        this.player.getInventory().setChestplate(TagGame.itemsManager.getItem("chestplate"));
-        this.player.getInventory().setLeggings(TagGame.itemsManager.getItem("leggings"));
-        this.player.getInventory().setBoots(TagGame.itemsManager.getItem("boots"));
+        this.player.getInventory().setHelmet(itemsManager.getItem("helmet"));
+        this.player.getInventory().setChestplate(itemsManager.getItem("chestplate"));
+        this.player.getInventory().setLeggings(itemsManager.getItem("leggings"));
+        this.player.getInventory().setBoots(itemsManager.getItem("boots"));
     }
     // ----------
 
     // -[ Scoreboards ]-
     public void setScoreboard(String name, HashMap<String, String> placeholders) {
-        String scoreboardTitle = TagGame.messagesManager.getMessage("scoreboards."+name+".title", placeholders, this.player, false);
+        String scoreboardTitle = plugin.getMessagesManager().getMessage("scoreboards." + name + ".title", placeholders, this.player, false, true);
 
         Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
 
         Objective objective = scoreboard.registerNewObjective(name, "dummy", scoreboardTitle);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        int messagesNumber = TagGame.messagesManager.getMessagesList("scoreboards."+name+".lines").size();
+        int messagesNumber = plugin.getMessagesManager().getMessagesList("scoreboards."+name+".lines").size();
         for (int index = 0; index < messagesNumber; index++) {
-            Score scoreboardLine = objective.getScore(TagGame.messagesManager.getMessageFromList("scoreboards."+name+".lines", index, placeholders, this.player));
+            Score scoreboardLine = objective.getScore(plugin.getMessagesManager().getMessageFromList("scoreboards."+name+".lines", index, placeholders, this.player));
             scoreboardLine.setScore(messagesNumber - index);
         }
 
@@ -224,31 +232,31 @@ public class PlayerData implements TagPlayer {
     // -[ Stats ]-
     @Override
     public int getGamesPlayed() {
-        return TagGame.databaseManager.getInt(this.player.getName(), "games_played");
+        return db.getInt(this.player.getName(), "games_played");
     }
     public void updateGamesPlayed(int add) {
-        TagGame.databaseManager.updateInt(this.player.getName(), "games_played", this.getGamesPlayed() + add);
+        db.updateInt(this.player.getName(), "games_played", this.getGamesPlayed() + add);
     }
 
     @Override
     public int getTimesLost() {
-        return TagGame.databaseManager.getInt(this.player.getName(), "times_lost");
+        return db.getInt(this.player.getName(), "times_lost");
     }
     public void updateTimesLost(int add) {
-        TagGame.databaseManager.updateInt(this.player.getName(), "times_lost", this.getTimesLost() + add);
+        db.updateInt(this.player.getName(), "times_lost", this.getTimesLost() + add);
     }
 
     @Override
     public int getTimesWon() {
-        return TagGame.databaseManager.getInt(this.player.getName(), "times_won");
+        return db.getInt(this.player.getName(), "times_won");
     }
     public void updateTimesWon(int add) {
-        TagGame.databaseManager.updateInt(this.player.getName(), "times_won", this.getTimesWon() + add);
+        db.updateInt(this.player.getName(), "times_won", this.getTimesWon() + add);
     }
 
     @Override
     public int getTimesTagger() {
-        return TagGame.databaseManager.getInt(this.player.getName(), "times_tagger") + this.savedTimesTagger;
+        return db.getInt(this.player.getName(), "times_tagger") + this.savedTimesTagger;
     }
     public void updateTimesTagger(int add) {
         this.savedTimesTagger += add;
@@ -256,7 +264,7 @@ public class PlayerData implements TagPlayer {
 
     @Override
     public int getTimesBeenTagged() {
-        return TagGame.databaseManager.getInt(this.player.getName(), "times_been_tagged") + this.savedTimesBeenTagged;
+        return db.getInt(this.player.getName(), "times_been_tagged") + this.savedTimesBeenTagged;
     }
     public void updateTimesBeenTagged(int add) {
         this.savedTimesBeenTagged += add;
@@ -264,7 +272,7 @@ public class PlayerData implements TagPlayer {
 
     @Override
     public int getTimesTagged() {
-        return TagGame.databaseManager.getInt(this.player.getName(), "times_tagged") + this.savedTimesTagged;
+        return db.getInt(this.player.getName(), "times_tagged") + this.savedTimesTagged;
     }
     public void updateTimesTagged(int add) {
         this.savedTimesTagged += add;
@@ -272,16 +280,16 @@ public class PlayerData implements TagPlayer {
 
     @Override
     public double getTimeTagger() {
-        return TagGame.databaseManager.getDouble(this.player.getName(), "time_tagger");
+        return db.getDouble(this.player.getName(), "time_tagger");
     }
     public void updateTimeTagger(double add) {
-        TagGame.databaseManager.updateDouble(this.player.getName(), "time_tagger", this.getTimeTagger() + add);
+        db.updateDouble(this.player.getName(), "time_tagger", this.getTimeTagger() + add);
     }
 
     public void uploadData() {
-        TagGame.databaseManager.updateInt(this.player.getName(), "times_tagger", this.getTimesTagger());
-        TagGame.databaseManager.updateInt(this.player.getName(), "times_been_tagged", this.getTimesBeenTagged());
-        TagGame.databaseManager.updateInt(this.player.getName(), "times_tagged", this.getTimesTagged());
+        db.updateInt(this.player.getName(), "times_tagger", this.getTimesTagger());
+        db.updateInt(this.player.getName(), "times_been_tagged", this.getTimesBeenTagged());
+        db.updateInt(this.player.getName(), "times_tagged", this.getTimesTagged());
     }
 
     public void clearData() {

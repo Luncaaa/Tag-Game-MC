@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 
+@SuppressWarnings("unused")
 public interface TagArena {
     /**
      * Gets the name of the arena.

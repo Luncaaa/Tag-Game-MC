@@ -1,18 +1,18 @@
 package me.lucaaa.tag.utils;
 
-import me.lucaaa.tag.TagGame;
-
 public enum ArenaMode {
-    HIT(TagGame.messagesManager.getMessage("placeholders.arena-mode.hit", null, null, false)), TNT(TagGame.messagesManager.getMessage("placeholders.arena-mode.tnt", null, null, false)),
-    TIMED_HIT(TagGame.messagesManager.getMessage("placeholders.arena-mode.timed-hit", null, null, false)), TIMED_TNT(TagGame.messagesManager.getMessage("placeholders.arena-mode.timed-tnt", null, null, false));
+    HIT("placeholders.arena-mode.hit"),
+    TNT("placeholders.arena-mode.tnt"),
+    TIMED_HIT("placeholders.arena-mode.timed-hit"),
+    TIMED_TNT("placeholders.arena-mode.timed-tnt");
 
-    private final String customName;
+    private final String customNameKey;
 
-    ArenaMode(String customName) {
-        this.customName = customName;
+    ArenaMode(String customNameKey) {
+        this.customNameKey = customNameKey;
     }
 
-    public String getCustomName() {
-        return this.customName;
+    public String getCustomNameKey() {
+        return this.customNameKey;
     }
 }

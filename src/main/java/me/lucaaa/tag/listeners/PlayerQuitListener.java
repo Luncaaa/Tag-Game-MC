@@ -6,8 +6,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 public class PlayerQuitListener implements Listener {
+    private final TagGame plugin;
+
+    public PlayerQuitListener(TagGame plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
-        TagGame.playersManager.removePlayer(event.getPlayer().getName());
+        plugin.getPlayersManager().removePlayer(event.getPlayer().getName());
     }
 }

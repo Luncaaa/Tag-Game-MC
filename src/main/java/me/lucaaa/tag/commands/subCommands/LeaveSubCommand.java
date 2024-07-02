@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 
 public class LeaveSubCommand extends SubCommandsFormat {
-    public LeaveSubCommand() {
+    public LeaveSubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "leave";
         this.description = "Leave an arena.";
         this.usage = "/tag leave";
@@ -19,10 +20,10 @@ public class LeaveSubCommand extends SubCommandsFormat {
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
-        PlayerData playerData = TagGame.playersManager.getPlayerData(sender.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(sender.getName());
 
         if (playerData.arena == null) {
-            sender.sendMessage(TagGame.messagesManager.getMessage("commands.not-in-arena", null, sender));
+            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.not-in-arena", null, sender));
             return;
         }
 

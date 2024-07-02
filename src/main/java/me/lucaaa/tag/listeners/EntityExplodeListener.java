@@ -9,10 +9,16 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.persistence.PersistentDataType;
 
 public class EntityExplodeListener implements Listener {
+    private final TagGame plugin;
+
+    public EntityExplodeListener(TagGame plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
         if (!(event.getEntity() instanceof TNTPrimed)) return;
-        if (!event.getEntity().getPersistentDataContainer().has(new NamespacedKey(TagGame.getPlugin(), "TAG"), PersistentDataType.STRING)) return;
+        if (!event.getEntity().getPersistentDataContainer().has(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING)) return;
 
         // Prevent blocks from breaking
         event.setCancelled(true);

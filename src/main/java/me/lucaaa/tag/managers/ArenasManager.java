@@ -1,5 +1,6 @@
 package me.lucaaa.tag.managers;
 
+import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.api.game.TagArena;
 import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.utils.ArenaMode;
@@ -7,7 +8,6 @@ import me.lucaaa.tag.utils.ArenaTime;
 import me.lucaaa.tag.utils.Logger;
 import me.lucaaa.tag.utils.StopCause;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +17,10 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 public class ArenasManager {
-    private final Plugin plugin;
+    private final TagGame plugin;
     public final HashMap<String, Arena> arenas = new HashMap<>();
 
-    public ArenasManager(Plugin plugin) {
+    public ArenasManager(TagGame plugin) {
         this.plugin = plugin;
 
         // Gets the arenas folder and creates it if it doesn't exist.
@@ -34,7 +34,7 @@ public class ArenasManager {
         for (File file : Objects.requireNonNull(arenasFolder.listFiles())) {
             Logger.log(Level.INFO, "Loading arena " + file.getName().replaceAll(".yml", "") + "...");
             ConfigManager arenaConfig = new ConfigManager(this.plugin, "arenas" + File.separator + file.getName());
-            this.arenas.put(arenaConfig.getFile().getName().replaceAll(".yml", ""), new Arena(arenaConfig.getFile().getName().replaceAll(".yml", ""), arenaConfig));
+            this.arenas.put(arenaConfig.getFile().getName().replaceAll(".yml", ""), new Arena(plugin, arenaConfig.getFile().getName().replaceAll(".yml", ""), arenaConfig));
         }
     }
 
@@ -69,7 +69,7 @@ public class ArenasManager {
         newArenaConfig.getConfig().set("mode", ArenaMode.HIT.name());
 
         newArenaConfig.save();
-        arenas.put(name, new Arena(name, newArenaConfig));
+        arenas.put(name, new Arena(plugin, name, newArenaConfig));
         return true;
     }
 

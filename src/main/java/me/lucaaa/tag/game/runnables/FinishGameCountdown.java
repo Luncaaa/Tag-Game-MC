@@ -7,11 +7,13 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class FinishGameCountdown {
+    private final TagGame plugin;
     private final Arena arena;
     private BukkitTask timer = null;
     private int timeLeft;
 
-    public FinishGameCountdown(Arena arena) {
+    public FinishGameCountdown(TagGame plugin, Arena arena) {
+        this.plugin = plugin;
         this.arena = arena;
         this.timeLeft = 0;
     }
@@ -33,7 +35,7 @@ public class FinishGameCountdown {
                 }
                 timeLeft--;
             }
-        }.runTaskTimer(TagGame.getPlugin(), 0, 20L);
+        }.runTaskTimer(plugin, 0, 20L);
     }
 
     public void stop() {

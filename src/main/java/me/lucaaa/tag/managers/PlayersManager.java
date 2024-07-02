@@ -9,18 +9,21 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 
 public class PlayersManager {
+    private final TagGame plugin;
     private final HashMap<String, PlayerData> playersData = new HashMap<>();
 
-    public PlayersManager() {
+    public PlayersManager(TagGame plugin) {
+        this.plugin = plugin;
+
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
             this.addPlayer(player);
         }
     }
 
     public void addPlayer(Player player) {
-        this.playersData.put(player.getName(), new PlayerData(player));
-        if (!TagGame.databaseManager.playerIsInDB(player.getName())) {
-            TagGame.databaseManager.createPlayer(player.getName());
+        this.playersData.put(player.getName(), new PlayerData(plugin, player));
+        if (!plugin.getDatabaseManager().playerIsInDB(player.getName())) {
+            plugin.getDatabaseManager().createPlayer(player.getName());
         }
     }
 

@@ -22,23 +22,29 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class RightClickListener implements Listener {
+    private final TagGame plugin;
+
+    public RightClickListener(TagGame plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !playerData.isSettingUpArena() && !playerData.isInArena() && Objects.requireNonNull(event.getClickedBlock()).getState() instanceof Sign) {
-            if (!TagGame.signsManager.signs.containsKey(event.getClickedBlock().getLocation())) return;
-            TagGame.arenasManager.getArena(TagGame.signsManager.signs.get(event.getClickedBlock().getLocation())).playerJoin(player);
+            if (!plugin.getSignsManager().signs.containsKey(event.getClickedBlock().getLocation())) return;
+            plugin.getArenasManager().getArena(plugin.getSignsManager().signs.get(event.getClickedBlock().getLocation())).playerJoin(player);
             return;
         }
         if (event.getHand() != EquipmentSlot.HAND || (!playerData.isSettingUpArena() && !playerData.isInArena())) return;
 
         event.setCancelled(true);
         if (playerData.isSettingUpArena()) {
-            Arena editingArena = TagGame.arenasManager.getArena(playerData.settingUpArena.getName());
+            Arena editingArena = plugin.getArenasManager().getArena(playerData.settingUpArena.getName());
             HashMap<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", playerData.settingUpArena.getName());
             editingArena.checkWorlds(player);
@@ -47,25 +53,25 @@ public class RightClickListener implements Listener {
                 switch (itemInHand.getType()) {
                     case DIAMOND_AXE -> {
                         editingArena.setArenaCorner2(Objects.requireNonNull(event.getClickedBlock()).getLocation());
-                        player.sendMessage(TagGame.messagesManager.getMessage("arenaSetup.set-corner", placeholders, player));
+                        player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.set-corner", placeholders, player));
                     }
 
                     case DIAMOND_HOE -> {
-                        if (editingArena.removeArenaAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) player.sendMessage(TagGame.messagesManager.getMessage("arenaSetup.remove-spawn", placeholders, player));
-                        else player.sendMessage(TagGame.messagesManager.getMessage("arenaSetup.block-is-not-spawn", placeholders, player));
+                        if (editingArena.removeArenaAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.remove-spawn", placeholders, player));
+                        else player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.block-is-not-spawn", placeholders, player));
                     }
 
                     case GOLDEN_AXE -> {
                         editingArena.setWaitingCorner2(Objects.requireNonNull(event.getClickedBlock()).getLocation());
-                        player.sendMessage(TagGame.messagesManager.getMessage("arenaSetup.set-corner", placeholders, player));
+                        player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.set-corner", placeholders, player));
                     }
 
                     case GOLDEN_HOE -> {
-                        if (editingArena.removeWaitingAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) player.sendMessage(TagGame.messagesManager.getMessage("arenaSetup.remove-spawn", placeholders, player));
-                        else player.sendMessage(TagGame.messagesManager.getMessage("arenaSetup.block-is-not-spawn", placeholders, player));
+                        if (editingArena.removeWaitingAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.remove-spawn", placeholders, player));
+                        else player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.block-is-not-spawn", placeholders, player));
                     }
-                    default -> {
-                    }
+
+                    default -> {}
                 }
 
             } else if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
@@ -105,7 +111,7 @@ public class RightClickListener implements Listener {
             }
 
         } else {
-            if (itemInHand.getType() == TagGame.itemsManager.getItem("leave-item").getType()) {
+            if (itemInHand.getType() == plugin.getItemsManager().getItem("leave-item").getType()) {
                 playerData.arena.playerLeave(player, true);
                 return;
             }
@@ -113,13 +119,12 @@ public class RightClickListener implements Listener {
             if (playerData.arena.getTaggers().contains(playerData) && (playerData.arena.getArenaMode() == ArenaMode.TNT || playerData.arena.getArenaMode() == ArenaMode.TIMED_TNT)) {
                 Long now = System.currentTimeMillis();
                 // Divide / 1000.0 to convert to seconds.
-                if ((now - playerData.tntThrowCooldown) / 1000.0 <= TagGame.mainConfig.getConfig().getDouble("tnt-cooldown")) return;
+                if ((now - playerData.tntThrowCooldown) / 1000.0 <= plugin.getMainConfig().getConfig().getDouble("tnt-cooldown")) return;
 
                 TNTPrimed tagTNT = event.getPlayer().getWorld().spawn(event.getPlayer().getLocation().add(0.0, 1.0, 0.0), TNTPrimed.class);
-                tagTNT.getPersistentDataContainer().set(new NamespacedKey(TagGame.getPlugin(), "TAG"), PersistentDataType.STRING, "tag-TNT");
-                tagTNT.getPersistentDataContainer().set(new NamespacedKey(TagGame.getPlugin(), "PLAYER"), PersistentDataType.STRING, event.getPlayer().getName());
+                tagTNT.getPersistentDataContainer().set(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING, event.getPlayer().getName());
                 tagTNT.setVelocity(event.getPlayer().getLocation().getDirection().add(new Vector(0.0, 0.15, 0.0)));
-                tagTNT.setFuseTicks(TagGame.mainConfig.getConfig().getInt("tnt-fuse-time"));
+                tagTNT.setFuseTicks(plugin.getMainConfig().getConfig().getInt("tnt-fuse-time"));
 
                 playerData.tntThrowCooldown = now;
             }

@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class StopArenaSubCommand extends SubCommandsFormat {
-    public StopArenaSubCommand() {
+    public StopArenaSubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "stop";
         this.description = "Stops an arena that is running.";
         this.usage = "/tag stop [arena]";
@@ -21,21 +22,21 @@ public class StopArenaSubCommand extends SubCommandsFormat {
 
     @Override
     public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
-        return new ArrayList<>(TagGame.arenasManager.arenas.keySet().stream().toList());
+        return new ArrayList<>(plugin.getArenasManager().arenas.keySet().stream().toList());
     }
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
-        Arena arena = TagGame.arenasManager.getArena(args[1]);
+        Arena arena = plugin.getArenasManager().getArena(args[1]);
         HashMap<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         if (!arena.isRunning()) {
-            sender.sendMessage(TagGame.messagesManager.getMessage("commands.arena-not-running", placeholders, sender));
+            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.arena-not-running", placeholders, sender));
             return;
         }
 
         arena.stopGame(StopCause.COMMAND, false);
-        sender.sendMessage(TagGame.messagesManager.getMessage("commands.stop-success", placeholders, sender));
+        sender.sendMessage(plugin.getMessagesManager().getMessage("commands.stop-success", placeholders, sender));
     }
 }

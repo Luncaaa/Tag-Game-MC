@@ -1,11 +1,18 @@
 package me.lucaaa.tag.commands.subCommands;
 
+import me.lucaaa.tag.TagGame;
 import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 public abstract class SubCommandsFormat {
+    protected final TagGame plugin;
+
+    public SubCommandsFormat(TagGame plugin) {
+        this.plugin = plugin;
+    }
+
     // The name of the subcommand
     public String name;
 

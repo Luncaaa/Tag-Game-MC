@@ -9,7 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class FinishSetupSubCommand extends SubCommandsFormat {
-    public FinishSetupSubCommand() {
+    public FinishSetupSubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "finishSetup";
         this.description = "Stop modifying an arena and its settings.";
         this.usage = "/tag finishSetup";
@@ -21,17 +22,17 @@ public class FinishSetupSubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         Player player = (Player) sender;
-        PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
 
         if (!playerData.isSettingUpArena()) {
-            player.sendMessage(TagGame.messagesManager.getMessage("commands.not-setting-up", null, player));
+            player.sendMessage(plugin.getMessagesManager().getMessage("commands.not-setting-up", null, player));
 
         } else {
             HashMap<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", playerData.settingUpArena.getName());
             playerData.settingUpArena = null;
             playerData.restoreSavedData();
-            player.sendMessage(TagGame.messagesManager.getMessage("commands.finish-setup", placeholders, player));
+            player.sendMessage(plugin.getMessagesManager().getMessage("commands.finish-setup", placeholders, player));
         }
     }
 }

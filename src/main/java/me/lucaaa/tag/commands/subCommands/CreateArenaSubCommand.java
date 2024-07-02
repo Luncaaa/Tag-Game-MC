@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class CreateArenaSubCommand extends SubCommandsFormat {
-    public CreateArenaSubCommand() {
+    public CreateArenaSubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "createArena";
         this.description = "Creates an arena.";
         this.usage = "/tag createArena [name]";
@@ -18,14 +19,14 @@ public class CreateArenaSubCommand extends SubCommandsFormat {
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
-        boolean couldCreateArena = TagGame.arenasManager.createArena(args[1]);
+        boolean couldCreateArena = plugin.getArenasManager().createArena(args[1]);
         HashMap<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         if (couldCreateArena) {
-            sender.sendMessage(TagGame.messagesManager.getMessage("commands.creation-success", placeholders, sender));
+            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.creation-success", placeholders, sender));
         } else {
-            sender.sendMessage(TagGame.messagesManager.getMessage("commands.creation-failure", placeholders, sender));
+            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.creation-failure", placeholders, sender));
         }
     }
 }

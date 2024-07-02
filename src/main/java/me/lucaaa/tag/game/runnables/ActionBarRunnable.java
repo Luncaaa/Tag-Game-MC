@@ -13,7 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ActionBarRunnable {
+    private final TagGame plugin;
     private final HashMap<Player, BukkitTask> currentTaggers = new HashMap<>();
+
+    public ActionBarRunnable(TagGame plugin) {
+        this.plugin = plugin;
+    }
 
     // Called when the initial taggers are selected.
     public void sendToPlayers(ArrayList<PlayerData> taggers) {
@@ -21,9 +26,9 @@ public class ActionBarRunnable {
             BukkitTask task = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(TagGame.messagesManager.getMessage("game.tagger-actionbar", null, tagger.getPlayer(), false)));
+                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plugin.getMessagesManager().getMessage("game.tagger-actionbar", null, tagger.getPlayer(), false, true)));
                 }
-            }.runTaskTimer(TagGame.getPlugin(), 0L, 20L);
+            }.runTaskTimer(plugin, 0L, 20L);
 
             this.currentTaggers.put(tagger.getPlayer(), task);
         }
@@ -38,9 +43,9 @@ public class ActionBarRunnable {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(TagGame.messagesManager.getMessage("game.tagger-actionbar", null, tagged.getPlayer(), false)));
+                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plugin.getMessagesManager().getMessage("game.tagger-actionbar", null, tagged.getPlayer(), false, true)));
             }
-        }.runTaskTimer(TagGame.getPlugin(), 0L, 20L);
+        }.runTaskTimer(plugin, 0L, 20L);
 
         this.currentTaggers.put(tagged, task);
     }

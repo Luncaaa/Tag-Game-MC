@@ -10,17 +10,19 @@ import java.sql.*;
 import java.util.concurrent.CompletableFuture;
 
 public class DatabaseManager {
-    // yay!
+    private final TagGame plugin;
     private final Connection connection;
 
-    public DatabaseManager(boolean useMySQL) throws IOException, SQLException {
+    public DatabaseManager(TagGame plugin, boolean useMySQL) throws IOException, SQLException {
+        this.plugin = plugin;
+
         if (!useMySQL) {
-            File dbFile = new File(TagGame.getPlugin().getDataFolder().getAbsolutePath() + File.separator + "stats.db");
+            File dbFile = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + "stats.db");
             if (!dbFile.exists()) dbFile.createNewFile();
             this.connection = DriverManager.getConnection("jdbc:sqlite:"+dbFile.getAbsolutePath());
 
         } else {
-            ConfigurationSection dbConfig = TagGame.mainConfig.getConfig().getConfigurationSection("database.mysql");
+            ConfigurationSection dbConfig = plugin.getMainConfig().getConfig().getConfigurationSection("database.mysql");
             assert dbConfig != null;
             String host = dbConfig.getString("host");
             String port = dbConfig.getString("port");
@@ -38,10 +40,10 @@ public class DatabaseManager {
                     statement.execute("CREATE TABLE IF NOT EXISTS player_stats(name TINYTEXT, games_played Int, times_lost Int, times_won Int, times_tagger Int, times_tagged Int, times_been_tagged Int, time_tagger Double)");
                     statement.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
-        }.runTaskAsynchronously(TagGame.getPlugin());
+        }.runTaskAsynchronously(plugin);
     }
 
     public boolean playerIsInDB(String playerName) {
@@ -54,8 +56,7 @@ public class DatabaseManager {
                 results.close();
                 return result;
             } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
+                throw new RuntimeException(e);
             }
         });
 
@@ -71,10 +72,10 @@ public class DatabaseManager {
                     statement.executeUpdate();
                     statement.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
-        }.runTaskAsynchronously(TagGame.getPlugin());
+        }.runTaskAsynchronously(plugin);
     }
 
     public int getInt(String playerName, String dataToGet) {
@@ -88,8 +89,7 @@ public class DatabaseManager {
                 query.close();
                 return result;
             } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
+                throw new RuntimeException(e);
             }
         });
 
@@ -107,8 +107,7 @@ public class DatabaseManager {
                 query.close();
                 return result;
             } catch (SQLException e) {
-                e.printStackTrace();
-                return null;
+                throw new RuntimeException(e);
             }
         });
 
@@ -126,10 +125,10 @@ public class DatabaseManager {
                     statement.executeUpdate();
                     statement.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
-        }.runTaskAsynchronously(TagGame.getPlugin());
+        }.runTaskAsynchronously(plugin);
     }
 
     public void updateDouble(String playerName, String dataToUpdate, double newValue) {
@@ -143,9 +142,9 @@ public class DatabaseManager {
                     statement.executeUpdate();
                     statement.close();
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
-        }.runTaskAsynchronously(TagGame.getPlugin());
+        }.runTaskAsynchronously(plugin);
     }
 }

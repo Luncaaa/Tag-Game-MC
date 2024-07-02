@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class SetupSubCommand extends SubCommandsFormat {
-    public SetupSubCommand() {
+    public SetupSubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "setup";
         this.description = "Modify an arena and its settings.";
         this.usage = "/tag setup [arena] <setWorld / setFinishTime / setTaggersNumber> <value>";
@@ -27,7 +28,7 @@ public class SetupSubCommand extends SubCommandsFormat {
     public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
         switch (args.length) {
             case 2 -> {
-                return new ArrayList<>(TagGame.arenasManager.arenas.keySet().stream().toList());
+                return new ArrayList<>(plugin.getArenasManager().arenas.keySet().stream().toList());
             }
             case 3 -> {
                 return new ArrayList<>(Arrays.asList("setFinishTime", "setWorld", "setTaggersNumber"));
@@ -46,47 +47,47 @@ public class SetupSubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         Player player = (Player) sender;
-        PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
         HashMap<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         switch (args.length) {
             case 2 -> {
-                if (TagGame.arenasManager.arenas.get(args[1]) == null) {
-                    player.sendMessage(TagGame.messagesManager.getMessage("commands.arena-not-found", placeholders, player));
+                if (plugin.getArenasManager().arenas.get(args[1]) == null) {
+                    player.sendMessage(plugin.getMessagesManager().getMessage("commands.arena-not-found", placeholders, player));
                     return;
                 }
 
-                playerData.settingUpArena = TagGame.arenasManager.getArena(args[1]);
+                playerData.settingUpArena = plugin.getArenasManager().getArena(args[1]);
                 playerData.giveSetupInventory();
-                player.sendMessage(TagGame.messagesManager.getMessage("commands.started-setup", placeholders, player));
+                player.sendMessage(plugin.getMessagesManager().getMessage("commands.started-setup", placeholders, player));
             }
 
-            case 3 -> player.sendMessage(TagGame.messagesManager.getMessage("commands.missing-argument", placeholders, player));
+            case 3 -> player.sendMessage(plugin.getMessagesManager().getMessage("commands.missing-argument", placeholders, player));
 
             default -> {
                 if (Objects.equals(args[2], "setFinishTime")) {
                     try {
                         placeholders.put("%time%", args[3]);
-                        TagGame.arenasManager.getArena(args[1]).setTimeEnd(Integer.parseInt(args[3]));
-                        player.sendMessage(TagGame.messagesManager.getMessage("commands.changed-time", placeholders, player));
+                        plugin.getArenasManager().getArena(args[1]).setTimeEnd(Integer.parseInt(args[3]));
+                        player.sendMessage(plugin.getMessagesManager().getMessage("commands.changed-time", placeholders, player));
                     } catch (NumberFormatException exception) {
                         placeholders.put("%number%", args[3]);
-                        player.sendMessage(TagGame.messagesManager.getMessage("commands.invalid-number", placeholders, player));
+                        player.sendMessage(plugin.getMessagesManager().getMessage("commands.invalid-number", placeholders, player));
                     }
 
                 } else if (Objects.equals(args[2], "setWorld")) {
                     placeholders.put("%world%", args[3]);
-                    TagGame.arenasManager.getArena(args[1]).setWorld(args[3]);
-                    player.sendMessage(TagGame.messagesManager.getMessage("commands.set-world", placeholders, player));
+                    plugin.getArenasManager().getArena(args[1]).setWorld(args[3]);
+                    player.sendMessage(plugin.getMessagesManager().getMessage("commands.set-world", placeholders, player));
 
                 } else if (Objects.equals(args[2], "setTaggersNumber")) {
                     placeholders.put("%number%", args[3]);
                     try {
-                        TagGame.arenasManager.getArena(args[1]).setTaggersNumber(Integer.parseInt(args[3]));
-                        player.sendMessage(TagGame.messagesManager.getMessage("commands.changed-taggers-number", placeholders, player));
+                        plugin.getArenasManager().getArena(args[1]).setTaggersNumber(Integer.parseInt(args[3]));
+                        player.sendMessage(plugin.getMessagesManager().getMessage("commands.changed-taggers-number", placeholders, player));
                     } catch (NumberFormatException exception) {
-                        player.sendMessage(TagGame.messagesManager.getMessage("commands.invalid-number", placeholders, player));
+                        player.sendMessage(plugin.getMessagesManager().getMessage("commands.invalid-number", placeholders, player));
                     }
                 }
             }

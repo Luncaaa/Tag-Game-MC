@@ -8,6 +8,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 /** Called when a player leaves an arena. */
+@SuppressWarnings("unused")
 public class TagPlayerLeaveEvent extends Event {
     private final TagPlayer player;
     private final TagArena arena;

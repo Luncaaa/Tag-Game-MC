@@ -11,13 +11,15 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class SelectTaggerCountdown {
+    private final TagGame plugin;
     private final Arena arena;
     private final ArrayList<PlayerData> playersList;
     private BukkitTask timer = null;
     private final HashMap<String, String> placeholders;
     private final Random random = new Random();
 
-    public SelectTaggerCountdown(Arena arena, ArrayList<PlayerData> playersList) {
+    public SelectTaggerCountdown(TagGame plugin, Arena arena, ArrayList<PlayerData> playersList) {
+        this.plugin = plugin;
         this.arena = arena;
         this.playersList = playersList;
         this.placeholders = arena.getPlaceholders();
@@ -36,7 +38,7 @@ public class SelectTaggerCountdown {
                 if (countdown <= 5 && countdown >= 1) {
                     placeholders.put("%time%", String.valueOf(countdown));
                     for (PlayerData playerData : playersList) {
-                        playerData.getPlayer().sendMessage(TagGame.messagesManager.getMessage("game.selecting-tagger", placeholders, playerData.getPlayer()));
+                        playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selecting-tagger", placeholders, playerData.getPlayer()));
                     }
                 }
 
@@ -59,7 +61,7 @@ public class SelectTaggerCountdown {
                 }
                 countdown--;
             }
-        }.runTaskTimer(TagGame.getPlugin(), 0L, 20L);
+        }.runTaskTimer(plugin, 0L, 20L);
     }
 
     public void stop() {

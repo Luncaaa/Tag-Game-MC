@@ -8,7 +8,8 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 
 public class SetLobbySubCommand extends SubCommandsFormat {
-    public SetLobbySubCommand() {
+    public SetLobbySubCommand(TagGame plugin) {
+        super(plugin);
         this.name = "setLobby";
         this.description = "Sets the main lobby.";
         this.usage = "/tag setLobby";
@@ -20,8 +21,8 @@ public class SetLobbySubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         Location playerLocation = ((Player) sender).getLocation();
-        TagGame.mainConfig.getConfig().set("lobby", playerLocation);
-        TagGame.mainConfig.save();
-        sender.sendMessage(TagGame.messagesManager.getMessage("commands.lobby-set", null, sender));
+        plugin.getMainConfig().getConfig().set("lobby", playerLocation);
+        plugin.getMainConfig().save();
+        sender.sendMessage(plugin.getMessagesManager().getMessage("commands.lobby-set", null, sender));
     }
 }

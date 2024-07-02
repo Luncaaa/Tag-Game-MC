@@ -11,6 +11,12 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class PlaceholdersManager extends PlaceholderExpansion {
+    private final TagGame plugin;
+
+    public PlaceholdersManager(TagGame plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public @NotNull String getIdentifier() {
         return "tag";
@@ -23,7 +29,7 @@ public class PlaceholdersManager extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.1";
+        return "1.2";
     }
 
     @Override
@@ -47,7 +53,7 @@ public class PlaceholdersManager extends PlaceholderExpansion {
         } else if (Objects.equals(placeholderParts[0], "player")) {
             if (placeholderParts.length < 2) return "Must provide property.";
             else {
-                PlayerData playerData = TagGame.playersManager.getPlayerData(player.getName());
+                PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
 
                 // If the 2nd parameter is arena, return the desired property of the arena the player is in.
                 if (Objects.equals(placeholderParts[1], "arena")) {
@@ -90,11 +96,11 @@ public class PlaceholdersManager extends PlaceholderExpansion {
     }
 
     private String getArenaPlaceholder(String arenaName, String property) {
-        if (!TagGame.arenasManager.arenas.containsKey(arenaName)) {
+        if (!plugin.getArenasManager().arenas.containsKey(arenaName)) {
             return "Arena not found: " + arenaName;
 
         } else {
-            HashMap<String, String> arenaPlaceholders = TagGame.arenasManager.getArena(arenaName).getPlaceholders();
+            HashMap<String, String> arenaPlaceholders = plugin.getArenasManager().getArena(arenaName).getPlaceholders();
             if (!arenaPlaceholders.containsKey("%" + property + "%")) return "Property not found: "+property;
             else return arenaPlaceholders.get("%" + property + "%");
         }
