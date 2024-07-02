@@ -1,9 +1,10 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'me.lucaaa.tag'
-version = '1.1'
+version = '1.2'
 
 repositories {
     mavenCentral()
@@ -14,5 +15,15 @@ repositories {
 
 dependencies {
     compileOnly "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT"
-    compileOnly("me.clip:placeholderapi:2.11.5")
+    compileOnly "me.clip:placeholderapi:2.11.6"
+    implementation "net.kyori:adventure-api:4.17.0"
+    implementation "net.kyori:adventure-text-minimessage:4.17.0"
 }
+
+shadowJar {
+    minimize()
+    relocate "net.kyori", "shaded.net.kyori"
+    archiveFileName = "${project.name}-v${project.version}.jar"
+}
+
+jar.dependsOn shadowJar
