@@ -13,5 +13,5 @@ If you have an issue, found a bug or want to suggest something, you can do it he
 - Contact me on Discord: Lucaaa#6268 / luncaaa
 
 ## How to compile
-The plugin is compiled using Gradle 8.7 and Java 16.
+The plugin is compiled using Gradle 8.8 and Java 16.
 Build the jar running the Gradle task "jar"
