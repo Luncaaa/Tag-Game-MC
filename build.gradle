@@ -24,6 +24,10 @@ shadowJar {
     minimize()
     relocate "net.kyori", "shaded.net.kyori"
     archiveFileName = "${project.name}-v${project.version}.jar"
+
+    manifest {
+        attributes(["paperweight-mappings-namespace": "mojang"])
+    }
 }
 
 jar.dependsOn shadowJar
