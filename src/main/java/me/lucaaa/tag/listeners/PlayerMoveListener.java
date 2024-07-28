@@ -18,7 +18,7 @@ public class PlayerMoveListener implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(event.getPlayer().getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(event.getPlayer());
         if (!playerData.isInArena()) return;
 
         Arena arena = playerData.arena;

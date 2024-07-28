@@ -2,6 +2,7 @@ package me.lucaaa.tag.managers;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import me.lucaaa.tag.TagGame;
+import me.lucaaa.tag.api.game.StatsManager;
 import me.lucaaa.tag.game.PlayerData;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,7 @@ public class PlaceholdersManager extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.2";
+        return "1.3";
     }
 
     @Override
@@ -51,40 +52,47 @@ public class PlaceholdersManager extends PlaceholderExpansion {
 
         // If the 1st parameter is player...
         } else if (Objects.equals(placeholderParts[0], "player")) {
-            if (placeholderParts.length < 2) return "Must provide property.";
-            else {
-                PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+            if (placeholderParts.length < 2)  {
+                return "Must provide property.";
 
+            } else {
                 // If the 2nd parameter is arena, return the desired property of the arena the player is in.
                 if (Objects.equals(placeholderParts[1], "arena")) {
+                    if (!player.isOnline()) return "";
+
+                    PlayerData playerData = plugin.getPlayersManager().getPlayerData(Objects.requireNonNull(player.getPlayer()));
                     if (!playerData.isInArena()) return "";
                     else return this.getArenaPlaceholder(playerData.arena.getName(), placeholderParts[2]);
 
                     // If the 2nd parameter is anything other than "arena", return the desired property of the player.
-                } else switch (placeholderParts[1]) {
-                    case "gamesPlayed" -> {
-                        return String.valueOf(playerData.getGamesPlayed());
-                    }
-                    case "timesLost" -> {
-                        return String.valueOf(playerData.getTimesLost());
-                    }
-                    case "timesWon" -> {
-                        return String.valueOf(playerData.getTimesWon());
-                    }
-                    case "timesTagger" -> {
-                        return String.valueOf(playerData.getTimesTagger());
-                    }
-                    case "timesTagged" -> {
-                        return String.valueOf(playerData.getTimesTagged());
-                    }
-                    case "timesBeenTagged" -> {
-                        return String.valueOf(playerData.getTimesBeenTagged());
-                    }
-                    case "timeTagger" -> {
-                        return String.valueOf(playerData.getTimeTagger());
-                    }
-                    default -> {
-                        return "Property not found: " + placeholderParts[1];
+                } else {
+                    StatsManager stats = plugin.getPlayersManager().getPlayerStats(player.getName());
+
+                    switch (placeholderParts[1]) {
+                        case "gamesPlayed" -> {
+                            return String.valueOf(stats.getGamesPlayed());
+                        }
+                        case "timesLost" -> {
+                            return String.valueOf(stats.getTimesLost());
+                        }
+                        case "timesWon" -> {
+                            return String.valueOf(stats.getTimesWon());
+                        }
+                        case "timesTagger" -> {
+                            return String.valueOf(stats.getTimesTagger());
+                        }
+                        case "timesTagged" -> {
+                            return String.valueOf(stats.getTimesTagged());
+                        }
+                        case "timesBeenTagged" -> {
+                            return String.valueOf(stats.getTimesBeenTagged());
+                        }
+                        case "timeTagger" -> {
+                            return String.valueOf(stats.getTimeTagger());
+                        }
+                        default -> {
+                            return "Property not found: " + placeholderParts[1];
+                        }
                     }
                 }
             }

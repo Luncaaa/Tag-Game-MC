@@ -2,6 +2,7 @@ package me.lucaaa.tag.listeners;
 
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.game.PlayerData;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,13 +17,13 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent event) {
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(event.getPlayer().getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(event.getPlayer());
         if (playerData.isInArena() || playerData.isSettingUpArena()) event.setCancelled(true);
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(event.getWhoClicked().getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData((Player) event.getWhoClicked());
         if (playerData.isInArena() || playerData.isSettingUpArena()) event.setCancelled(true);
     }
 }

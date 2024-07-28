@@ -47,7 +47,7 @@ public class SetupSubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         Player player = (Player) sender;
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         HashMap<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 

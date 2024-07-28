@@ -26,9 +26,9 @@ public class JoinSubCommand extends SubCommandsFormat {
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
-        if (plugin.getPlayersManager().getPlayerData(sender.getName()).arena != null) {
+        if (plugin.getPlayersManager().getPlayerData((Player) sender).arena != null) {
             HashMap<String, String> placeholders = new HashMap<>();
-            placeholders.put("%arena%", plugin.getPlayersManager().getPlayerData(sender.getName()).arena.getName());
+            placeholders.put("%arena%", plugin.getPlayersManager().getPlayerData((Player) sender).arena.getName());
             sender.sendMessage(plugin.getMessagesManager().getMessage("commands.already-in-arena", placeholders, sender));
             return;
         }

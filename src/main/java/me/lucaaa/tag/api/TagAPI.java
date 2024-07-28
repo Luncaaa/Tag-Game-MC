@@ -3,6 +3,7 @@ package me.lucaaa.tag.api;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.api.game.TagArena;
 import me.lucaaa.tag.api.game.TagPlayer;
+import org.bukkit.entity.Player;
 
 @SuppressWarnings("unused")
 public class TagAPI {
@@ -21,11 +22,11 @@ public class TagAPI {
     /**
      * Gets information about a player.
      *
-     * @param playerName The name of the player you want to get information of.
+     * @param player The player you want to get information of.
      * @return The player you want or null if it was not found.
      */
-    public static TagPlayer getTagPlayer(String playerName) {
-        return plugin.getPlayersManager().getTagPlayer(playerName);
+    public static TagPlayer getTagPlayer(Player player) {
+        return plugin.getPlayersManager().getPlayerData(player);
     }
 
     /**

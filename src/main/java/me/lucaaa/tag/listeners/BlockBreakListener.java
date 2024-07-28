@@ -23,7 +23,7 @@ public class BlockBreakListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
         // If the block that was broken was a join sign, remove it from the arena's signs, and the signs list.

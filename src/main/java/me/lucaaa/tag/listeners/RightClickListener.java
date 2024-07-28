@@ -31,7 +31,7 @@ public class RightClickListener implements Listener {
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         ItemStack itemInHand = player.getInventory().getItemInMainHand();
 
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;

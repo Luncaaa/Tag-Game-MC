@@ -22,7 +22,7 @@ public class FinishSetupSubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         Player player = (Player) sender;
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
 
         if (!playerData.isSettingUpArena()) {
             player.sendMessage(plugin.getMessagesManager().getMessage("commands.not-setting-up", null, player));

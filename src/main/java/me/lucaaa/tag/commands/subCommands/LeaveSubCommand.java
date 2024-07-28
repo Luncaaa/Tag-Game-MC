@@ -20,7 +20,7 @@ public class LeaveSubCommand extends SubCommandsFormat {
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(sender.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData((Player) sender);
 
         if (playerData.arena == null) {
             sender.sendMessage(plugin.getMessagesManager().getMessage("commands.not-in-arena", null, sender));

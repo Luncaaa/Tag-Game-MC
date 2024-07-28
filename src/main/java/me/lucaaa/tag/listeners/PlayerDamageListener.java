@@ -4,6 +4,7 @@ import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.game.PlayerData;
 import me.lucaaa.tag.utils.ArenaMode;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -14,6 +15,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Objects;
 
 public class PlayerDamageListener implements Listener {
     private final TagGame plugin;
@@ -28,7 +31,7 @@ public class PlayerDamageListener implements Listener {
 
         NamespacedKey tagger = new NamespacedKey(plugin, "TAG");
 
-        PlayerData victimData = plugin.getPlayersManager().getPlayerData(victim.getName());
+        PlayerData victimData = plugin.getPlayersManager().getPlayerData(victim);
         if (event.getDamager().getPersistentDataContainer().has(tagger, PersistentDataType.STRING)) event.setCancelled(true);
         if (!victimData.isInArena()) return;
 
@@ -40,7 +43,7 @@ public class PlayerDamageListener implements Listener {
         Arena arena = victimData.arena;
 
         if (event.getDamager() instanceof Player attacker && (arena.getArenaMode() == ArenaMode.HIT || arena.getArenaMode() == ArenaMode.TIMED_HIT)) {
-            PlayerData attackerData = plugin.getPlayersManager().getPlayerData(attacker.getName());
+            PlayerData attackerData = plugin.getPlayersManager().getPlayerData(attacker);
 
             if (!attackerData.isInArena()) return;
 
@@ -56,9 +59,13 @@ public class PlayerDamageListener implements Listener {
         } else if (event.getDamager() instanceof TNTPrimed tagTNT) {
             if (!tagTNT.getPersistentDataContainer().has(tagger, PersistentDataType.STRING)) return;
             if (arena.getTaggers().contains(victimData)) return;
-            if (!arena.getTaggers().contains(plugin.getPlayersManager().getPlayerData(tagTNT.getPersistentDataContainer().get(tagger, PersistentDataType.STRING)))) return;
 
-            arena.setTagger(plugin.getPlayersManager().getPlayerData(tagTNT.getPersistentDataContainer().get(tagger, PersistentDataType.STRING)), victimData);
+            Player player = Bukkit.getPlayer(Objects.requireNonNull(tagTNT.getPersistentDataContainer().get(tagger, PersistentDataType.STRING)));
+            if (player == null) return;
+
+            if (!arena.getTaggers().contains(plugin.getPlayersManager().getPlayerData(player))) return;
+
+            arena.setTagger(plugin.getPlayersManager().getPlayerData(player), victimData);
         }
 
         victim.setVelocity(event.getDamager().getLocation().getDirection().multiply(plugin.getMainConfig().getConfig().getDouble("knockback")).setY(plugin.getMainConfig().getConfig().getDouble("height")));
@@ -66,9 +73,9 @@ public class PlayerDamageListener implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player player)) return;
 
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(event.getEntity().getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         if (!playerData.isInArena()) return;
 
         if (plugin.getMainConfig().getConfig().getBoolean("prevent-damage")) {
