@@ -29,7 +29,7 @@ public class TagGame extends JavaPlugin {
     private ArenasManager arenasManager;
 
     // Reload the config files.
-    public void reloadConfigs() throws SQLException, IOException {
+    public void reloadConfigs() {
         // Creates the config and lang files.
         createConfigs();
         mainConfig = new ConfigManager(this, "config.yml");
@@ -38,13 +38,25 @@ public class TagGame extends JavaPlugin {
         ConfigManager langConfig = new ConfigManager(this, "langs" + File.separator + mainConfig.getConfig().getString("language"));
 
         // Managers
-        databaseManager = new DatabaseManager(this, mainConfig.getConfig().getBoolean("database.use-mysql"));
+        Runnable startDB = () -> {
+            try {
+                databaseManager = new DatabaseManager(TagGame.this, mainConfig.getConfig().getBoolean("database.use-mysql"));
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        if (playersManager != null) {
+            playersManager.removeEveryone().thenRun(() -> databaseManager.closePool()).thenRun(startDB);
+        } else {
+            startDB.run();
+        }
+
         messagesManager = new MessagesManager(langConfig.getConfig(), mainConfig.getConfig().getString("prefix"), this.isPAPIInstalled);
         signsManager = new SignsManager();
         itemsManager = new ItemsManager(this, mainConfig);
         if (arenasManager != null) arenasManager.stopAllArenas();
         arenasManager = new ArenasManager(this);
-        if (playersManager != null) playersManager.removeEveryone();
         playersManager = new PlayersManager(this);
     }
 
@@ -67,11 +79,7 @@ public class TagGame extends JavaPlugin {
         }
 
         // Set up files and managers.
-        try {
-            reloadConfigs();
-        } catch (SQLException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        reloadConfigs();
 
         // Look for updates.
         new UpdateManager(this).getVersion(v -> {
@@ -123,7 +131,7 @@ public class TagGame extends JavaPlugin {
         // Stops all arenas.
         arenasManager.stopAllArenas();
         // Gives everyone that setting up an arena their saved inventory.
-        playersManager.removeEveryone();
+        playersManager.removeEveryone().thenRun(() -> databaseManager.closePool());
 
         Logger.log(Level.INFO, "The plugin has been disabled.");
     }

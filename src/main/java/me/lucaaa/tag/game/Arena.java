@@ -492,7 +492,7 @@ public class Arena implements TagArena {
             if (!this.sendToGame(player)) return;
         }
 
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         player.getInventory().clear();
 
         ItemStack leaveItem = plugin.getItemsManager().getItem("leave-item");
@@ -515,14 +515,14 @@ public class Arena implements TagArena {
         HashMap<String, String> joinPlaceholders = new HashMap<>(this.placeholders);
         joinPlaceholders.put("%player%", player.getName());
         for (PlayerData playerDataInGame : this.playersList) {
-            if (playerDataInGame == plugin.getPlayersManager().getPlayerData(player.getName())) return;
+            if (playerDataInGame == plugin.getPlayersManager().getPlayerData(player)) return;
             playerDataInGame.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.player-join", joinPlaceholders, playerDataInGame.getPlayer()));
         }
     }
 
     @Override
     public void playerLeave(Player player, boolean tp) {
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
 
         if (tp) {
             if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
@@ -541,7 +541,7 @@ public class Arena implements TagArena {
             this.timeBeingTagger.remove(playerData);
         } else {
             double taggingTime = (System.currentTimeMillis() - playerData.startTaggerTime) / 1000.0;
-            playerData.updateTimeTagger(taggingTime);
+            playerData.getStatsManager().updateTimeTagger(taggingTime);
             playerData.startTaggerTime = 0L;
         }
         this.playersList.remove(playerData);
@@ -582,7 +582,7 @@ public class Arena implements TagArena {
 
         } else if (this.taggers.contains(playerData)) {
             double taggingTime = (System.currentTimeMillis() - playerData.startTaggerTime) / 1000.0;
-            playerData.updateTimeTagger(taggingTime);
+            playerData.getStatsManager().updateTimeTagger(taggingTime);
             playerData.startTaggerTime = 0L;
 
             if (this.arenaMode == ArenaMode.TNT) playerData.tntThrowCooldown = 0L;
@@ -601,7 +601,7 @@ public class Arena implements TagArena {
 
     // Sends the player to the waiting lobby. Once there are enough players, the game will start.
     private boolean sendToWaitingArea(Player player) {
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         if (this.waitingAreaSpawns.isEmpty()) {
             player.sendMessage(plugin.getMessagesManager().getMessage("commands.no-spawns", this.placeholders, player));
             return false;
@@ -631,7 +631,7 @@ public class Arena implements TagArena {
 
     // Sends the player to the arena if the waiting area is disabled.
     private boolean sendToGame(Player player) {
-        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player.getName());
+        PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         if (this.arenaAreaSpawns.isEmpty()) {
             player.sendMessage(plugin.getMessagesManager().getMessage("commands.no-spawns", this.placeholders, player));
             return false;
@@ -661,7 +661,7 @@ public class Arena implements TagArena {
         Bukkit.getPluginManager().callEvent(startEvent);
 
         for (PlayerData playerData : this.playersList) {
-            playerData.updateGamesPlayed(1);
+            playerData.getStatsManager().updateGamesPlayed(1);
             playerData.inWaitingArea = false;
         }
         this.isRunning = true;
@@ -724,7 +724,7 @@ public class Arena implements TagArena {
                 Double taggingTime = (System.currentTimeMillis() - tagger.startTaggerTime) / 1000.0;
                 if (this.timeBeingTagger.get(tagger) == null) this.timeBeingTagger.put(tagger, taggingTime);
                 else this.timeBeingTagger.replace(tagger, this.timeBeingTagger.get(tagger) + taggingTime);
-                tagger.updateTimeTagger(taggingTime);
+                tagger.getStatsManager().updateTimeTagger(taggingTime);
             }
 
             PlayerData highestPlayer = null;
@@ -765,7 +765,7 @@ public class Arena implements TagArena {
             playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.game-end", playerPlaceholders, playerData.getPlayer()));
 
             if (losers.contains(playerData)) {
-                playerData.updateTimesLost(1);
+                playerData.getStatsManager().updateTimesLost(1);
                 if (runCommands) {
                     for (String command : commandsOnEnd.getStringList("losers")) {
                         Bukkit.dispatchCommand(consoleSender, ChatColor.translateAlternateColorCodes('&', command.replace("%player%", playerData.getPlayer().getName())));
@@ -773,7 +773,7 @@ public class Arena implements TagArena {
                 }
                 playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.lose", playerPlaceholders, playerData.getPlayer()));
             } else {
-                playerData.updateTimesWon(1);
+                playerData.getStatsManager().updateTimesWon(1);
                 if (runCommands) {
                     for (String command : commandsOnEnd.getStringList("winners")) {
                         Bukkit.dispatchCommand(consoleSender, ChatColor.translateAlternateColorCodes('&', command.replace("%player%", playerData.getPlayer().getName())));
@@ -804,7 +804,7 @@ public class Arena implements TagArena {
 
         this.actionBarRunnable.sendToPlayers(taggers);
         for (PlayerData tagger : taggers) {
-            tagger.updateTimesTagger(1);
+            tagger.getStatsManager().saveTempData(1, 0, 0);
             this.taggers.add(tagger);
             tagger.giveTaggerInventory();
             tagger.startTaggerTime = System.currentTimeMillis();
@@ -821,16 +821,15 @@ public class Arena implements TagArena {
     }
 
     public void setTagger(PlayerData tagger, PlayerData tagged) {
-        tagger.updateTimesTagged(1);
-        tagged.updateTimesTagger(1);
-        tagged.updateTimesBeenTagged(1);
+        tagger.getStatsManager().saveTempData(0, 1, 0);
+        tagged.getStatsManager().saveTempData(1, 0, 1);
 
         TagPlayerTaggedEvent tagEvent = new TagPlayerTaggedEvent(tagged, tagger, this);
         Bukkit.getPluginManager().callEvent(tagEvent);
         if (tagEvent.isCancelled()) return;
 
-        tagger.uploadData();
-        tagged.uploadData();
+        tagger.getStatsManager().mergeTempData();
+        tagged.getStatsManager().mergeTempData();
 
         HashMap<String, String> taggedPlaceholders = new HashMap<>(this.placeholders);
         taggedPlaceholders.put("%tagged%", tagged.getPlayer().getName());
@@ -839,7 +838,7 @@ public class Arena implements TagArena {
         Double taggingTime = (System.currentTimeMillis() - tagger.startTaggerTime) / 1000.0;
         if (this.timeBeingTagger.get(tagger) == null) this.timeBeingTagger.put(tagger, taggingTime);
         else this.timeBeingTagger.replace(tagger, this.timeBeingTagger.get(tagger) + taggingTime);
-        tagger.updateTimeTagger(taggingTime);
+        tagger.getStatsManager().updateTimeTagger(taggingTime);
         tagged.startTaggerTime = System.currentTimeMillis();
 
         this.taggers.remove(tagger);

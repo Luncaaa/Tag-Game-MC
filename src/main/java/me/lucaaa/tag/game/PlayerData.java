@@ -3,8 +3,8 @@ package me.lucaaa.tag.game;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.api.game.TagArena;
 import me.lucaaa.tag.api.game.TagPlayer;
-import me.lucaaa.tag.managers.DatabaseManager;
 import me.lucaaa.tag.managers.ItemsManager;
+import me.lucaaa.tag.managers.StatsManager;
 import me.lucaaa.tag.utils.ArenaMode;
 import me.lucaaa.tag.utils.ArenaTime;
 import org.bukkit.*;
@@ -25,18 +25,13 @@ import java.util.Objects;
 public class PlayerData implements TagPlayer {
     private final TagGame plugin;
     private final Player player;
-    private final DatabaseManager db;
+    private final StatsManager stats;
 
     public Long interactEventCooldown = 0L;
     public Long tntThrowCooldown = 0L;
     public Arena arena = null;
     public boolean inWaitingArea = false;
     public Long startTaggerTime = 0L;
-
-    // Saved stats - used for when player is tagged. If the event is canceled, do nothing or, if it isn't, upload these variables.
-    private int savedTimesTagger = 0;
-    private int savedTimesTagged = 0;
-    private int savedTimesBeenTagged = 0;
 
     // Saved inventories
     private ItemStack[] savedInventoryContents = null;
@@ -58,7 +53,7 @@ public class PlayerData implements TagPlayer {
     public PlayerData(TagGame plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.db = plugin.getDatabaseManager();
+        this.stats = new StatsManager(player.getName(), plugin);
     }
 
     @Override
@@ -231,71 +226,8 @@ public class PlayerData implements TagPlayer {
 
     // -[ Stats ]-
     @Override
-    public int getGamesPlayed() {
-        return db.getInt(this.player.getName(), "games_played");
-    }
-    public void updateGamesPlayed(int add) {
-        db.updateInt(this.player.getName(), "games_played", this.getGamesPlayed() + add);
-    }
-
-    @Override
-    public int getTimesLost() {
-        return db.getInt(this.player.getName(), "times_lost");
-    }
-    public void updateTimesLost(int add) {
-        db.updateInt(this.player.getName(), "times_lost", this.getTimesLost() + add);
-    }
-
-    @Override
-    public int getTimesWon() {
-        return db.getInt(this.player.getName(), "times_won");
-    }
-    public void updateTimesWon(int add) {
-        db.updateInt(this.player.getName(), "times_won", this.getTimesWon() + add);
-    }
-
-    @Override
-    public int getTimesTagger() {
-        return db.getInt(this.player.getName(), "times_tagger") + this.savedTimesTagger;
-    }
-    public void updateTimesTagger(int add) {
-        this.savedTimesTagger += add;
-    }
-
-    @Override
-    public int getTimesBeenTagged() {
-        return db.getInt(this.player.getName(), "times_been_tagged") + this.savedTimesBeenTagged;
-    }
-    public void updateTimesBeenTagged(int add) {
-        this.savedTimesBeenTagged += add;
-    }
-
-    @Override
-    public int getTimesTagged() {
-        return db.getInt(this.player.getName(), "times_tagged") + this.savedTimesTagged;
-    }
-    public void updateTimesTagged(int add) {
-        this.savedTimesTagged += add;
-    }
-
-    @Override
-    public double getTimeTagger() {
-        return db.getDouble(this.player.getName(), "time_tagger");
-    }
-    public void updateTimeTagger(double add) {
-        db.updateDouble(this.player.getName(), "time_tagger", this.getTimeTagger() + add);
-    }
-
-    public void uploadData() {
-        db.updateInt(this.player.getName(), "times_tagger", this.getTimesTagger());
-        db.updateInt(this.player.getName(), "times_been_tagged", this.getTimesBeenTagged());
-        db.updateInt(this.player.getName(), "times_tagged", this.getTimesTagged());
-    }
-
-    public void clearData() {
-        this.savedTimesTagger = 0;
-        this.savedTimesBeenTagged = 0;
-        this.savedTimesTagged = 0;
+    public StatsManager getStatsManager() {
+        return this.stats;
     }
     // ----------
 }

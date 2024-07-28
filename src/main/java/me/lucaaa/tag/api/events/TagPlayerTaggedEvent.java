@@ -45,8 +45,8 @@ public class TagPlayerTaggedEvent extends Event implements Cancellable {
     @Override
     public void setCancelled(boolean cancelled) {
         if (cancelled) {
-            this.tagged.clearData();
-            this.tagger.clearData();
+            this.tagged.getStatsManager().clearTempData();
+            this.tagger.getStatsManager().clearTempData();
         }
         this.isCancelled = cancelled;
     }

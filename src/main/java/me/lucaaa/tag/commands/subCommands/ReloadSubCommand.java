@@ -4,7 +4,6 @@ import me.lucaaa.tag.TagGame;
 import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 public class ReloadSubCommand extends SubCommandsFormat {
     public ReloadSubCommand(TagGame plugin) {
@@ -19,11 +18,7 @@ public class ReloadSubCommand extends SubCommandsFormat {
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
-        try {
-            plugin.reloadConfigs();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        plugin.reloadConfigs();
         sender.sendMessage(plugin.getMessagesManager().getMessage("commands.reload-successful", null, sender));
     }
 }
