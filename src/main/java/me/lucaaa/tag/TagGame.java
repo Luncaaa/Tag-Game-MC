@@ -42,7 +42,7 @@ public class TagGame extends JavaPlugin {
             try {
                 databaseManager = new DatabaseManager(TagGame.this, mainConfig.getConfig().getBoolean("database.use-mysql"));
             } catch (SQLException | IOException e) {
-                throw new RuntimeException(e);
+                Logger.logError(Level.SEVERE, "An error occurred while initialising the database manager. Data won't be saved or read.", e);
             }
         };
 

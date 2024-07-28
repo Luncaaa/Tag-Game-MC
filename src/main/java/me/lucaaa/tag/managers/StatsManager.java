@@ -28,9 +28,7 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
         this.plugin = plugin;
         this.db = plugin.getDatabaseManager();
 
-        Runnable runnable = () -> {
-            db.createPlayerIfNotExist(playerName);
-
+        Runnable runnable = () -> db.createPlayerIfNotExist(playerName).thenRun(() -> {
             gamesPlayed = db.getInt(player, "games_played");
             timesLost = db.getInt(player, "times_lost");
             timesWon = db.getInt(player, "times_won");
@@ -38,7 +36,7 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
             timesBeenTagged = db.getInt(player, "times_been_tagged");
             timesTagged = db.getInt(player, "times_tagged");
             timeTagger = db.getDouble(player, "time_tagger");
-        };
+        });
 
         CompletableFuture<Void> saving = plugin.getDatabaseManager().isSaving(playerName);
         if (saving != null) {
