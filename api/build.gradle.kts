@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("maven-publish")
 }
 
 tasks {
@@ -25,5 +26,13 @@ tasks {
 
     jar {
         dependsOn("makeJavadoc")
+    }
+}
+
+publishing {
+    publications {
+        val mavenJava by creating(MavenPublication::class) {
+            from(components["java"])
+        }
     }
 }
