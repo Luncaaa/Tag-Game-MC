@@ -19,13 +19,15 @@ tasks {
 
     register<Jar>("makeJavadoc") {
         dependsOn(javadoc)
-        destinationDirectory.set(file(project.layout.buildDirectory))
+
         archiveClassifier.set("javadoc")
         description = "Creates a Javadoc Jar"
+        from(javadoc.get().destinationDir)
     }
 
     jar {
         dependsOn("makeJavadoc")
+        finalizedBy(publishToMavenLocal)
     }
 }
 
@@ -35,4 +37,9 @@ publishing {
             from(components["java"])
         }
     }
+}
+
+artifacts {
+    archives(tasks.jar)
+    archives(tasks.named("makeJavadoc"))
 }
