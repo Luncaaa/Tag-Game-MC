@@ -41,24 +41,24 @@ public class BlockBreakListener implements Listener {
 
             if (itemInHand.getType() == Material.DIAMOND_AXE) {
                 editingArena.setArenaCorner1(event.getBlock().getLocation());
-                player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.set-corner", placeholders, player));
+                plugin.getMessagesManager().sendMessage("arenaSetup.set-corner", placeholders, player);
 
             } else if (itemInHand.getType() == Material.DIAMOND_HOE) {
                 if (editingArena.addArenaAreaSpawn(event.getBlock().getLocation())) {
-                    player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.add-spawn", placeholders, player));
+                    plugin.getMessagesManager().sendMessage("arenaSetup.add-spawn", placeholders, player);
                 } else {
-                    player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.block-is-spawn", placeholders, player));
+                    plugin.getMessagesManager().sendMessage("arenaSetup.block-is-spawn", placeholders, player);
                 }
 
             } else if (itemInHand.getType() == Material.GOLDEN_AXE) {
                 editingArena.setWaitingCorner1(event.getBlock().getLocation());
-                player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.set-corner", placeholders, player));
+                plugin.getMessagesManager().sendMessage("arenaSetup.set-corner", placeholders, player);
 
             } else if (itemInHand.getType() == Material.GOLDEN_HOE) {
                 if (editingArena.addWaitingAreaSpawn(event.getBlock().getLocation())) {
-                    player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.add-spawn", placeholders, player));
+                    plugin.getMessagesManager().sendMessage("arenaSetup.add-spawn", placeholders, player);
                 } else {
-                    player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.block-is-spawn", placeholders, player));
+                    plugin.getMessagesManager().sendMessage("arenaSetup.block-is-spawn", placeholders, player);
                 }
             }
         }

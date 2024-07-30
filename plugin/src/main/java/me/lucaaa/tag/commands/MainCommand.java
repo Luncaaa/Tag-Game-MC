@@ -37,8 +37,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
         // If there are no arguments, show an error.
         if (args.length == 0) {
-            sender.sendMessage(messagesManager.getMessage("commands.not-enough-arguments", null, sender));
-            sender.sendMessage(messagesManager.getMessage("commands.use-help-command", null, sender));
+            messagesManager.sendMessage("commands.not-enough-arguments", null, sender);
+            messagesManager.sendMessage("commands.use-help-command", null, sender);
             return true;
         }
 
@@ -48,8 +48,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
         // If the subcommand does not exist, show an error.
         if (!subCommands.containsKey(args[0])) {
-            sender.sendMessage(messagesManager.getMessage("commands.command-not-found", placeholders, sender));
-            sender.sendMessage(messagesManager.getMessage("commands.use-help-command", placeholders, sender));
+            messagesManager.sendMessage("commands.command-not-found", placeholders, sender);
+            messagesManager.sendMessage("commands.use-help-command", placeholders, sender);
             return true;
         }
 
@@ -61,21 +61,21 @@ public class MainCommand implements CommandExecutor, TabCompleter {
 
         // If the player who ran the command does not have the needed permissions, show an error.
         if (!sender.hasPermission("tag.admin") && (subCommand.neededPermission != null && !sender.hasPermission(subCommand.neededPermission))) {
-            sender.sendMessage(messagesManager.getMessage("commands.no-permission", placeholders, sender));
+            messagesManager.sendMessage("commands.no-permission", placeholders, sender);
             return true;
         }
 
         // If the command was executed by console but only players can execute it, show an error.
         if (sender instanceof ConsoleCommandSender && !subCommand.executableByConsole) {
-            sender.sendMessage(messagesManager.getMessage("commands.player-command-only", placeholders, sender));
+            messagesManager.sendMessage("commands.player-command-only", placeholders, sender);
             return true;
         }
 
         // If the user entered fewer arguments than the subcommand needs, an error will appear.
         // args.size - 1 because the name of the subcommand is not included in the minArguments
         if (args.length - 1 < subCommand.minArguments) {
-            sender.sendMessage(messagesManager.getMessage("commands.not-enough-arguments", placeholders, sender));
-            sender.sendMessage(messagesManager.getMessage("commands.command-usage", placeholders, sender));
+            messagesManager.sendMessage("commands.not-enough-arguments", placeholders, sender);
+            messagesManager.sendMessage("commands.command-usage", placeholders, sender);
             return true;
         }
 

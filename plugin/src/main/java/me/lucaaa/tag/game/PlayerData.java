@@ -12,10 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Score;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -207,7 +204,7 @@ public class PlayerData implements TagPlayer {
 
     // -[ Scoreboards ]-
     public void setScoreboard(String name, HashMap<String, String> placeholders) {
-        String scoreboardTitle = plugin.getMessagesManager().getMessage("scoreboards." + name + ".title", placeholders, this.player, false, true);
+        String scoreboardTitle = plugin.getMessagesManager().getParsedMessage("scoreboards." + name + ".title", placeholders, this.player, false);
 
         Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
 
@@ -216,8 +213,11 @@ public class PlayerData implements TagPlayer {
 
         int messagesNumber = plugin.getMessagesManager().getMessagesList("scoreboards."+name+".lines").size();
         for (int index = 0; index < messagesNumber; index++) {
-            Score scoreboardLine = objective.getScore(plugin.getMessagesManager().getMessageFromList("scoreboards."+name+".lines", index, placeholders, this.player));
-            scoreboardLine.setScore(messagesNumber - index);
+            Team team = scoreboard.registerNewTeam("TagGameMC-"+name+index);
+            team.setSuffix(plugin.getMessagesManager().getMessageFromList("scoreboards."+name+".lines", index, placeholders, this.player));
+            String uniqueEntry = ChatColor.values()[index] + "";
+            team.addEntry(uniqueEntry);
+            objective.getScore(uniqueEntry).setScore(messagesNumber - index);
         }
 
         this.player.setScoreboard(scoreboard);

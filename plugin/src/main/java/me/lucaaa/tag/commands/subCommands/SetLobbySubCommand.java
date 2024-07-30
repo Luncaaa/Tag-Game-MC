@@ -23,6 +23,6 @@ public class SetLobbySubCommand extends SubCommandsFormat {
         Location playerLocation = ((Player) sender).getLocation();
         plugin.getMainConfig().getConfig().set("lobby", playerLocation);
         plugin.getMainConfig().save();
-        sender.sendMessage(plugin.getMessagesManager().getMessage("commands.lobby-set", null, sender));
+        plugin.getMessagesManager().sendMessage("commands.lobby-set", null, sender);
     }
 }

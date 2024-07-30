@@ -24,9 +24,9 @@ public class CreateArenaSubCommand extends SubCommandsFormat {
         placeholders.put("%arena%", args[1]);
 
         if (couldCreateArena) {
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.creation-success", placeholders, sender));
+            plugin.getMessagesManager().sendMessage("commands.creation-success", placeholders, sender);
         } else {
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.creation-failure", placeholders, sender));
+            plugin.getMessagesManager().sendMessage("commands.creation-failure", placeholders, sender);
         }
     }
 }

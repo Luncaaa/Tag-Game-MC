@@ -23,7 +23,7 @@ public class LeaveSubCommand extends SubCommandsFormat {
         PlayerData playerData = plugin.getPlayersManager().getPlayerData((Player) sender);
 
         if (playerData.arena == null) {
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.not-in-arena", null, sender));
+            plugin.getMessagesManager().sendMessage("commands.not-in-arena", null, sender);
             return;
         }
 

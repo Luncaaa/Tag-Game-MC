@@ -30,9 +30,9 @@ public class RemoveArenaSubCommand extends SubCommandsFormat {
         placeholders.put("%arena%", args[1]);
 
         if (couldRemoveArena) {
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.removal-success", placeholders, sender));
+            plugin.getMessagesManager().sendMessage("commands.removal-success", placeholders, sender);
         } else {
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.removal-failure", placeholders, sender));
+            plugin.getMessagesManager().sendMessage("commands.removal-failure", placeholders, sender);
         }
     }
 }

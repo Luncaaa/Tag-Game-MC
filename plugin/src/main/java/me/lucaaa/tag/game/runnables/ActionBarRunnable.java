@@ -1,6 +1,7 @@
 package me.lucaaa.tag.game.runnables;
 
 import me.lucaaa.tag.TagGame;
+import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.game.PlayerData;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -14,10 +15,12 @@ import java.util.Map;
 
 public class ActionBarRunnable {
     private final TagGame plugin;
-    private final HashMap<Player, BukkitTask> currentTaggers = new HashMap<>();
+    private final Arena arena;
+    private final Map<Player, BukkitTask> currentTaggers = new HashMap<>();
 
-    public ActionBarRunnable(TagGame plugin) {
+    public ActionBarRunnable(TagGame plugin, Arena arena) {
         this.plugin = plugin;
+        this.arena = arena;
     }
 
     // Called when the initial taggers are selected.
@@ -26,7 +29,7 @@ public class ActionBarRunnable {
             BukkitTask task = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plugin.getMessagesManager().getMessage("game.tagger-actionbar", null, tagger.getPlayer(), false, true)));
+                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagger.getPlayer(), false));
                 }
             }.runTaskTimer(plugin, 0L, 20L);
 
@@ -43,7 +46,7 @@ public class ActionBarRunnable {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(plugin.getMessagesManager().getMessage("game.tagger-actionbar", null, tagged.getPlayer(), false, true)));
+                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagged.getPlayer(), false));
             }
         }.runTaskTimer(plugin, 0L, 20L);
 

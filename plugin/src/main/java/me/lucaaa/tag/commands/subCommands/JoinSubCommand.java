@@ -29,7 +29,7 @@ public class JoinSubCommand extends SubCommandsFormat {
         if (plugin.getPlayersManager().getPlayerData((Player) sender).arena != null) {
             HashMap<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", plugin.getPlayersManager().getPlayerData((Player) sender).arena.getName());
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.already-in-arena", placeholders, sender));
+            plugin.getMessagesManager().sendMessage("commands.already-in-arena", placeholders, sender);
             return;
         }
 
@@ -37,7 +37,7 @@ public class JoinSubCommand extends SubCommandsFormat {
         placeholders.put("%arena%", args[1]);
 
         if (plugin.getArenasManager().arenas.get(args[1]) == null) {
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.arena-not-found", placeholders, sender));
+            plugin.getMessagesManager().sendMessage("commands.arena-not-found", placeholders, sender);
             return;
         }
 

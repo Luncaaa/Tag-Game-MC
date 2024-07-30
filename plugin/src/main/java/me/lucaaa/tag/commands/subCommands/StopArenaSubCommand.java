@@ -32,11 +32,11 @@ public class StopArenaSubCommand extends SubCommandsFormat {
         placeholders.put("%arena%", args[1]);
 
         if (!arena.isRunning()) {
-            sender.sendMessage(plugin.getMessagesManager().getMessage("commands.arena-not-running", placeholders, sender));
+            plugin.getMessagesManager().sendMessage("commands.arena-not-running", placeholders, sender);
             return;
         }
 
         arena.stopGame(StopCause.COMMAND, false);
-        sender.sendMessage(plugin.getMessagesManager().getMessage("commands.stop-success", placeholders, sender));
+        plugin.getMessagesManager().sendMessage("commands.stop-success", placeholders, sender);
     }
 }

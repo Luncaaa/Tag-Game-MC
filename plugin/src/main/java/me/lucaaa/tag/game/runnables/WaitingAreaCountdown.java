@@ -40,7 +40,7 @@ public class WaitingAreaCountdown {
                 if (countdown == 15 || countdown == 10 || (countdown <= 5 && countdown >= 1)) {
                     placeholders.put("%time%", String.valueOf(countdown));
                     for (PlayerData playerData : playersList) {
-                        playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.game-starting", placeholders, playerData.getPlayer()));
+                        plugin.getMessagesManager().sendMessage("game.game-starting", placeholders, playerData.getPlayer());
                     }
                 }
 

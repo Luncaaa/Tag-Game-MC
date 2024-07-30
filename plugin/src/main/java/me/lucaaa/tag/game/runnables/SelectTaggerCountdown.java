@@ -36,7 +36,7 @@ public class SelectTaggerCountdown {
                 if (countdown <= 5 && countdown >= 1) {
                     placeholders.put("%time%", String.valueOf(countdown));
                     for (PlayerData playerData : playersList) {
-                        playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selecting-tagger", placeholders, playerData.getPlayer()));
+                       plugin.getMessagesManager().sendMessage("game.selecting-tagger", placeholders, playerData.getPlayer());
                     }
                 }
 

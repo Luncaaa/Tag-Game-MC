@@ -19,6 +19,6 @@ public class ReloadSubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         plugin.reloadConfigs();
-        sender.sendMessage(plugin.getMessagesManager().getMessage("commands.reload-successful", null, sender));
+        plugin.getMessagesManager().sendMessage("commands.reload-successful", null, sender);
     }
 }

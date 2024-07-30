@@ -25,14 +25,14 @@ public class FinishSetupSubCommand extends SubCommandsFormat {
         PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
 
         if (!playerData.isSettingUpArena()) {
-            player.sendMessage(plugin.getMessagesManager().getMessage("commands.not-setting-up", null, player));
+            plugin.getMessagesManager().sendMessage("commands.not-setting-up", null, player);
 
         } else {
             HashMap<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", playerData.settingUpArena.getName());
             playerData.settingUpArena = null;
             playerData.restoreSavedData();
-            player.sendMessage(plugin.getMessagesManager().getMessage("commands.finish-setup", placeholders, player));
+            plugin.getMessagesManager().sendMessage("commands.finish-setup", placeholders, player);
         }
     }
 }

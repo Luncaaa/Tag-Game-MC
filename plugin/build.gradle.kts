@@ -11,6 +11,8 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     implementation("net.kyori:adventure-api:4.17.0")
     implementation("net.kyori:adventure-text-minimessage:4.17.0")
+    implementation("net.kyori:adventure-text-serializer-legacy:4.3.3")
+    implementation("net.kyori:adventure-platform-bungeecord:4.3.3")
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation(project(":api"))
 }

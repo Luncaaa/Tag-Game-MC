@@ -3,11 +3,11 @@ package me.lucaaa.tag.managers;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucaaa.tag.utils.Logger;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.md_5.bungee.api.ChatColor;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,13 +15,13 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 
 public class MessagesManager {
     private final Map<String, String> messages = new HashMap<>();
-    private final Map<String, ArrayList<String>> messagesList = new HashMap<>();
+    private final Map<String, List<String>> messagesList = new HashMap<>();
     private final String prefix;
     private final boolean isPapiInstalled;
 
@@ -40,23 +40,25 @@ public class MessagesManager {
     }
 
     // Gets a message from the language config the user has set in config.yml
-    public String getMessage(String key, Map<String, String> placeholders, CommandSender sender) {
-        return this.getMessage(key, placeholders, sender, true, true);
+    public void sendMessage(String key, Map<String, String> placeholders, CommandSender sender) {
+        this.sendMessage(key, placeholders, sender, true);
     }
 
-    public String getMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix, boolean replaceColors) {
+    public void sendMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+        sender.spigot().sendMessage(this.getMessage(key, placeholders, sender, addPrefix));
+    }
+    
+    public String getUncoloredMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
         if (!this.messages.containsKey(key)) {
             Logger.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
             return "Message not found.";
         }
 
-        String message = this.messages.get(key);
-        if (addPrefix) message = prefix + " " + message;
+        return this.parseMessage(this.messages.get(key), placeholders, sender, addPrefix);
+    }
 
-        if (placeholders != null) message = this.replacePlaceholders(message, placeholders);
-        if (sender instanceof Player && isPapiInstalled) message = PlaceholderAPI.setPlaceholders((OfflinePlayer) sender, message);
-
-        return (replaceColors) ? this.componentToString((TextComponent) MiniMessage.miniMessage().deserialize(message), null) : message;
+    public String getParsedMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+        return BaseComponent.toLegacyText(this.getMessage(key, placeholders, sender, addPrefix));
     }
 
     public String getMessageFromList(String key, int index, Map<String, String> placeholders, CommandSender sender) {
@@ -65,15 +67,11 @@ public class MessagesManager {
             return "Message not found.";
         }
 
-        String message = this.messagesList.get(key).get(index);
-
-        if (placeholders != null) message = this.replacePlaceholders(message, placeholders);
-        if (sender instanceof Player && isPapiInstalled) message = PlaceholderAPI.setPlaceholders((OfflinePlayer) sender, message);
-
-        return this.componentToString((TextComponent) MiniMessage.miniMessage().deserialize(message), null);
+        String message = this.parseMessage(this.messagesList.get(key).get(index), placeholders, sender, false);
+        return BaseComponent.toLegacyText(this.parseMessage(message));
     }
 
-    public ArrayList<String> getMessagesList(String key) {
+    public List<String> getMessagesList(String key) {
         if (!this.messagesList.containsKey(key)) {
             ArrayList<String> notFound = new ArrayList<>();
             notFound.add("Messages not found.");
@@ -92,13 +90,45 @@ public class MessagesManager {
         return newMessage;
     }
 
-    public String getColoredMessage(String message, boolean addPrefix) {
-        String messageToSend = message;
-        if (addPrefix) messageToSend =  prefix + " " + messageToSend;
+    public BaseComponent[] getMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+        if (!this.messages.containsKey(key)) {
+            Logger.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
+            return new TextComponent[]{new TextComponent("Message not found.")};
+        }
 
-        return this.componentToString((TextComponent) MiniMessage.miniMessage().deserialize(messageToSend), null);
+        String message = this.parseMessage(this.messages.get(key), placeholders, sender, addPrefix);
+        return this.parseMessage(message);
     }
 
+    public String getColoredMessage(String message, boolean addPrefix) {
+        return this.getColoredMessage(message, null, null, addPrefix);
+    }
+
+    public String getColoredMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+        String msg = this.parseMessage(message, placeholders, sender, addPrefix);
+        return BaseComponent.toLegacyText(this.parseMessage(msg));
+    }
+
+    private BaseComponent[] parseMessage(String message) {
+        // From legacy and minimessage format to a component
+        Component legacy = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
+        // From component to Minimessage String. Replacing the "\" with nothing makes the minimessage formats work.
+        String minimessage = MiniMessage.miniMessage().serialize(legacy).replace("\\", "");
+        // From Minimessage String to Minimessage component
+        Component component = MiniMessage.miniMessage().deserialize(minimessage);
+        // From Minimessage component to legacy string.
+        return BungeeComponentSerializer.get().serialize(component);
+    }
+
+    private String parseMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+        if (addPrefix) message = prefix + "&r " + message;
+
+        if (placeholders != null) message = this.replacePlaceholders(message, placeholders);
+        if (sender instanceof Player && isPapiInstalled) message = PlaceholderAPI.setPlaceholders((OfflinePlayer) sender, message);
+        return message;
+    }
+
+    /* Old method - only parses color (no click actions)
     private String componentToString(TextComponent component, TextColor parentColor) {
         StringBuilder componentString = new StringBuilder(component.content());
 
@@ -125,5 +155,5 @@ public class MessagesManager {
         }
 
         return ChatColor.translateAlternateColorCodes('&', componentString.toString());
-    }
+    }*/
 }

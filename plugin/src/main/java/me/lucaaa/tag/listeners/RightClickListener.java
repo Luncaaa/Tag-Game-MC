@@ -53,22 +53,30 @@ public class RightClickListener implements Listener {
                 switch (itemInHand.getType()) {
                     case DIAMOND_AXE -> {
                         editingArena.setArenaCorner2(Objects.requireNonNull(event.getClickedBlock()).getLocation());
-                        player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.set-corner", placeholders, player));
+                        plugin.getMessagesManager().sendMessage("arenaSetup.set-corner", placeholders, player);
                     }
 
                     case DIAMOND_HOE -> {
-                        if (editingArena.removeArenaAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.remove-spawn", placeholders, player));
-                        else player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.block-is-not-spawn", placeholders, player));
+                        if (editingArena.removeArenaAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) {
+                            plugin.getMessagesManager().sendMessage("arenaSetup.remove-spawn", placeholders, player);
+                        }
+                        else {
+                            plugin.getMessagesManager().sendMessage("arenaSetup.block-is-not-spawn", placeholders, player);
+                        }
                     }
 
                     case GOLDEN_AXE -> {
                         editingArena.setWaitingCorner2(Objects.requireNonNull(event.getClickedBlock()).getLocation());
-                        player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.set-corner", placeholders, player));
+                        plugin.getMessagesManager().sendMessage("arenaSetup.set-corner", placeholders, player);
                     }
 
                     case GOLDEN_HOE -> {
-                        if (editingArena.removeWaitingAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.remove-spawn", placeholders, player));
-                        else player.sendMessage(plugin.getMessagesManager().getMessage("arenaSetup.block-is-not-spawn", placeholders, player));
+                        if (editingArena.removeWaitingAreaSpawn(Objects.requireNonNull(event.getClickedBlock()).getLocation())) {
+                            plugin.getMessagesManager().sendMessage("arenaSetup.remove-spawn", placeholders, player);
+                        }
+                        else {
+                            plugin.getMessagesManager().sendMessage("arenaSetup.block-is-not-spawn", placeholders, player);
+                        }
                     }
 
                     default -> {}

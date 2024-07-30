@@ -114,7 +114,7 @@ public class Arena implements TagArena {
         this.waitingAreaCountdown = new WaitingAreaCountdown(plugin, this, this.playersList, this.arenaAreaSpawns);
         this.selectTaggerCountdown = new SelectTaggerCountdown(plugin, this, this.playersList);
         this.finishGameCountdown = new FinishGameCountdown(plugin, this);
-        this.actionBarRunnable = new ActionBarRunnable(plugin);
+        this.actionBarRunnable = new ActionBarRunnable(plugin, this);
 
         this.placeholders = this.getPlaceholders();
         //this.updateSigns()
@@ -128,15 +128,15 @@ public class Arena implements TagArena {
     public HashMap<String, String> getPlaceholders() {
         String finishTime;
         if (this.arenaTime == ArenaTime.UNLIMITED) finishTime = String.valueOf(this.timeBeforeEnding);
-        else finishTime = plugin.getMessagesManager().getMessage(this.arenaTime.getCustomNameKey(), null, null, false, false);
+        else finishTime = plugin.getMessagesManager().getUncoloredMessage(this.arenaTime.getCustomNameKey(), null, null, false);
 
         String timeLeft;
         if (this.arenaTime == ArenaTime.UNLIMITED) {
-            timeLeft = plugin.getMessagesManager().getMessage("placeholders.time.unlimited", null, null, false, false);
+            timeLeft = plugin.getMessagesManager().getUncoloredMessage("placeholders.time.unlimited", null, null, false);
         } else {
             // (this.finishGameCountdown != null) -> false when the getPlaceholders() function is called from the constructor.
             if (this.finishGameCountdown != null && this.finishGameCountdown.isRunning()) timeLeft = String.valueOf(this.finishGameCountdown.getTimeLeft());
-            else timeLeft = plugin.getMessagesManager().getMessage("placeholders.time.waiting", null, null, false, false);
+            else timeLeft = plugin.getMessagesManager().getUncoloredMessage("placeholders.time.waiting", null, null, false);
         }
 
         HashMap<String, String> placeholders = new HashMap<>();
@@ -145,8 +145,8 @@ public class Arena implements TagArena {
         placeholders.put("%maxPlayers%", String.valueOf(this.maxPlayers));
         placeholders.put("%taggersNumber%", String.valueOf(this.taggersNumber));
         placeholders.put("%currentPlayers%", String.valueOf(this.playersList.size()));
-        placeholders.put("%time_mode%", plugin.getMessagesManager().getMessage(this.arenaTime.getCustomNameKey(), null, null, false, false));
-        placeholders.put("%mode%", plugin.getMessagesManager().getMessage(this.arenaMode.getCustomNameKey(), null, null, false, false));
+        placeholders.put("%time_mode%", plugin.getMessagesManager().getUncoloredMessage(this.arenaTime.getCustomNameKey(), null, null, false));
+        placeholders.put("%mode%", plugin.getMessagesManager().getUncoloredMessage(this.arenaMode.getCustomNameKey(), null, null, false));
         placeholders.put("%finishTime%", String.valueOf(finishTime));
         placeholders.put("%taggers%", this.taggers.stream().map(it -> it.getPlayer().getName()).collect(Collectors.joining(", ")));
         placeholders.put("%finishGameCountdown%", timeLeft);
@@ -431,7 +431,7 @@ public class Arena implements TagArena {
             arenaTimeItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
-        arenaTimeItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "Arena time: " + plugin.getMessagesManager().getMessage(this.arenaTime.getCustomNameKey(), null, null, false, false)));
+        arenaTimeItemMeta.setDisplayName("Arena time: " + plugin.getMessagesManager().getParsedMessage(this.arenaTime.getCustomNameKey(), null, null, false));
         arenaTimeItemMeta.setLore(Arrays.asList("If the time is limited, after x time the tagger will lose.", "If the time is unlimited, the game will never end.", "", "Note: The game can end before time if a player", "leaves and there are not enough players."));
         arenaTimeItem.setItemMeta(arenaTimeItemMeta);
 
@@ -461,7 +461,7 @@ public class Arena implements TagArena {
             arenaModeItemMeta.addEnchant(Enchantment.MENDING, 1 , false);
             arenaModeItemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
-        arenaModeItemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "Arena mode: " + plugin.getMessagesManager().getMessage(this.arenaMode.getCustomNameKey(), null, null, false, false)));
+        arenaModeItemMeta.setDisplayName("Arena mode: " + plugin.getMessagesManager().getParsedMessage(this.arenaMode.getCustomNameKey(), null, null, false));
         arenaModeItemMeta.setLore(Arrays.asList("If the mode is hit, players will have to attack to tag", "If the mode is TNT, players will have to throw TNT to tag.", "If the mode is timed, the player who has been tagger for longer will lose.", "", "Note: Damage won't be dealt while in-game"));
         arenaModeItem.setItemMeta(arenaModeItemMeta);
 
@@ -473,13 +473,13 @@ public class Arena implements TagArena {
     @Override
     public void playerJoin(Player player) {
         if (this.playersList.size() >= this.maxPlayers) {
-            player.sendMessage(plugin.getMessagesManager().getMessage("commands.arena-full", this.placeholders, player));
+            plugin.getMessagesManager().sendMessage("commands.arena-full", this.placeholders, player);
             return;
         }
 
         if (this.isWaitingAreaEnabled()) {
             if (this.isRunning) {
-                player.sendMessage(plugin.getMessagesManager().getMessage("game.in-game", this.placeholders, player));
+                plugin.getMessagesManager().sendMessage("game.in-game", this.placeholders, player);
                 return;
             }
             if (!this.sendToWaitingArea(player)) return;
@@ -505,13 +505,13 @@ public class Arena implements TagArena {
 
         this.updateSigns();
         this.updateScoreboards();
-        player.sendMessage(plugin.getMessagesManager().getMessage("commands.joined-arena", this.placeholders, player));
+        plugin.getMessagesManager().sendMessage("commands.joined-arena", this.placeholders, player);
 
         HashMap<String, String> joinPlaceholders = new HashMap<>(this.placeholders);
         joinPlaceholders.put("%player%", player.getName());
         for (PlayerData playerDataInGame : this.playersList) {
             if (playerDataInGame == plugin.getPlayersManager().getPlayerData(player)) return;
-            playerDataInGame.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.player-join", joinPlaceholders, playerDataInGame.getPlayer()));
+            plugin.getMessagesManager().sendMessage("game.player-join", joinPlaceholders, playerDataInGame.getPlayer());
         }
     }
 
@@ -544,17 +544,17 @@ public class Arena implements TagArena {
         playerData.arena = null;
         playerData.tntThrowCooldown = 0L;
         player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
-        player.sendMessage(plugin.getMessagesManager().getMessage("commands.left-arena", this.placeholders, player));
+        plugin.getMessagesManager().sendMessage("commands.left-arena", this.placeholders, player);
 
         HashMap<String, String> leavePlaceholders = new HashMap<>(this.placeholders);
         leavePlaceholders.put("%player%", player.getName());
         for (PlayerData playerDataInGame : this.playersList) {
-            playerDataInGame.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.player-leave", leavePlaceholders, playerDataInGame.getPlayer()));
+            plugin.getMessagesManager().sendMessage("game.player-leave", leavePlaceholders, playerDataInGame.getPlayer());
         }
 
         if (this.playersList.size() < this.minPlayers) {
             for (PlayerData playerDataInGame : this.playersList) {
-                playerDataInGame.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.not-enough-players", this.placeholders, playerDataInGame.getPlayer()));
+                plugin.getMessagesManager().sendMessage("game.not-enough-players", this.placeholders, playerDataInGame.getPlayer());
             }
 
             if (this.isWaitingAreaEnabled()) {
@@ -598,7 +598,7 @@ public class Arena implements TagArena {
     private boolean sendToWaitingArea(Player player) {
         PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         if (this.waitingAreaSpawns.isEmpty()) {
-            player.sendMessage(plugin.getMessagesManager().getMessage("commands.no-spawns", this.placeholders, player));
+            plugin.getMessagesManager().sendMessage("commands.no-spawns", this.placeholders, player);
             return false;
         }
 
@@ -628,7 +628,7 @@ public class Arena implements TagArena {
     private boolean sendToGame(Player player) {
         PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         if (this.arenaAreaSpawns.isEmpty()) {
-            player.sendMessage(plugin.getMessagesManager().getMessage("commands.no-spawns", this.placeholders, player));
+            plugin.getMessagesManager().sendMessage("commands.no-spawns", this.placeholders, player);
             return false;
         }
 
@@ -757,24 +757,24 @@ public class Arena implements TagArena {
             playerData.restoreSavedData();
             playerData.arena = null;
             playerData.getPlayer().setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
-            playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.game-end", playerPlaceholders, playerData.getPlayer()));
+            plugin.getMessagesManager().sendMessage("game.game-end", playerPlaceholders, playerData.getPlayer());
 
             if (losers.contains(playerData)) {
                 playerData.getStatsManager().updateTimesLost(1);
                 if (runCommands) {
                     for (String command : commandsOnEnd.getStringList("losers")) {
-                        Bukkit.dispatchCommand(consoleSender, ChatColor.translateAlternateColorCodes('&', command.replace("%player%", playerData.getPlayer().getName())));
+                        Bukkit.dispatchCommand(consoleSender, plugin.getMessagesManager().getColoredMessage(command.replace("%player%", playerData.getPlayer().getName()), this.getPlaceholders(), playerData.getPlayer(), false));
                     }
                 }
-                playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.lose", playerPlaceholders, playerData.getPlayer()));
+                plugin.getMessagesManager().sendMessage("game.lose", playerPlaceholders, playerData.getPlayer());
             } else {
                 playerData.getStatsManager().updateTimesWon(1);
                 if (runCommands) {
                     for (String command : commandsOnEnd.getStringList("winners")) {
-                        Bukkit.dispatchCommand(consoleSender, ChatColor.translateAlternateColorCodes('&', command.replace("%player%", playerData.getPlayer().getName())));
+                        Bukkit.dispatchCommand(consoleSender, plugin.getMessagesManager().getColoredMessage(command.replace("%player%", playerData.getPlayer().getName()), this.getPlaceholders(), playerData.getPlayer(), false));
                     }
                 }
-                playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.win", playerPlaceholders, playerData.getPlayer()));
+                plugin.getMessagesManager().sendMessage("game.win", playerPlaceholders, playerData.getPlayer());
             }
         }
 
@@ -803,13 +803,13 @@ public class Arena implements TagArena {
             this.taggers.add(tagger);
             tagger.giveTaggerInventory();
             tagger.startTaggerTime = System.currentTimeMillis();
-            tagger.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selected-tagger", taggersPlaceholders, tagger.getPlayer()));
+            plugin.getMessagesManager().sendMessage("game.selected-tagger", taggersPlaceholders, tagger.getPlayer());
         }
 
         for (PlayerData playerData : this.playersList) {
             if (this.taggers.contains(playerData)) continue;
-            if (this.taggersNumber > 1) playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selected-taggers-announcement", taggersPlaceholders, playerData.getPlayer()));
-            else playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.selected-tagger-announcement", taggersPlaceholders, playerData.getPlayer()));
+            if (this.taggersNumber > 1) plugin.getMessagesManager().sendMessage("game.selected-taggers-announcement", taggersPlaceholders, playerData.getPlayer());
+            else plugin.getMessagesManager().sendMessage("game.selected-tagger-announcement", taggersPlaceholders, playerData.getPlayer());
         }
         this.updateSigns();
         this.updateScoreboards();
@@ -843,11 +843,11 @@ public class Arena implements TagArena {
         taggedPlaceholders.put("%tagger%", tagger.getPlayer().getName());
         tagger.getPlayer().getInventory().setArmorContents(null);
         tagger.getPlayer().getInventory().setItem(0, new ItemStack(Material.AIR));
-        tagger.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.tagger-tagged", taggedPlaceholders, tagger.getPlayer()));
-        tagged.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.victim-tagged", taggedPlaceholders, tagged.getPlayer()));
+        plugin.getMessagesManager().sendMessage("game.tagger-tagged", taggedPlaceholders, tagger.getPlayer());
+        plugin.getMessagesManager().sendMessage("game.victim-tagged", taggedPlaceholders, tagged.getPlayer());
         for (PlayerData playerData : this.playersList) {
             if (playerData == tagged || playerData == tagger) continue;
-            playerData.getPlayer().sendMessage(plugin.getMessagesManager().getMessage("game.tagged-announcement", taggedPlaceholders, playerData.getPlayer()));
+            plugin.getMessagesManager().sendMessage("game.tagged-announcement", taggedPlaceholders, playerData.getPlayer());
         }
 
         this.taggers.add(tagged);
