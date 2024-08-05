@@ -3,6 +3,10 @@ plugins {
     id("maven-publish")
 }
 
+java {
+    withJavadocJar()
+}
+
 tasks {
     javadoc {
         title = "TagGame API " + project.version
@@ -17,16 +21,7 @@ tasks {
         }
     }
 
-    register<Jar>("makeJavadoc") {
-        dependsOn(javadoc)
-
-        archiveClassifier.set("javadoc")
-        description = "Creates a Javadoc Jar"
-        from(javadoc.get().destinationDir)
-    }
-
     jar {
-        dependsOn("makeJavadoc")
         finalizedBy(publishToMavenLocal)
     }
 }
@@ -34,12 +29,11 @@ tasks {
 publishing {
     publications {
         val mavenJava by creating(MavenPublication::class) {
+            groupId = "TagGameMC"
+            artifactId = "tag-api"
+            version = "1.3"
+
             from(components["java"])
         }
     }
-}
-
-artifacts {
-    archives(tasks.jar)
-    archives(tasks.named("makeJavadoc"))
 }
