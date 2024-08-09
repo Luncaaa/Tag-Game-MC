@@ -5,6 +5,7 @@ Play tag in your Minecraft server!
 You can download the plugin here:
 - Spigot resource page: https://www.spigotmc.org/resources/tag-game.109807/
 - Hangar resource page: https://hangar.papermc.io/Lucaaa/TagGame
+- Modrinth resource page: https://modrinth.com/plugin/tag-game-mc
 - Wiki: https://lucaaa.gitbook.io/tag-game/
 
 If you have an issue, found a bug or want to suggest something, you can do it here:
