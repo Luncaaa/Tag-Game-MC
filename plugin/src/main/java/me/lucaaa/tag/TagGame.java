@@ -1,5 +1,6 @@
 package me.lucaaa.tag;
 
+import me.lucaaa.tag.actions.ActionsHandler;
 import me.lucaaa.tag.api.APIImplementation;
 import me.lucaaa.tag.api.APIProvider;
 import me.lucaaa.tag.commands.MainCommand;
@@ -28,6 +29,9 @@ public class TagGame extends JavaPlugin {
     private PlayersManager playersManager;
     private ItemsManager itemsManager;
     private ArenasManager arenasManager;
+
+    // Default actions handler.
+    private ActionsHandler actionsHandler;
 
     // Reload the config files.
     public void reloadConfigs() {
@@ -59,6 +63,8 @@ public class TagGame extends JavaPlugin {
         if (arenasManager != null) arenasManager.stopAllArenas();
         arenasManager = new ArenasManager(this);
         playersManager = new PlayersManager(this);
+
+        actionsHandler = new ActionsHandler(this, mainConfig.getConfig());
     }
 
     // If the config files do not exist, create them.
@@ -163,5 +169,9 @@ public class TagGame extends JavaPlugin {
 
     public ArenasManager getArenasManager() {
         return this.arenasManager;
+    }
+
+    public ActionsHandler getActionsHandler() {
+        return this.actionsHandler;
     }
 }

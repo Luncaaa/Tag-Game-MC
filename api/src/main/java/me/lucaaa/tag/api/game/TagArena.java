@@ -144,9 +144,9 @@ public interface TagArena {
     /**
      * Stops the arena.
      *
-     * @param runCommands Whether commands should be run for winner and losers.
+     * @param executeActions Whether actions should be executed for winner and losers.
      */
-    void stopGame(boolean runCommands);
+    void stopGame(boolean executeActions);
 
     /**
      * Gets the players who are taggers.

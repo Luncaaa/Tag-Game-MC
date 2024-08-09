@@ -36,15 +36,34 @@ borders-leave: PREVENT
 knockback: 2.0
 height: 0.5
 
-# Commands that will be run when the game ends.
-# %player% - The player
-commands-on-end:
-  # Commands ran for the losers (taggers on HIT and TNT modes or person with the highest tagging time in TIMED_TNT or TIMED_HIT):
-  losers:
-    - "say you lost %player%"
-  # Commands ran for the rest of the players:
-  winners:
-    - "say you won %player%"
+# Actions that will be executed when the game ends.
+# Arenas can have their own actions. If they don't have them, these actions will be run instead.
+# See the wiki for info on the available actions and placeholders.
+actions:
+  # Actions executed for every player, no matter if they won or lost.
+  ANY:
+    gameEnd:
+      global: true
+      type: message
+      message: "&aThe game has ended!"
+
+  # Actions executed for the losers (taggers on HIT and TNT modes or person with the highest tagging time in TIMED_TNT or TIMED_HIT):
+  LOSERS:
+    betterLuck:
+      global: false
+      type: message
+      message: "&cYou lost, %player% :( Better luck next time!"
+
+  # Actions executed for the rest of the players:
+  WINNERS:
+    congratulations:
+      global: false
+      type: message
+      message: "&aYou won, %player% :) Enjoy a free diamond!"
+    giveDiamond:
+      global: false
+      type: console-cmd
+      command: "give %player% minecraft:diamond 1"
 
 # Number of ticks after which the TNT will explode (only for TNT mode arenas)
 tnt-fuse-time: 50

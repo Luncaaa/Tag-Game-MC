@@ -1,6 +1,8 @@
 package me.lucaaa.tag.game;
 
 import me.lucaaa.tag.TagGame;
+import me.lucaaa.tag.actions.ActionSet;
+import me.lucaaa.tag.actions.ActionsHandler;
 import me.lucaaa.tag.api.events.*;
 import me.lucaaa.tag.api.game.*;
 import me.lucaaa.tag.game.runnables.*;
@@ -11,8 +13,6 @@ import me.lucaaa.tag.api.enums.StopCause;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Sign;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -65,6 +65,8 @@ public class Arena implements TagArena {
     private final FinishGameCountdown finishGameCountdown;
     private final ActionBarRunnable actionBarRunnable;
 
+    private final ActionsHandler actionsHandler;
+
     private boolean isRunning = false;
 
     public Arena(TagGame plugin, String name, ConfigManager arenaConfig) {
@@ -115,6 +117,12 @@ public class Arena implements TagArena {
         this.selectTaggerCountdown = new SelectTaggerCountdown(plugin, this, playersList);
         this.finishGameCountdown = new FinishGameCountdown(plugin, this);
         this.actionBarRunnable = new ActionBarRunnable(plugin, this);
+
+        if (this.arenaConfig.isConfigurationSection("actions")) {
+            this.actionsHandler = new ActionsHandler(plugin, this.arenaConfig);
+        } else {
+            this.actionsHandler = null;
+        }
 
         this.placeholders = getPlaceholders();
         //updateSigns()
@@ -671,11 +679,11 @@ public class Arena implements TagArena {
     }
 
     @Override
-    public void stopGame(boolean runCommands) {
-        stopGame(StopCause.API, runCommands);
+    public void stopGame(boolean executeActions) {
+        stopGame(StopCause.API, executeActions);
     }
 
-    public void stopGame(StopCause cause, boolean runCommands) {
+    public void stopGame(StopCause cause, boolean executeActions) {
         ArenaStopEvent stopEvent = new ArenaStopEvent(this, cause);
         Bukkit.getPluginManager().callEvent(stopEvent);
 
@@ -707,10 +715,6 @@ public class Arena implements TagArena {
             updateSigns();
             return;
         }
-
-        ConfigurationSection commandsOnEnd = plugin.getMainConfig().getConfig().getConfigurationSection("commands-on-end");
-        assert commandsOnEnd != null;
-        ConsoleCommandSender consoleSender = Bukkit.getConsoleSender();
 
         ArrayList<PlayerData> losers = new ArrayList<>();
         if (arenaMode == ArenaMode.TIMED_HIT || arenaMode == ArenaMode.TIMED_TNT) {
@@ -755,27 +759,28 @@ public class Arena implements TagArena {
             else playerData.getPlayer().teleport(playerData.getSavedLocation());
 
             playerData.restoreSavedData();
-            playerData.arena = null;
+            playerData.getStatsManager().saveData(true);
+
             playerData.getPlayer().setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
             plugin.getMessagesManager().sendMessage("game.game-end", playerPlaceholders, playerData.getPlayer());
 
+            ActionsHandler actionsHandler = (this.actionsHandler == null) ? plugin.getActionsHandler() : this.actionsHandler;
+
             if (losers.contains(playerData)) {
                 playerData.getStatsManager().updateTimesLost(1);
-                if (runCommands) {
-                    for (String command : commandsOnEnd.getStringList("losers")) {
-                        Bukkit.dispatchCommand(consoleSender, plugin.getMessagesManager().getColoredMessage(command.replace("%player%", playerData.getPlayer().getName()), getPlaceholders(), playerData.getPlayer(), false));
-                    }
+                if (executeActions) {
+                    actionsHandler.runActions(playerData.getPlayer(), ActionSet.LOSERS);
                 }
                 plugin.getMessagesManager().sendMessage("game.lose", playerPlaceholders, playerData.getPlayer());
             } else {
                 playerData.getStatsManager().updateTimesWon(1);
-                if (runCommands) {
-                    for (String command : commandsOnEnd.getStringList("winners")) {
-                        Bukkit.dispatchCommand(consoleSender, plugin.getMessagesManager().getColoredMessage(command.replace("%player%", playerData.getPlayer().getName()), getPlaceholders(), playerData.getPlayer(), false));
-                    }
+                if (executeActions) {
+                    actionsHandler.runActions(playerData.getPlayer(), ActionSet.WINNERS);
                 }
                 plugin.getMessagesManager().sendMessage("game.win", playerPlaceholders, playerData.getPlayer());
             }
+
+            playerData.arena = null;
         }
 
         playersList.clear();
