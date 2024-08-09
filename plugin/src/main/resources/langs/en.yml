@@ -62,6 +62,12 @@ arenaSetup:
   block-is-spawn: "&cThis block is already a spawn."
   block-is-not-spawn: "&cThis block is not a spawn."
 
+# Messages sent when managing join signs.
+joinSigns:
+  created: "&aSuccessfully created a join sign!"
+  removed: "&aSuccessfully removed the join sign!"
+  no-permission: "&cYou don't have permission to manage join signs!"
+
 # Messages sent to the players while playing.
 # Arena placeholders:
 # %prefix% - The plugin's prefix (from config.yml).

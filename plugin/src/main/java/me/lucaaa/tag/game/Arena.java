@@ -165,7 +165,7 @@ public class Arena implements TagArena {
     // -[ Signs ]-
     public void addSign(Location location) {
         signs.add(location);
-        plugin.getSignsManager().addSign(location, name);
+        plugin.getSignsManager().addSign(location, this);
         updateConfigSigns();
     }
 

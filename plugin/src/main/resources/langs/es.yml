@@ -62,6 +62,12 @@ arenaSetup:
   block-is-spawn: "&cEste bloque ya es un spawn."
   block-is-now-spawn: "&cEste bloque no es un spawn."
 
+# Mensajes enviados cuando se modifican carteles para unirse.
+joinSigns:
+  created: "&a¡Se ha creado un cartel de unión exitosamente!"
+  removed: "&a¡El cartel de unión ha sido eliminado exitosamente!"
+  no-permission: "&c¡No tienes permiso para modificar carteles de unión!"
+
 # Mensajes enviados a los jugadores cuando están jugando.
 # Placeholders de la arena:
 # %prefix% - The plugin's prefix (from config.yml).

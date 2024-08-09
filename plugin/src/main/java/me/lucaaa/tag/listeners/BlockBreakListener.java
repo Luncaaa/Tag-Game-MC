@@ -3,6 +3,7 @@ package me.lucaaa.tag.listeners;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.game.PlayerData;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -28,8 +29,19 @@ public class BlockBreakListener implements Listener {
 
         // If the block that was broken was a join sign, remove it from the arena's signs, and the signs list.
         if (!playerData.isSettingUpArena() && !playerData.isInArena() && event.getBlock().getState() instanceof Sign) {
-            if (!plugin.getSignsManager().signs.containsKey(event.getBlock().getLocation())) return;
-            plugin.getArenasManager().getArena(plugin.getSignsManager().signs.get(event.getBlock().getLocation())).removeSign(event.getBlock().getLocation());
+            Location location = event.getBlock().getLocation();
+            if (!plugin.getSignsManager().isJoinSign(location)) return;
+
+            Arena arena = plugin.getSignsManager().getArena(location);
+
+            if (!event.getPlayer().hasPermission("tag.admin") && !event.getPlayer().hasPermission("tag.setup")) {
+                plugin.getMessagesManager().sendMessage("joinSigns.no-permission", arena.getPlaceholders(), event.getPlayer());
+                event.setCancelled(true);
+                return;
+            }
+
+            arena.removeSign(location);
+            plugin.getMessagesManager().sendMessage("joinSigns.removed", arena.getPlaceholders(), event.getPlayer());
         }
 
         if (playerData.isSettingUpArena()) {

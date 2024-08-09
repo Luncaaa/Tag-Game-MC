@@ -36,8 +36,8 @@ public class RightClickListener implements Listener {
 
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !playerData.isSettingUpArena() && !playerData.isInArena() && Objects.requireNonNull(event.getClickedBlock()).getState() instanceof Sign) {
-            if (!plugin.getSignsManager().signs.containsKey(event.getClickedBlock().getLocation())) return;
-            plugin.getArenasManager().getArena(plugin.getSignsManager().signs.get(event.getClickedBlock().getLocation())).playerJoin(player);
+            if (!plugin.getSignsManager().isJoinSign(event.getClickedBlock().getLocation())) return;
+            plugin.getSignsManager().getArena(event.getClickedBlock().getLocation()).playerJoin(player);
             return;
         }
         if (event.getHand() != EquipmentSlot.HAND || (!playerData.isSettingUpArena() && !playerData.isInArena())) return;
