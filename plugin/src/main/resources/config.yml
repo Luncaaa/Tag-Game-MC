@@ -38,6 +38,7 @@ height: 0.5
 
 # Actions that will be executed when the game ends.
 # Arenas can have their own actions. If they don't have them, these actions will be run instead.
+# For custom actions in an arena, just add an "actions" section in the arena config file and add your custom actions there.
 # See the wiki for info on the available actions and placeholders.
 actions:
   # Actions executed for every player, no matter if they won or lost.
