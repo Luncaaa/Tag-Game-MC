@@ -12,12 +12,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scoreboard.*;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class PlayerData implements TagPlayer {
     private final TagGame plugin;
@@ -39,6 +37,7 @@ public class PlayerData implements TagPlayer {
     private float savedXPToNextLvl = 0.0F;
     private double savedHealth = 0.0;
     private int savedHunger = 0;
+    private Collection<PotionEffect> savedEffects = List.of();
     private boolean dataIsSaved = false;
 
     // Saved location
@@ -93,6 +92,7 @@ public class PlayerData implements TagPlayer {
         savedHealth = player.getHealth();
         savedHunger = player.getFoodLevel();
         savedLocation = player.getLocation();
+        savedEffects = player.getActivePotionEffects();
         dataIsSaved = true;
     }
 
@@ -107,6 +107,7 @@ public class PlayerData implements TagPlayer {
         player.setExp(savedXPToNextLvl);
         player.setHealth(savedHealth);
         player.setFoodLevel(savedHunger);
+        player.addPotionEffects(savedEffects);
 
         savedInventoryContents = null;
         savedInventoryArmor = null;
@@ -117,6 +118,7 @@ public class PlayerData implements TagPlayer {
         savedHealth = 0.0;
         savedHunger = 0;
         savedLocation = null;
+        savedEffects = List.of();
         dataIsSaved = false;
     }
 
