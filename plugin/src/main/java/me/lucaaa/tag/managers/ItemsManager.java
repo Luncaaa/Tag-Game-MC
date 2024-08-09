@@ -45,7 +45,7 @@ public class ItemsManager {
     }
 
     private void loadItem(String category, String itemConfigSectionName) {
-        ConfigurationSection itemConfigSection = this.configManager.getConfig().getConfigurationSection(category + "." + itemConfigSectionName);
+        ConfigurationSection itemConfigSection = configManager.getConfig().getConfigurationSection(category + "." + itemConfigSectionName);
 
         ItemStack item;
 
@@ -84,10 +84,10 @@ public class ItemsManager {
 
         item.setItemMeta(itemMeta);
 
-        this.items.put(itemConfigSectionName, item);
+        items.put(itemConfigSectionName, item);
     }
 
     public ItemStack getItem(String itemName) {
-        return (this.items.containsKey(itemName)) ? this.items.get(itemName) : this.items.get("not-found");
+        return (items.containsKey(itemName)) ? items.get(itemName) : items.get("not-found");
     }
 }

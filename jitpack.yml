@@ -1,2 +1,2 @@
 install:
-  - ./gradlew :api:jar
+  - ./gradlew :api:build

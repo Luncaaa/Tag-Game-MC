@@ -19,12 +19,12 @@ public class FinishGameCountdown {
     }
 
     public boolean isRunning() {
-        return this.timer != null;
+        return timer != null;
     }
 
     public void start(int finishTime) {
-        this.timeLeft = finishTime;
-        this.timer = new BukkitRunnable() {
+        timeLeft = finishTime;
+        timer = new BukkitRunnable() {
             @Override
             public void run() {
                 arena.updateSigns();
@@ -39,11 +39,11 @@ public class FinishGameCountdown {
     }
 
     public void stop() {
-        if (this.timer != null) this.timer.cancel();
-        this.timer = null;
+        if (timer != null) timer.cancel();
+        timer = null;
     }
 
     public int getTimeLeft() {
-        return this.timeLeft;
+        return timeLeft;
     }
 }

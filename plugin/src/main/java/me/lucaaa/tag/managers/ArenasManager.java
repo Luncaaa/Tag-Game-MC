@@ -33,7 +33,7 @@ public class ArenasManager {
         Objects.requireNonNull(arenasFolder.listFiles());
         for (File file : Objects.requireNonNull(arenasFolder.listFiles())) {
             Logger.log(Level.INFO, "Loading arena " + file.getName().replaceAll(".yml", "") + "...");
-            ConfigManager arenaConfig = new ConfigManager(this.plugin, "arenas" + File.separator + file.getName());
+            ConfigManager arenaConfig = new ConfigManager(plugin, "arenas" + File.separator + file.getName());
             this.arenas.put(arenaConfig.getFile().getName().replaceAll(".yml", ""), new Arena(plugin, arenaConfig.getFile().getName().replaceAll(".yml", ""), arenaConfig));
         }
     }
@@ -44,7 +44,7 @@ public class ArenasManager {
             return false;
         }
 
-        ConfigManager newArenaConfig = new ConfigManager(this.plugin, "arenas" + File.separator + name + ".yml");
+        ConfigManager newArenaConfig = new ConfigManager(plugin, "arenas" + File.separator + name + ".yml");
 
         // Set properties in the arena file.
         ConfigurationSection waitingAreaSection = newArenaConfig.getConfig().createSection("waiting-area");
@@ -79,24 +79,24 @@ public class ArenasManager {
             return false;
         }
 
-        File arenaFileConfig = new ConfigManager(this.plugin, "arenas" + File.separator + name +".yml").getFile();
+        File arenaFileConfig = new ConfigManager(plugin, "arenas" + File.separator + name +".yml").getFile();
         arenaFileConfig.delete();
         arenas.remove(name);
         return true;
     }
 
     public void stopAllArenas() {
-        for (Arena arena : this.arenas.values()) {
+        for (Arena arena : arenas.values()) {
             arena.stopGame(StopCause.RELOAD, false);
         }
     }
 
     // Gets an arena by name.
     public Arena getArena(String name) {
-        return this.arenas.get(name);
+        return arenas.get(name);
     }
 
     public TagArena getTagArena(String name) {
-        return this.arenas.get(name);
+        return arenas.get(name);
     }
 }

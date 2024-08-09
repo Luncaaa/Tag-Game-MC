@@ -16,14 +16,14 @@ public class ConfigManager {
     }
 
     public void save() throws IOException {
-        this.config.save(this.file);
+        config.save(file);
     }
 
     public File getFile() {
-        return this.file;
+        return file;
     }
 
     public YamlConfiguration getConfig() {
-        return this.config;
+        return config;
     }
 }

@@ -1,4 +1,4 @@
-package me.lucaaa.tag.commands.subCommands;
+package me.lucaaa.tag.commands.subcommands;
 
 import me.lucaaa.tag.TagGame;
 import org.bukkit.command.CommandSender;
@@ -31,7 +31,7 @@ public abstract class SubCommandsFormat {
     // If the command can be executed by console or not
     public boolean executableByConsole;
 
-    // The permission needed to run this command other than plugin.admin. Can be null (no permission needed)
+    // The permission needed to run this command other than tag.admin. Can be null (no permission needed)
     public String neededPermission;
 
     /**

@@ -24,11 +24,11 @@ public class SelectTaggerCountdown {
     }
 
     public boolean isRunning() {
-        return this.timer != null;
+        return timer != null;
     }
 
     public void start() {
-        this.timer = new BukkitRunnable() {
+        timer = new BukkitRunnable() {
             private int countdown = 7;
 
             @Override
@@ -63,7 +63,7 @@ public class SelectTaggerCountdown {
     }
 
     public void stop() {
-        if (this.timer != null) this.timer.cancel();
-        this.timer = null;
+        if (timer != null) timer.cancel();
+        timer = null;
     }
 }

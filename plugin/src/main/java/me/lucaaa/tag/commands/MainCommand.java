@@ -1,7 +1,7 @@
 package me.lucaaa.tag.commands;
 
 import me.lucaaa.tag.TagGame;
-import me.lucaaa.tag.commands.subCommands.*;
+import me.lucaaa.tag.commands.subcommands.*;
 import me.lucaaa.tag.managers.MessagesManager;
 import org.bukkit.command.*;
 import org.jetbrains.annotations.NotNull;
@@ -99,7 +99,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             for (Map.Entry<String, SubCommandsFormat> entry : subCommands.entrySet()) {
                 if (entry.getValue().neededPermission == null || sender.hasPermission(entry.getValue().neededPermission) || sender.hasPermission("tag.admin")) {
                     completions.add(entry.getKey());
-                } else if (sender.hasPermission(entry.getValue().neededPermission) || sender.hasPermission("plugin.admin")) {
+                } else if (sender.hasPermission(entry.getValue().neededPermission) || sender.hasPermission("tag.admin")) {
                     completions.add(entry.getKey());
                 }
             }

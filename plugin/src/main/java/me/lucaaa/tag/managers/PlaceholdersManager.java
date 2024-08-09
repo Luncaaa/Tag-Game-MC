@@ -48,7 +48,7 @@ public class PlaceholdersManager extends PlaceholderExpansion {
         // If the 1st parameter is arena, return the desired property.
         if (Objects.equals(placeholderParts[0], "arena")) {
             if (placeholderParts.length < 3) return "Must provide arena name and property.";
-            else return this.getArenaPlaceholder(placeholderParts[1], placeholderParts[2]);
+            else return getArenaPlaceholder(placeholderParts[1], placeholderParts[2]);
 
         // If the 1st parameter is player...
         } else if (Objects.equals(placeholderParts[0], "player")) {
@@ -62,7 +62,7 @@ public class PlaceholdersManager extends PlaceholderExpansion {
 
                     PlayerData playerData = plugin.getPlayersManager().getPlayerData(Objects.requireNonNull(player.getPlayer()));
                     if (!playerData.isInArena()) return "";
-                    else return this.getArenaPlaceholder(playerData.arena.getName(), placeholderParts[2]);
+                    else return getArenaPlaceholder(playerData.arena.getName(), placeholderParts[2]);
 
                     // If the 2nd parameter is anything other than "arena", return the desired property of the player.
                 } else {

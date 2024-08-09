@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("com.github.johnrengelman.shadow") version("8.1.1")
+    id("io.github.goooler.shadow") version("8.1.8")
 }
 
 repositories {
@@ -21,7 +21,7 @@ tasks {
     shadowJar {
         minimize()
         relocate("net.kyori", "shaded.net.kyori")
-        archiveFileName.set("${project.parent?.name}-v${project.version}.jar")
+        archiveFileName.set("${project.parent?.name}-${project.version}.jar")
         destinationDirectory.set(file("../build/libs"))
 
         manifest {
@@ -33,7 +33,7 @@ tasks {
         }
     }
 
-    jar {
+    assemble {
         dependsOn(shadowJar)
     }
 }

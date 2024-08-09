@@ -10,6 +10,6 @@ public class Logger {
     }
 
     public static void logError(Level level, String message, Throwable error) {
-        Bukkit.getLogger().log(level, "[AdvancedDisplays] " + message, error);
+        Bukkit.getLogger().log(level, "[TAG] " + message, error);
     }
 }

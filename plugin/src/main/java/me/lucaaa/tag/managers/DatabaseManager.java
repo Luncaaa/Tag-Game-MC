@@ -69,7 +69,7 @@ public class DatabaseManager {
             config.setDriverClassName("org.sqlite.JDBC");
         }
         config.setMinimumIdle(1);
-        config.setMaximumPoolSize(15);
+        config.setMaximumPoolSize(50);
         config.setConnectionTimeout(60000);
         config.setConnectionTestQuery("SELECT 1");
         dataSource = new HikariDataSource(config);
@@ -93,7 +93,7 @@ public class DatabaseManager {
 
     public CompletableFuture<Void> createPlayerIfNotExist(String playerName) {
         Runnable task = () -> {
-            try (Connection conn = this.getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
+            try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
                 statement.setString(1, playerName);
                 ResultSet results = statement.executeQuery();
 
@@ -119,7 +119,7 @@ public class DatabaseManager {
     }
 
     public int getInt(String playerName, String dataToGet) {
-        try (Connection conn = this.getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
+        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
             statement.setString(1, playerName);
             ResultSet query = statement.executeQuery();
             query.next();
@@ -133,7 +133,7 @@ public class DatabaseManager {
     }
 
     public double getDouble(String playerName, String dataToGet) {
-        try (Connection conn = this.getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
+        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
             statement.setString(1, playerName);
             ResultSet query = statement.executeQuery();
             query.next();
@@ -147,7 +147,7 @@ public class DatabaseManager {
     }
 
     public void updateInt(String playerName, String dataToUpdate, int newValue) {
-        try (Connection conn = this.getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE player_stats SET "+dataToUpdate+" = ? WHERE name = ?")) {
+        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE player_stats SET "+dataToUpdate+" = ? WHERE name = ?")) {
             statement.setInt(1, newValue);
             statement.setString(2, playerName);
             statement.executeUpdate();
@@ -157,7 +157,7 @@ public class DatabaseManager {
     }
 
     public void updateDouble(String playerName, String dataToUpdate, double newValue) {
-        try (Connection conn = this.getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE player_stats SET "+dataToUpdate+" = ? WHERE name = ?")) {
+        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE player_stats SET "+dataToUpdate+" = ? WHERE name = ?")) {
             statement.setDouble(1, newValue);
             statement.setString(2, playerName);
             statement.executeUpdate();
@@ -167,11 +167,11 @@ public class DatabaseManager {
     }
 
     public CompletableFuture<Void> isSaving(String playerName) {
-        return this.savingData.get(playerName);
+        return savingData.get(playerName);
     }
 
     public void addSaving(String playerName, CompletableFuture<Void> function) {
         function.thenRun(() -> savingData.remove(playerName));
-        this.savingData.put(playerName, function);
+        savingData.put(playerName, function);
     }
 }

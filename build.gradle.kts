@@ -4,7 +4,7 @@ plugins {
 
 allprojects {
     apply(plugin = "java")
-    group = "me.lucaaa.tag"
+    group = "me.lucaaa"
     version = "1.3"
 }
 

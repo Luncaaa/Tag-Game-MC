@@ -1,4 +1,4 @@
-package me.lucaaa.tag.commands.subCommands;
+package me.lucaaa.tag.commands.subcommands;
 
 import me.lucaaa.tag.TagGame;
 import org.bukkit.Location;

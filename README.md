@@ -15,4 +15,4 @@ If you have an issue, found a bug or want to suggest something, you can do it he
 
 ## How to compile
 The plugin is compiled using Gradle 8.9 and Java 16.
-Build the jar running the Gradle task "jar"
+Build the jar running the Gradle task "build"

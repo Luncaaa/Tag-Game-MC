@@ -48,83 +48,83 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
 
     @Override
     public int getGamesPlayed() {
-        return this.gamesPlayed;
+        return gamesPlayed;
     }
 
     public void updateGamesPlayed(int add) {
-        this.gamesPlayed += add;
+        gamesPlayed += add;
     }
 
     @Override
     public int getTimesLost() {
-        return this.timesLost;
+        return timesLost;
     }
 
     public void updateTimesLost(int add) {
-        this.timesLost += add;
+        timesLost += add;
     }
 
     @Override
     public int getTimesWon() {
-        return this.timesWon;
+        return timesWon;
     }
 
     public void updateTimesWon(int add) {
-        this.timesWon += add;
+        timesWon += add;
     }
 
     @Override
     public int getTimesTagger() {
-        return this.timesTagger;
+        return timesTagger;
     }
 
     public void updateTimesTagger(int add) {
-        this.timesTagger += add;
+        timesTagger += add;
     }
 
     @Override
     public int getTimesBeenTagged() {
-        return this.timesBeenTagged;
+        return timesBeenTagged;
     }
 
     public void updateTimesBeenTagged(int add) {
-        this.timesBeenTagged += add;
+        timesBeenTagged += add;
     }
 
     @Override
     public int getTimesTagged() {
-        return this.timesTagged;
+        return timesTagged;
     }
 
     public void updateTimesTagged(int add) {
-        this.timesTagged += add;
+        timesTagged += add;
     }
 
     @Override
     public double getTimeTagger() {
-        return this.timeTagger;
+        return timeTagger;
     }
 
     public void updateTimeTagger(double add) {
-        this.timeTagger += add;
+        timeTagger += add;
     }
 
     public void saveTempData(int timesTagger, int timesTagged, int timesBeenTagged) {
-        this.savedTimesTagger = timesTagger;
-        this.savedTimesTagged = timesTagged;
-        this.savedTimesBeenTagged = timesBeenTagged;
+        savedTimesTagger = timesTagger;
+        savedTimesTagged = timesTagged;
+        savedTimesBeenTagged = timesBeenTagged;
     }
 
     public void mergeTempData() {
-        this.updateTimesTagger(this.savedTimesTagger);
-        this.updateTimesTagged(this.savedTimesTagged);
-        this.updateTimesBeenTagged(this.savedTimesBeenTagged);
+        updateTimesTagger(savedTimesTagger);
+        updateTimesTagged(savedTimesTagged);
+        updateTimesBeenTagged(savedTimesBeenTagged);
     }
 
     public void clearTempData() {
-        this.savedTimesTagger = 0;
-        this.savedTimesTagged = 0;
-        this.savedTimesBeenTagged = 0;
+        savedTimesTagger = 0;
+        savedTimesTagged = 0;
+        savedTimesBeenTagged = 0;
     }
 
     public void saveData(boolean async) {

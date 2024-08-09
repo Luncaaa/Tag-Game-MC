@@ -21,7 +21,7 @@ tasks {
         }
     }
 
-    jar {
+    assemble {
         finalizedBy(publishToMavenLocal)
     }
 }

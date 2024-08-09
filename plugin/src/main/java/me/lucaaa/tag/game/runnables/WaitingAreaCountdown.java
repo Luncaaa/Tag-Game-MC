@@ -29,11 +29,11 @@ public class WaitingAreaCountdown {
     }
 
     public boolean isRunning() {
-        return this.timer != null;
+        return timer != null;
     }
 
     public void start() {
-        this.timer = new BukkitRunnable() {
+        timer = new BukkitRunnable() {
             private int countdown = 15;
             @Override
             public void run() {
@@ -59,7 +59,7 @@ public class WaitingAreaCountdown {
     }
 
     public void stop() {
-        this.timer.cancel();
-        this.timer = null;
+        timer.cancel();
+        timer = null;
     }
 }

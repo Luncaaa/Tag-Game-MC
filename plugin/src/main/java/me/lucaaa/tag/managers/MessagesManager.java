@@ -41,43 +41,43 @@ public class MessagesManager {
 
     // Gets a message from the language config the user has set in config.yml
     public void sendMessage(String key, Map<String, String> placeholders, CommandSender sender) {
-        this.sendMessage(key, placeholders, sender, true);
+        sendMessage(key, placeholders, sender, true);
     }
 
     public void sendMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        sender.spigot().sendMessage(this.getMessage(key, placeholders, sender, addPrefix));
+        sender.spigot().sendMessage(getMessage(key, placeholders, sender, addPrefix));
     }
     
     public String getUncoloredMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        if (!this.messages.containsKey(key)) {
+        if (!messages.containsKey(key)) {
             Logger.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
             return "Message not found.";
         }
 
-        return this.parseMessage(this.messages.get(key), placeholders, sender, addPrefix);
+        return parseMessage(messages.get(key), placeholders, sender, addPrefix);
     }
 
     public String getParsedMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        return BaseComponent.toLegacyText(this.getMessage(key, placeholders, sender, addPrefix));
+        return BaseComponent.toLegacyText(getMessage(key, placeholders, sender, addPrefix));
     }
 
     public String getMessageFromList(String key, int index, Map<String, String> placeholders, CommandSender sender) {
-        if (!this.messagesList.containsKey(key) || index > this.messagesList.get(key).size() - 1) {
+        if (!messagesList.containsKey(key) || index > messagesList.get(key).size() - 1) {
             Logger.log(Level.WARNING, "The key \"" + key + "." + index + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
             return "Message not found.";
         }
 
-        String message = this.parseMessage(this.messagesList.get(key).get(index), placeholders, sender, false);
-        return BaseComponent.toLegacyText(this.parseMessage(message));
+        String message = parseMessage(messagesList.get(key).get(index), placeholders, sender, false);
+        return BaseComponent.toLegacyText(parseMessage(message));
     }
 
     public List<String> getMessagesList(String key) {
-        if (!this.messagesList.containsKey(key)) {
+        if (!messagesList.containsKey(key)) {
             ArrayList<String> notFound = new ArrayList<>();
             notFound.add("Messages not found.");
             return notFound;
         }
-        return this.messagesList.get(key);
+        return messagesList.get(key);
     }
 
     // Loops through the placeholder map and replaces the keys with the values in the provided string.
@@ -91,22 +91,22 @@ public class MessagesManager {
     }
 
     public BaseComponent[] getMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        if (!this.messages.containsKey(key)) {
+        if (!messages.containsKey(key)) {
             Logger.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
             return new TextComponent[]{new TextComponent("Message not found.")};
         }
 
-        String message = this.parseMessage(this.messages.get(key), placeholders, sender, addPrefix);
-        return this.parseMessage(message);
+        String message = parseMessage(messages.get(key), placeholders, sender, addPrefix);
+        return parseMessage(message);
     }
 
     public String getColoredMessage(String message, boolean addPrefix) {
-        return this.getColoredMessage(message, null, null, addPrefix);
+        return getColoredMessage(message, null, null, addPrefix);
     }
 
     public String getColoredMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        String msg = this.parseMessage(message, placeholders, sender, addPrefix);
-        return BaseComponent.toLegacyText(this.parseMessage(msg));
+        String msg = parseMessage(message, placeholders, sender, addPrefix);
+        return BaseComponent.toLegacyText(parseMessage(msg));
     }
 
     private BaseComponent[] parseMessage(String message) {
@@ -123,7 +123,7 @@ public class MessagesManager {
     private String parseMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
         if (addPrefix) message = prefix + "&r " + message;
 
-        if (placeholders != null) message = this.replacePlaceholders(message, placeholders);
+        if (placeholders != null) message = replacePlaceholders(message, placeholders);
         if (sender instanceof Player && isPapiInstalled) message = PlaceholderAPI.setPlaceholders((OfflinePlayer) sender, message);
         return message;
     }

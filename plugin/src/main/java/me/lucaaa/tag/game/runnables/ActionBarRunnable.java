@@ -33,15 +33,15 @@ public class ActionBarRunnable {
                 }
             }.runTaskTimer(plugin, 0L, 20L);
 
-            this.currentTaggers.put(tagger.getPlayer(), task);
+            currentTaggers.put(tagger.getPlayer(), task);
         }
     }
 
     // Called when a player tags another player.
     public void sendToPlayer(Player tagged, Player tagger) {
-        this.currentTaggers.get(tagger).cancel();
+        currentTaggers.get(tagger).cancel();
         tagger.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
-        this.currentTaggers.remove(tagger);
+        currentTaggers.remove(tagger);
 
         BukkitTask task = new BukkitRunnable() {
             @Override
@@ -50,14 +50,14 @@ public class ActionBarRunnable {
             }
         }.runTaskTimer(plugin, 0L, 20L);
 
-        this.currentTaggers.put(tagged, task);
+        currentTaggers.put(tagged, task);
     }
 
     public void stop() {
-        for (Map.Entry<Player, BukkitTask> entry : this.currentTaggers.entrySet()) {
+        for (Map.Entry<Player, BukkitTask> entry : currentTaggers.entrySet()) {
             entry.getValue().cancel();
             entry.getKey().spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
         }
-        this.currentTaggers.clear();
+        currentTaggers.clear();
     }
 }

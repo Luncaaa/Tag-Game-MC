@@ -55,75 +55,75 @@ public class PlayerData implements TagPlayer {
 
     @Override
     public Player getPlayer() {
-        return this.player;
+        return player;
     }
 
     @Override
     public boolean isSettingUpArena() {
-        return this.settingUpArena != null;
+        return settingUpArena != null;
     }
 
     @Override
     public TagArena getSettingUpArena() {
-        return this.settingUpArena;
+        return settingUpArena;
     }
 
     @Override
     public boolean isInArena() {
-        return this.arena != null;
+        return arena != null;
     }
 
     @Override
     public TagArena getArena() {
-        return this.arena;
+        return arena;
     }
 
     public Location getSavedLocation() {
-        return this.savedLocation;
+        return savedLocation;
     }
 
     // -[ Inventory ]-
     public void saveData() {
-        this.savedInventoryContents = this.player.getInventory().getContents();
-        this.savedInventoryArmor = this.player.getInventory().getArmorContents();
-        this.savedInventoryExtra = this.player.getInventory().getExtraContents();
-        this.savedGamemode = this.player.getGameMode();
-        this.savedXPLvl = this.player.getLevel();
-        this.savedXPToNextLvl = this.player.getExp();
-        this.savedHealth = this.player.getHealth();
-        this.savedHunger = this.player.getFoodLevel();
-        this.savedLocation = this.player.getLocation();
-        this.dataIsSaved = true;
+        savedInventoryContents = player.getInventory().getContents();
+        savedInventoryArmor = player.getInventory().getArmorContents();
+        savedInventoryExtra = player.getInventory().getExtraContents();
+        savedGamemode = player.getGameMode();
+        savedXPLvl = player.getLevel();
+        savedXPToNextLvl = player.getExp();
+        savedHealth = player.getHealth();
+        savedHunger = player.getFoodLevel();
+        savedLocation = player.getLocation();
+        dataIsSaved = true;
     }
 
     // Replaces current inventory with the saved one
     public void restoreSavedData() {
-        if (!this.dataIsSaved) return;
-        this.player.getInventory().setContents(this.savedInventoryContents);
-        this.player.getInventory().setArmorContents(this.savedInventoryArmor);
-        this.player.getInventory().setExtraContents(this.savedInventoryExtra);
-        this.player.setGameMode(this.savedGamemode);
-        this.player.setLevel(this.savedXPLvl);
-        this.player.setExp(this.savedXPToNextLvl);
-        this.player.setHealth(this.savedHealth);
-        this.player.setFoodLevel(this.savedHunger);
+        if (!dataIsSaved) return;
+        player.getInventory().setContents(savedInventoryContents);
+        player.getInventory().setArmorContents(savedInventoryArmor);
+        player.getInventory().setExtraContents(savedInventoryExtra);
+        player.setGameMode(savedGamemode);
+        player.setLevel(savedXPLvl);
+        player.setExp(savedXPToNextLvl);
+        player.setHealth(savedHealth);
+        player.setFoodLevel(savedHunger);
 
-        this.savedInventoryContents = null;
-        this.savedInventoryArmor = null;
-        this.savedInventoryExtra = null;
-        this.savedGamemode = null;
-        this.savedXPLvl = 0;
-        this.savedXPToNextLvl = 0.0F;
-        this.savedHealth = 0.0;
-        this.savedHunger = 0;
-        this.savedLocation = null;
-        this.dataIsSaved = false;
+        savedInventoryContents = null;
+        savedInventoryArmor = null;
+        savedInventoryExtra = null;
+        savedGamemode = null;
+        savedXPLvl = 0;
+        savedXPToNextLvl = 0.0F;
+        savedHealth = 0.0;
+        savedHunger = 0;
+        savedLocation = null;
+        dataIsSaved = false;
     }
 
     // Gives inventory with setup tools
     public void giveSetupInventory() {
-        this.saveData();
-        this.player.getInventory().clear();
+        saveData();
+        player.getInventory().clear();
 
         List<String> cornersLore = Arrays.asList("Left click to set corner 1", "Right click to set corner 2");
         List<String> spawnsLore = Arrays.asList("Left click to set a spawn", "Right click to remove a spawn");
@@ -156,34 +156,34 @@ public class PlayerData implements TagPlayer {
         arenaAreaCornerAxeMeta.setLore(spawnsLore);
         waitingAreaSpawnHoe.setItemMeta(waitingAreaSpawnHoeMeta);
 
-        this.player.getInventory().setItem(0, arenaAreaCornerAxe);
-        this.player.getInventory().setItem(1, arenaAreaSpawnHoe);
-        this.player.getInventory().setItem(2, waitingAreaCornerAxe);
-        this.player.getInventory().setItem(3, waitingAreaSpawnHoe);
-        this.updateSetupInventory();
+        player.getInventory().setItem(0, arenaAreaCornerAxe);
+        player.getInventory().setItem(1, arenaAreaSpawnHoe);
+        player.getInventory().setItem(2, waitingAreaCornerAxe);
+        player.getInventory().setItem(3, waitingAreaSpawnHoe);
+        updateSetupInventory();
     }
 
     // Updates the items in the inventory, such as the waiting area toggle.
     public void updateSetupInventory() {
-        this.player.getInventory().setItem(4, this.settingUpArena.getToggleWaitingAreaItem());
-        this.player.getInventory().setItem(5, this.settingUpArena.getMinPlayersItem());
-        this.player.getInventory().setItem(6, this.settingUpArena.getMaxPlayersItem());
-        this.player.getInventory().setItem(7, this.settingUpArena.getArenaTimeModeItem());
-        this.player.getInventory().setItem(8, this.settingUpArena.getArenaModeItem());
+        player.getInventory().setItem(4, settingUpArena.getToggleWaitingAreaItem());
+        player.getInventory().setItem(5, settingUpArena.getMinPlayersItem());
+        player.getInventory().setItem(6, settingUpArena.getMaxPlayersItem());
+        player.getInventory().setItem(7, settingUpArena.getArenaTimeModeItem());
+        player.getInventory().setItem(8, settingUpArena.getArenaModeItem());
     }
 
     // Gives the stick which he can use to tag other players
     public void giveTaggerInventory() {
         ItemsManager itemsManager = plugin.getItemsManager();
         ItemStack taggingStick;
-        if (this.arena.getArenaMode() == ArenaMode.HIT || this.arena.getArenaMode() == ArenaMode.TIMED_HIT) {
-            if (this.arena.getArenaTimeMode() == ArenaTime.LIMITED) {
+        if (arena.getArenaMode() == ArenaMode.HIT || arena.getArenaMode() == ArenaMode.TIMED_HIT) {
+            if (arena.getArenaTimeMode() == ArenaTime.LIMITED) {
                 taggingStick = itemsManager.getItem("tag-item-limited");
             } else {
                 taggingStick = itemsManager.getItem("tag-item-unlimited");
             }
         } else {
-            if (this.arena.getArenaTimeMode() == ArenaTime.LIMITED) {
+            if (arena.getArenaTimeMode() == ArenaTime.LIMITED) {
                 taggingStick = itemsManager.getItem("tnt-item-limited");
             } else {
                 taggingStick = itemsManager.getItem("tnt-item-unlimited");
@@ -194,17 +194,17 @@ public class PlayerData implements TagPlayer {
         taggingStickMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING, "tag_stick");
         taggingStick.setItemMeta(taggingStickMeta);
 
-        this.player.getInventory().setItem(0, taggingStick);
-        this.player.getInventory().setHelmet(itemsManager.getItem("helmet"));
-        this.player.getInventory().setChestplate(itemsManager.getItem("chestplate"));
-        this.player.getInventory().setLeggings(itemsManager.getItem("leggings"));
-        this.player.getInventory().setBoots(itemsManager.getItem("boots"));
+        player.getInventory().setItem(0, taggingStick);
+        player.getInventory().setHelmet(itemsManager.getItem("helmet"));
+        player.getInventory().setChestplate(itemsManager.getItem("chestplate"));
+        player.getInventory().setLeggings(itemsManager.getItem("leggings"));
+        player.getInventory().setBoots(itemsManager.getItem("boots"));
     }
     // ----------
 
     // -[ Scoreboards ]-
     public void setScoreboard(String name, HashMap<String, String> placeholders) {
-        String scoreboardTitle = plugin.getMessagesManager().getParsedMessage("scoreboards." + name + ".title", placeholders, this.player, false);
+        String scoreboardTitle = plugin.getMessagesManager().getParsedMessage("scoreboards." + name + ".title", placeholders, player, false);
 
         Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();
 
@@ -214,20 +214,20 @@ public class PlayerData implements TagPlayer {
         int messagesNumber = plugin.getMessagesManager().getMessagesList("scoreboards."+name+".lines").size();
         for (int index = 0; index < messagesNumber; index++) {
             Team team = scoreboard.registerNewTeam("TagGameMC-"+name+index);
-            team.setSuffix(plugin.getMessagesManager().getMessageFromList("scoreboards."+name+".lines", index, placeholders, this.player));
+            team.setSuffix(plugin.getMessagesManager().getMessageFromList("scoreboards."+name+".lines", index, placeholders, player));
             String uniqueEntry = ChatColor.values()[index] + "";
             team.addEntry(uniqueEntry);
             objective.getScore(uniqueEntry).setScore(messagesNumber - index);
         }
 
-        this.player.setScoreboard(scoreboard);
+        player.setScoreboard(scoreboard);
     }
     // ----------
 
     // -[ Stats ]-
     @Override
     public StatsManager getStatsManager() {
-        return this.stats;
+        return stats;
     }
     // ----------
 }
