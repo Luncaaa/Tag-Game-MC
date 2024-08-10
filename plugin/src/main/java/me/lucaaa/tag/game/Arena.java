@@ -653,7 +653,11 @@ public class Arena implements TagArena {
         else randomSpawn = arenaAreaSpawns.get(new Random().nextInt(arenaAreaSpawns.size()));
         player.teleport(randomSpawn);
 
-        if (playersList.size() >= minPlayers && !isRunning) startGame();
+        if (isRunning) {
+            playerData.getStatsManager().updateGamesPlayed(1);
+        } else if (playersList.size() >= minPlayers) {
+            startGame();
+        }
         return true;
     }
 
