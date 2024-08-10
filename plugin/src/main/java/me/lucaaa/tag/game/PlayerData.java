@@ -49,7 +49,7 @@ public class PlayerData implements TagPlayer {
     public PlayerData(TagGame plugin, Player player) {
         this.plugin = plugin;
         this.player = player;
-        this.stats = new StatsManager(player.getName(), plugin);
+        this.stats = new StatsManager(player, plugin, false);
     }
 
     @Override

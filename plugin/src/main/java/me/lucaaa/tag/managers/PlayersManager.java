@@ -4,6 +4,7 @@ import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.api.game.StatsManager;
 import me.lucaaa.tag.game.PlayerData;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -45,11 +46,12 @@ public class PlayersManager {
         });
     }
 
-    public StatsManager getPlayerStats(String playerName) {
-        if (playersData.containsKey(playerName)) {
-            return playersData.get(playerName).getStatsManager();
+    public StatsManager getPlayerStats(OfflinePlayer player) {
+        if (playersData.containsKey(player.getName())) {
+            return playersData.get(player.getName()).getStatsManager();
         } else {
-            return new me.lucaaa.tag.managers.StatsManager(playerName, plugin);
+            me.lucaaa.tag.managers.StatsManager stats = new me.lucaaa.tag.managers.StatsManager(player, plugin, true);
+            return (stats.isPlayerSaved()) ? stats : null;
         }
     }
 

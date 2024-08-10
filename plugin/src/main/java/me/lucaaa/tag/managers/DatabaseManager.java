@@ -92,19 +92,25 @@ public class DatabaseManager {
         }
     }
 
-    public CompletableFuture<Void> createPlayerIfNotExist(String playerName) {
+    public boolean playerExists(String playerName) {
+        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
+            statement.setString(1, playerName);
+            ResultSet results = statement.executeQuery();
+
+            boolean exists = results.next();
+            results.close();
+            return exists;
+
+        } catch (SQLException e) {
+            Logger.logError(Level.SEVERE, "An error occurred while checking if player " + playerName + " exists.", e);
+            return false;
+        }
+    }
+
+    public CompletableFuture<Void> createPlayer(String playerName) {
         Runnable task = () -> {
-            try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
-                statement.setString(1, playerName);
-                ResultSet results = statement.executeQuery();
-
-                if (!results.next()) {
-                    PreparedStatement addStatement = conn.prepareStatement("INSERT INTO player_stats VALUES ('"+playerName+"', 0, 0, 0, 0, 0, 0, 0.0)");
-                    addStatement.executeUpdate();
-                    addStatement.close();
-                }
-
-                results.close();
+            try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("INSERT INTO player_stats VALUES ('"+playerName+"', 0, 0, 0, 0, 0, 0, 0.0)")) {
+                statement.executeUpdate();
 
             } catch (SQLException e) {
                 Logger.logError(Level.SEVERE, "An error occurred while creating stats for player " + playerName, e);

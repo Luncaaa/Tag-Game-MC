@@ -1,13 +1,17 @@
 package me.lucaaa.tag.managers;
 
 import me.lucaaa.tag.TagGame;
+import org.bukkit.OfflinePlayer;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
-    private final String player;
+    private final String playerName;
     private final TagGame plugin;
     private final DatabaseManager db;
+    private final CompletableFuture<Boolean> isPlayerSaved;
+    private final CompletableFuture<Void> loading;
 
     // Stats
     private int gamesPlayed;
@@ -23,27 +27,39 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
     private int savedTimesTagged = 0;
     private int savedTimesBeenTagged = 0;
 
-    public StatsManager(String playerName, TagGame plugin) {
-        this.player = playerName;
+    public StatsManager(OfflinePlayer player, TagGame plugin, boolean is3rdParty) {
+        this.playerName = player.getName();
         this.plugin = plugin;
         this.db = plugin.getDatabaseManager();
 
-        Runnable runnable = () -> db.createPlayerIfNotExist(playerName).thenRun(() -> {
-            gamesPlayed = db.getInt(player, "games_played");
-            timesLost = db.getInt(player, "times_lost");
-            timesWon = db.getInt(player, "times_won");
-            timesTagger = db.getInt(player, "times_tagger");
-            timesBeenTagged = db.getInt(player, "times_been_tagged");
-            timesTagged = db.getInt(player, "times_tagged");
-            timeTagger = db.getDouble(player, "time_tagger");
-        });
+        this.isPlayerSaved = CompletableFuture.supplyAsync(() -> db.playerExists(playerName));
 
-        CompletableFuture<Void> saving = plugin.getDatabaseManager().isSaving(playerName);
-        if (saving != null) {
-            saving.thenRun(runnable);
-        } else {
-            CompletableFuture.runAsync(runnable);
-        }
+        this.loading = isPlayerSaved.thenAcceptAsync(exists -> {
+            if (!exists && is3rdParty) return;
+
+            Runnable runnable = () -> {
+                gamesPlayed = db.getInt(playerName, "games_played");
+                timesLost = db.getInt(playerName, "times_lost");
+                timesWon = db.getInt(playerName, "times_won");
+                timesTagger = db.getInt(playerName, "times_tagger");
+                timesBeenTagged = db.getInt(playerName, "times_been_tagged");
+                timesTagged = db.getInt(playerName, "times_tagged");
+                timeTagger = db.getDouble(playerName, "time_tagger");
+            };
+
+            CompletableFuture<Void> saving = plugin.getDatabaseManager().isSaving(playerName);
+
+            CompletableFuture<Void> afterSaving;
+            afterSaving = Objects.requireNonNullElseGet(saving, () -> CompletableFuture.completedFuture(null));
+
+            afterSaving.thenRun(() -> {
+                if (!exists) {
+                    db.createPlayer(playerName).thenRun(runnable);
+                } else {
+                    runnable.run();
+                }
+            });
+        });
     }
 
     @Override
@@ -129,19 +145,27 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
 
     public void saveData(boolean async) {
         Runnable task = () -> {
-            db.updateInt(player, "games_played", gamesPlayed);
-            db.updateInt(player, "times_lost", timesLost);
-            db.updateInt(player, "times_won", timesWon);
-            db.updateInt(player, "times_tagger", timesTagger);
-            db.updateInt(player, "times_been_tagged", timesBeenTagged);
-            db.updateInt(player, "times_tagged", timesTagged);
-            db.updateDouble(player, "time_tagger", timeTagger);
+            db.updateInt(playerName, "games_played", gamesPlayed);
+            db.updateInt(playerName, "times_lost", timesLost);
+            db.updateInt(playerName, "times_won", timesWon);
+            db.updateInt(playerName, "times_tagger", timesTagger);
+            db.updateInt(playerName, "times_been_tagged", timesBeenTagged);
+            db.updateInt(playerName, "times_tagged", timesTagged);
+            db.updateDouble(playerName, "time_tagger", timeTagger);
         };
 
         if (async) {
-            plugin.getDatabaseManager().addSaving(player, CompletableFuture.runAsync(task));
+            plugin.getDatabaseManager().addSaving(playerName, CompletableFuture.runAsync(task));
         } else {
             task.run();
         }
+    }
+
+    public boolean isPlayerSaved() {
+        // Forces the data to load before returning anything.
+        // This method will only be called by PAPI or the API,
+        // so it will not freeze anything.
+        loading.join();
+        return isPlayerSaved.join();
     }
 }

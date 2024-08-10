@@ -1,7 +1,9 @@
 package me.lucaaa.tag.api;
 
+import me.lucaaa.tag.api.game.StatsManager;
 import me.lucaaa.tag.api.game.TagArena;
 import me.lucaaa.tag.api.game.TagPlayer;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -32,4 +34,16 @@ public interface TagAPI {
      * @return The arena you want or null if it was not found.
      */
     TagArena getTagArena(String arenaName);
+
+    /**
+     * Gets the plugin's stats for a player.
+     *
+     * <p>It is recommended that if the player is online you use {@link TagPlayer#getStatsManager()} instead.<br>
+     * If the player is not in the database, it will return null.<br>
+     * You should run this method asynchronously.</p>
+     *
+     * @param player The player's stats you want to get.
+     * @return The player's stats
+     */
+    StatsManager getPlayerStats(OfflinePlayer player);
 }

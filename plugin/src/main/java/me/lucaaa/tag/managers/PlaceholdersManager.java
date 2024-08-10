@@ -66,7 +66,8 @@ public class PlaceholdersManager extends PlaceholderExpansion {
 
                     // If the 2nd parameter is anything other than "arena", return the desired property of the player.
                 } else {
-                    StatsManager stats = plugin.getPlayersManager().getPlayerStats(player.getName());
+                    StatsManager stats = plugin.getPlayersManager().getPlayerStats(player);
+                    if (stats == null) return "Player not in database";
 
                     switch (placeholderParts[1]) {
                         case "gamesPlayed" -> {
