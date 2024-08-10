@@ -1,6 +1,8 @@
 package me.lucaaa.tag.actions;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.lucaaa.tag.TagGame;
+import me.lucaaa.tag.game.Arena;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
@@ -12,19 +14,18 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Action {
+    protected final TagGame plugin;
     private final int delay;
-    private final boolean global;
-    private final boolean globalPlaceholders;
     private boolean correctFormat = true;
     private final List<String> missingFields = new ArrayList<>();
     protected boolean isCorrect = true;
 
-    public Action(List<String> requiredFields, ConfigurationSection section, boolean canBeGlobal) {
+    public Action(TagGame plugin, List<String> requiredFields, ConfigurationSection section) {
+        this.plugin = plugin;
         this.delay = section.getInt("delay", 0);
-        this.global = canBeGlobal && section.getBoolean("global", false);
-        this.globalPlaceholders = section.getBoolean("global-placeholders", true);
 
         for (String requiredField : requiredFields) {
             if (section.get(requiredField) == null) {
@@ -34,27 +35,14 @@ public abstract class Action {
         }
     }
 
-    public Action(List<String> requiredFields, ConfigurationSection section) {
-        this(requiredFields, section, true);
-    }
-
     /**
      * Runs the action for a specific player.
-     * @param clickedPlayer The player who clicked the display.
-     * @param actionPlayer Who to run the action for.
+     * @param player Who to run the action for.
      */
-    public abstract void runAction(Player clickedPlayer, Player actionPlayer);
+    public abstract void runAction(Arena arena, Player player);
 
     public int getDelay() {
         return this.delay;
-    }
-
-    public boolean isGlobal() {
-        return this.global;
-    }
-
-    public boolean useGlobalPlaceholders() {
-        return this.globalPlaceholders;
     }
 
     public boolean isFormatCorrect() {
@@ -69,13 +57,14 @@ public abstract class Action {
         return this.isCorrect;
     }
 
-    public BaseComponent[] getTextComponent(String message, Player clickedPlayer, Player globalPlayer) {
-        message = message.replace("%player%", clickedPlayer.getName());
-        if (globalPlayer != null) message = message.replace("%global_player%", globalPlayer.getName());
-
-        Player placeholderPlayer = (useGlobalPlaceholders()) ? globalPlayer : clickedPlayer;
+    public BaseComponent[] getTextComponent(String message, Player player, Map<String, String> placeholders) {
+        message = message.replace("%player%", player.getName());
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            message = PlaceholderAPI.setPlaceholders(placeholderPlayer, message);
+            message = PlaceholderAPI.setPlaceholders(player, message);
+        }
+
+        if (placeholders != null) {
+            message = plugin.getMessagesManager().replacePlaceholders(message, placeholders);
         }
 
         // From legacy and minimessage format to a component
@@ -88,7 +77,7 @@ public abstract class Action {
         return BungeeComponentSerializer.get().serialize(component);
     }
 
-    public String getTextString(String message, Player clickedPlayer, Player actionPlayer) {
-        return BaseComponent.toLegacyText(getTextComponent(message, clickedPlayer, actionPlayer));
+    public String getTextString(String message, Player player, Map<String, String> placeholders) {
+        return BaseComponent.toLegacyText(getTextComponent(message, player, placeholders));
     }
 }

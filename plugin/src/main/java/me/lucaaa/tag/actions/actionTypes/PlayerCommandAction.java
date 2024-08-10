@@ -1,6 +1,8 @@
 package me.lucaaa.tag.actions.actionTypes;
 
+import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.Action;
+import me.lucaaa.tag.game.Arena;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -12,8 +14,8 @@ public class PlayerCommandAction extends Action {
     private final String command;
     private final String arguments;
 
-    public PlayerCommandAction(ConfigurationSection actionSection) {
-        super(List.of("command"), actionSection);
+    public PlayerCommandAction(TagGame plugin, ConfigurationSection actionSection) {
+        super(plugin, List.of("command"), actionSection);
 
         List<String> fullCommand = new LinkedList<>(Arrays.asList(actionSection.getString("command", "").split(" ")));
         this.command = fullCommand.remove(0);
@@ -21,7 +23,7 @@ public class PlayerCommandAction extends Action {
     }
 
     @Override
-    public void runAction(Player clickedPlayer, Player actionPlayer) {
-        actionPlayer.performCommand(this.command + " " + getTextString(this.arguments, clickedPlayer, actionPlayer));
+    public void runAction(Arena arena, Player player) {
+        player.performCommand(this.command + " " + getTextString(this.arguments, player, arena.getPlaceholders()));
     }
 }

@@ -1,6 +1,8 @@
 package me.lucaaa.tag.actions.actionTypes;
 
+import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.Action;
+import me.lucaaa.tag.game.Arena;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -13,8 +15,8 @@ public class TitleAction extends Action {
     private final int stay;
     private final int fadeOut;
 
-    public TitleAction(ConfigurationSection actionSection) {
-        super(List.of("title", "subtitle", "fadeIn", "stay", "fadeOut"), actionSection);
+    public TitleAction(TagGame plugin, ConfigurationSection actionSection) {
+        super(plugin, List.of("title", "subtitle", "fadeIn", "stay", "fadeOut"), actionSection);
         this.title = actionSection.getString("title");
         this.subtitle = actionSection.getString("subtitle");
         this.fadeIn = actionSection.getInt("fadeIn", 20);
@@ -23,9 +25,9 @@ public class TitleAction extends Action {
     }
 
     @Override
-    public void runAction(Player clickedPlayer, Player actionPlayer) {
-        String title = this.getTextString(this.title, clickedPlayer, actionPlayer);
-        String subtitle = this.getTextString(this.subtitle, clickedPlayer, actionPlayer);
-        actionPlayer.sendTitle(title, subtitle, this.fadeIn, this.stay, this.fadeOut);
+    public void runAction(Arena arena, Player player) {
+        String title = this.getTextString(this.title, player, arena.getPlaceholders());
+        String subtitle = this.getTextString(this.subtitle, player, arena.getPlaceholders());
+        player.sendTitle(title, subtitle, this.fadeIn, this.stay, this.fadeOut);
     }
 }

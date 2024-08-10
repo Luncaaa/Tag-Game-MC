@@ -1,6 +1,8 @@
 package me.lucaaa.tag.actions.actionTypes;
 
+import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.Action;
+import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.utils.Logger;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -14,8 +16,8 @@ public class SoundAction extends Action {
     private final float volume;
     private final float pitch;
 
-    public SoundAction(ConfigurationSection actionSection) {
-        super(List.of("sound", "volume", "pitch"), actionSection);
+    public SoundAction(TagGame plugin, ConfigurationSection actionSection) {
+        super(plugin, List.of("sound", "volume", "pitch"), actionSection);
         Sound sound = null;
         try {
             sound = Sound.valueOf(actionSection.getString("sound"));
@@ -30,7 +32,7 @@ public class SoundAction extends Action {
     }
 
     @Override
-    public void runAction(Player clickedPlayer, Player actionPlayer) {
-        actionPlayer.playSound(actionPlayer.getLocation(), this.sound, this.volume, this.pitch);
+    public void runAction(Arena arena, Player player) {
+        player.playSound(player.getLocation(), this.sound, this.volume, this.pitch);
     }
 }

@@ -2,6 +2,7 @@ package me.lucaaa.tag.actions;
 
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.actionTypes.*;
+import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.utils.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -53,13 +54,13 @@ public class ActionsHandler {
             }
 
             Action action = switch (actionType) {
-                case MESSAGE -> new MessageAction(actionSection);
-                case CONSOLE_COMMAND -> new ConsoleCommandAction(actionSection);
-                case PLAYER_COMMAND -> new PlayerCommandAction(actionSection);
-                case TITLE -> new TitleAction(actionSection);
+                case MESSAGE -> new MessageAction(plugin, actionSection);
+                case CONSOLE_COMMAND -> new ConsoleCommandAction(plugin, actionSection);
+                case PLAYER_COMMAND -> new PlayerCommandAction(plugin, actionSection);
+                case TITLE -> new TitleAction(plugin, actionSection);
                 case ACTIONBAR -> new ActionbarAction(plugin, actionSection);
-                case PLAY_SOUND -> new SoundAction(actionSection);
-                case EFFECT -> new EffectAction(actionSection);
+                case PLAY_SOUND -> new SoundAction(plugin, actionSection);
+                case EFFECT -> new EffectAction(plugin, actionSection);
             };
 
             if (!action.isFormatCorrect()) {
@@ -76,32 +77,25 @@ public class ActionsHandler {
         }
     }
 
-    public void runActions(Player player, ActionSet clickType) {
+    public void runActions(Arena arena, Player player, ActionSet clickType) {
         ArrayList<Action> actionsToRun = actionsMap.get(clickType);
         if (actionsToRun == null) return;
 
         for (Action action : actionsToRun) {
-            if (action.isGlobal()) {
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    executeAction(action, player, onlinePlayer);
-                }
-            } else {
-                executeAction(action, player, player);
-            }
+            executeAction(arena, action, player);
         }
     }
 
     /**
      * Runs the action for a specific player.
      * @param action The action to run.
-     * @param clickedPlayer The player who clicked the display.
-     * @param actionPlayer Who to run the action for.
+     * @param player Who to run the action for.
      */
-    private void executeAction(Action action, Player clickedPlayer, Player actionPlayer) {
+    private void executeAction(Arena arena, Action action, Player player) {
         if (action.getDelay() > 0) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> action.runAction(clickedPlayer, actionPlayer), action.getDelay());
+            Bukkit.getScheduler().runTaskLater(plugin, () -> action.runAction(arena, player), action.getDelay());
         } else {
-            action.runAction(clickedPlayer, actionPlayer);
+            action.runAction(arena, player);
         }
     }
 }

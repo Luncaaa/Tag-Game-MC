@@ -769,13 +769,13 @@ public class Arena implements TagArena {
             if (losers.contains(playerData)) {
                 playerData.getStatsManager().updateTimesLost(1);
                 if (executeActions) {
-                    actionsHandler.runActions(playerData.getPlayer(), ActionSet.LOSERS);
+                    actionsHandler.runActions(this, playerData.getPlayer(), ActionSet.LOSERS);
                 }
                 plugin.getMessagesManager().sendMessage("game.lose", playerPlaceholders, playerData.getPlayer());
             } else {
                 playerData.getStatsManager().updateTimesWon(1);
                 if (executeActions) {
-                    actionsHandler.runActions(playerData.getPlayer(), ActionSet.WINNERS);
+                    actionsHandler.runActions(this, playerData.getPlayer(), ActionSet.WINNERS);
                 }
                 plugin.getMessagesManager().sendMessage("game.win", playerPlaceholders, playerData.getPlayer());
             }

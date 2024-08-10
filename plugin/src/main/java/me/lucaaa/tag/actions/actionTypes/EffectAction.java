@@ -1,6 +1,8 @@
 package me.lucaaa.tag.actions.actionTypes;
 
+import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.Action;
+import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.utils.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -14,8 +16,8 @@ import java.util.logging.Level;
 public class EffectAction extends Action {
     private final PotionEffect effect;
 
-    public EffectAction(ConfigurationSection actionSection) {
-        super(List.of("effect", "duration", "amplifier"), actionSection);
+    public EffectAction(TagGame plugin, ConfigurationSection actionSection) {
+        super(plugin, List.of("effect", "duration", "amplifier"), actionSection);
         PotionEffectType type = PotionEffectType.getByName(Objects.requireNonNull(actionSection.getString("effect")));
 
         if (type == null) {
@@ -35,7 +37,7 @@ public class EffectAction extends Action {
     }
 
     @Override
-    public void runAction(Player clickedPlayer, Player actionPlayer) {
-        actionPlayer.addPotionEffect(effect);
+    public void runAction(Arena arena, Player player) {
+        player.addPotionEffect(effect);
     }
 }

@@ -8,7 +8,6 @@ import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -81,7 +80,7 @@ public class MessagesManager {
     }
 
     // Loops through the placeholder map and replaces the keys with the values in the provided string.
-    private String replacePlaceholders(String message, Map<String, String> placeholders) {
+    public String replacePlaceholders(String message, Map<String, String> placeholders) {
         String newMessage = message;
         placeholders.put("%prefix%", prefix);
         for (Map.Entry<String, String> entry : placeholders.entrySet()) {
@@ -124,7 +123,7 @@ public class MessagesManager {
         if (addPrefix) message = prefix + "&r " + message;
 
         if (placeholders != null) message = replacePlaceholders(message, placeholders);
-        if (sender instanceof Player && isPapiInstalled) message = PlaceholderAPI.setPlaceholders((OfflinePlayer) sender, message);
+        if (sender instanceof Player && isPapiInstalled) message = PlaceholderAPI.setPlaceholders((Player) sender, message);
         return message;
     }
 
