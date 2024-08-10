@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FinishSetupSubCommand extends SubCommandsFormat {
     public FinishSetupSubCommand(TagGame plugin) {
@@ -28,7 +29,7 @@ public class FinishSetupSubCommand extends SubCommandsFormat {
             plugin.getMessagesManager().sendMessage("commands.not-setting-up", null, player);
 
         } else {
-            HashMap<String, String> placeholders = new HashMap<>();
+            Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", playerData.settingUpArena.getName());
             playerData.settingUpArena = null;
             playerData.restoreSavedData();

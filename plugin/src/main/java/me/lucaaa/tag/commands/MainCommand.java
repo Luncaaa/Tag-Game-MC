@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class MainCommand implements CommandExecutor, TabCompleter {
     private final TagGame plugin;
-    private final HashMap<String, SubCommandsFormat> subCommands = new HashMap<>();
+    private final Map<String, SubCommandsFormat> subCommands = new HashMap<>();
 
     public MainCommand(TagGame plugin) {
         this.plugin = plugin;
@@ -43,7 +43,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
         }
 
         // Placeholders that include the name of the subcommand.
-        HashMap<String, String> placeholders = new HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%subcommand%", args[0]);
 
         // If the subcommand does not exist, show an error.
@@ -91,7 +91,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        ArrayList<String> completions = new ArrayList<>();
+        List<String> completions = new ArrayList<>();
 
         // Tab completions for each subcommand. If the user is going to type the first argument, and it does not need any permission
         // to be executed, complete it. If it needs a permission, check if the user has it and add more completions.

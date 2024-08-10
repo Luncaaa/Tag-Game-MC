@@ -205,7 +205,7 @@ public class PlayerData implements TagPlayer {
     // ----------
 
     // -[ Scoreboards ]-
-    public void setScoreboard(String name, HashMap<String, String> placeholders) {
+    public void setScoreboard(String name, Map<String, String> placeholders) {
         String scoreboardTitle = plugin.getMessagesManager().getParsedMessage("scoreboards." + name + ".title", placeholders, player, false);
 
         Scoreboard scoreboard = Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard();

@@ -5,8 +5,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class JoinSubCommand extends SubCommandsFormat {
     public JoinSubCommand(TagGame plugin) {
@@ -20,20 +21,20 @@ public class JoinSubCommand extends SubCommandsFormat {
     }
 
     @Override
-    public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
-        return new ArrayList<>(plugin.getArenasManager().arenas.keySet().stream().toList());
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
+        return plugin.getArenasManager().arenas.keySet().stream().toList();
     }
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         if (plugin.getPlayersManager().getPlayerData((Player) sender).arena != null) {
-            HashMap<String, String> placeholders = new HashMap<>();
+            Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", plugin.getPlayersManager().getPlayerData((Player) sender).arena.getName());
             plugin.getMessagesManager().sendMessage("commands.already-in-arena", placeholders, sender);
             return;
         }
 
-        HashMap<String, String> placeholders = new HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         if (plugin.getArenasManager().arenas.get(args[1]) == null) {

@@ -7,8 +7,8 @@ import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class WaitingAreaCountdown {
@@ -17,7 +17,7 @@ public class WaitingAreaCountdown {
     private final List<PlayerData> playersList;
     private final List<Location> spawnsList;
     private BukkitTask timer = null;
-    private final HashMap<String, String> placeholders;
+    private final Map<String, String> placeholders;
     private final Random random = new Random();
 
     public WaitingAreaCountdown(TagGame plugin, Arena arena, List<PlayerData> playersList, List<Location> spawnsList) {

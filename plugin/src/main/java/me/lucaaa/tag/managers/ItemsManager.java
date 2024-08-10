@@ -12,16 +12,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 
 public class ItemsManager {
     private final TagGame plugin;
     private final ConfigManager configManager;
-    private final HashMap<String, ItemStack> items = new HashMap<>();
+    private final Map<String, ItemStack> items = new HashMap<>();
 
     public ItemsManager(TagGame plugin, ConfigManager configManager) {
         this.plugin = plugin;
@@ -70,7 +67,7 @@ public class ItemsManager {
 
         if (itemConfigSection.getString("name") != null) itemMeta.setDisplayName(plugin.getMessagesManager().getColoredMessage(itemConfigSection.getString("name"), false));
         if (itemConfigSection.getList("lore") != null) {
-            ArrayList<String> lore = new ArrayList<>();
+            List<String> lore = new ArrayList<>();
             for (String loreLine : itemConfigSection.getStringList("lore")) {
                 lore.add(plugin.getMessagesManager().getColoredMessage(loreLine, false));
             }

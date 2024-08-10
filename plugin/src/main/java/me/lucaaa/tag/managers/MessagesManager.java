@@ -33,7 +33,7 @@ public class MessagesManager {
             if (langConfig.isConfigurationSection(key)) continue;
             if (langConfig.isString(key)) this.messages.put(key, langConfig.getString(key));
             if (langConfig.isList(key)) {
-                this.messagesList.put(key, new ArrayList<>(langConfig.getStringList(key)));
+                this.messagesList.put(key, langConfig.getStringList(key));
             }
         }
     }
@@ -72,7 +72,7 @@ public class MessagesManager {
 
     public List<String> getMessagesList(String key) {
         if (!messagesList.containsKey(key)) {
-            ArrayList<String> notFound = new ArrayList<>();
+            List<String> notFound = new ArrayList<>();
             notFound.add("Messages not found.");
             return notFound;
         }

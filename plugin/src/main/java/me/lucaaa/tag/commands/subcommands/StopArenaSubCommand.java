@@ -6,8 +6,9 @@ import me.lucaaa.tag.api.enums.StopCause;
 import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StopArenaSubCommand extends SubCommandsFormat {
     public StopArenaSubCommand(TagGame plugin) {
@@ -21,14 +22,14 @@ public class StopArenaSubCommand extends SubCommandsFormat {
     }
 
     @Override
-    public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
-        return new ArrayList<>(plugin.getArenasManager().arenas.keySet().stream().toList());
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
+        return plugin.getArenasManager().arenas.keySet().stream().toList();
     }
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         Arena arena = plugin.getArenasManager().getArena(args[1]);
-        HashMap<String, String> placeholders = new HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         if (!arena.isRunning()) {

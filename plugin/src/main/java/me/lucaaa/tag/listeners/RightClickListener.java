@@ -19,6 +19,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class RightClickListener implements Listener {
@@ -45,7 +46,7 @@ public class RightClickListener implements Listener {
         event.setCancelled(true);
         if (playerData.isSettingUpArena()) {
             Arena editingArena = plugin.getArenasManager().getArena(playerData.settingUpArena.getName());
-            HashMap<String, String> placeholders = new HashMap<>();
+            Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", playerData.settingUpArena.getName());
             editingArena.checkWorlds(player);
 

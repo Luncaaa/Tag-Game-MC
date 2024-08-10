@@ -8,10 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class SetupSubCommand extends SubCommandsFormat {
     public SetupSubCommand(TagGame plugin) {
@@ -25,21 +22,21 @@ public class SetupSubCommand extends SubCommandsFormat {
     }
 
     @Override
-    public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
         switch (args.length) {
             case 2 -> {
-                return new ArrayList<>(plugin.getArenasManager().arenas.keySet().stream().toList());
+                return plugin.getArenasManager().arenas.keySet().stream().toList();
             }
             case 3 -> {
-                return new ArrayList<>(Arrays.asList("setFinishTime", "setWorld", "setTaggersNumber"));
+                return List.of("setFinishTime", "setWorld", "setTaggersNumber");
             }
             case 4 -> {
                 // Gets the names of all the existing worlds.
-                if (Objects.equals(args[2], "setWorld")) return new ArrayList<>(Bukkit.getWorlds().stream().map(World::getName).toList());
-                else return new ArrayList<>();
+                if (Objects.equals(args[2], "setWorld")) return Bukkit.getWorlds().stream().map(World::getName).toList();
+                else return List.of();
             }
             default -> {
-                return new ArrayList<>();
+                return List.of();
             }
         }
     }
@@ -48,7 +45,7 @@ public class SetupSubCommand extends SubCommandsFormat {
     public void run(CommandSender sender, String[] args) throws IOException {
         Player player = (Player) sender;
         PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
-        HashMap<String, String> placeholders = new HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         switch (args.length) {

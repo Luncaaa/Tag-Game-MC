@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CreateArenaSubCommand extends SubCommandsFormat {
     public CreateArenaSubCommand(TagGame plugin) {
@@ -20,7 +21,7 @@ public class CreateArenaSubCommand extends SubCommandsFormat {
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         boolean couldCreateArena = plugin.getArenasManager().createArena(args[1]);
-        HashMap<String, String> placeholders = new HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         if (couldCreateArena) {

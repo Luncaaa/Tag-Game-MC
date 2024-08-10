@@ -10,11 +10,12 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class DatabaseManager {
-    private final HashMap<String, CompletableFuture<Void>> savingData = new HashMap<>();
+    private final Map<String, CompletableFuture<Void>> savingData = new HashMap<>();
     private final CompletableFuture<Void> dataSourceInit;
     private boolean dataSourceInitDone = false;
 

@@ -31,7 +31,7 @@ public class Arena implements TagArena {
     private final TagGame plugin;
     
     private final String name;
-    private final HashMap<String, String> placeholders;
+    private final Map<String, String> placeholders;
     private final YamlConfiguration arenaConfig;
     private final File arenaFile;
 
@@ -46,7 +46,7 @@ public class Arena implements TagArena {
     private final List<Location> waitingAreaSpawns = new ArrayList<>();
     private final List<Location> arenaAreaSpawns = new ArrayList<>();
 
-    private final ArrayList<Location> signs = new ArrayList<>();
+    private final List<Location> signs = new ArrayList<>();
 
     private int minPlayers;
     private int maxPlayers;
@@ -58,7 +58,7 @@ public class Arena implements TagArena {
 
     private final List<PlayerData> playersList = new ArrayList<>();
     private final List<PlayerData> taggers = new ArrayList<>();
-    private final HashMap<PlayerData, Double> timeBeingTagger = new HashMap<>();
+    private final Map<PlayerData, Double> timeBeingTagger = new HashMap<>();
 
     private final WaitingAreaCountdown waitingAreaCountdown;
     private final SelectTaggerCountdown selectTaggerCountdown;
@@ -133,7 +133,7 @@ public class Arena implements TagArena {
         return name;
     }
 
-    public HashMap<String, String> getPlaceholders() {
+    public Map<String, String> getPlaceholders() {
         String finishTime;
         if (arenaTime == ArenaTime.UNLIMITED) finishTime = String.valueOf(timeBeforeEnding);
         else finishTime = plugin.getMessagesManager().getUncoloredMessage(arenaTime.getCustomNameKey(), null, null, false);
@@ -147,7 +147,7 @@ public class Arena implements TagArena {
             else timeLeft = plugin.getMessagesManager().getUncoloredMessage("placeholders.time.waiting", null, null, false);
         }
 
-        HashMap<String, String> placeholders = new HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", name);
         placeholders.put("%minPlayers%", String.valueOf(minPlayers));
         placeholders.put("%maxPlayers%", String.valueOf(maxPlayers));
@@ -176,7 +176,7 @@ public class Arena implements TagArena {
     }
 
     private void updateConfigSigns() {
-        ArrayList<String> signsList = new ArrayList<>();
+        List<String> signsList = new ArrayList<>();
         for (Location sign : signs) {
             signsList.add(Objects.requireNonNull(sign.getWorld()).getName() + ";" + sign.getX() + ";" + sign.getY() + ";" + sign.getZ());
         }
@@ -318,7 +318,7 @@ public class Arena implements TagArena {
     }
 
     private void updateWaitingAreaSpawns() {
-        ArrayList<String> spawnsList = new ArrayList<>();
+        List<String> spawnsList = new ArrayList<>();
         for (Location waitingAreaSpawn : waitingAreaSpawns) {
             spawnsList.add(waitingAreaSpawn.getX() + ";" + waitingAreaSpawn.getY() + ";" + waitingAreaSpawn.getZ());
         }
@@ -327,7 +327,7 @@ public class Arena implements TagArena {
     }
 
     private void updateArenaAreaSpawns() {
-        ArrayList<String> spawnsList = new ArrayList<>();
+        List<String> spawnsList = new ArrayList<>();
         for (Location waitingAreaSpawn : arenaAreaSpawns) {
             spawnsList.add(waitingAreaSpawn.getX() + ";" + waitingAreaSpawn.getY() + ";" + waitingAreaSpawn.getZ());
         }
@@ -515,7 +515,7 @@ public class Arena implements TagArena {
         updateScoreboards();
         plugin.getMessagesManager().sendMessage("commands.joined-arena", placeholders, player);
 
-        HashMap<String, String> joinPlaceholders = new HashMap<>(placeholders);
+        Map<String, String> joinPlaceholders = new HashMap<>(placeholders);
         joinPlaceholders.put("%player%", player.getName());
         for (PlayerData playerDataInGame : playersList) {
             if (playerDataInGame == plugin.getPlayersManager().getPlayerData(player)) return;
@@ -554,7 +554,7 @@ public class Arena implements TagArena {
         player.setScoreboard(Objects.requireNonNull(Bukkit.getScoreboardManager()).getNewScoreboard());
         plugin.getMessagesManager().sendMessage("commands.left-arena", placeholders, player);
 
-        HashMap<String, String> leavePlaceholders = new HashMap<>(placeholders);
+        Map<String, String> leavePlaceholders = new HashMap<>(placeholders);
         leavePlaceholders.put("%player%", player.getName());
         for (PlayerData playerDataInGame : playersList) {
             plugin.getMessagesManager().sendMessage("game.player-leave", leavePlaceholders, playerDataInGame.getPlayer());
@@ -590,7 +590,7 @@ public class Arena implements TagArena {
 
             if (arenaMode == ArenaMode.TNT) playerData.tntThrowCooldown = 0L;
             // A player is valid if they are not a tagger
-            ArrayList<PlayerData> validPlayers = new ArrayList<>(playersList.stream().filter(it -> !taggers.contains(it)).toList());
+            List<PlayerData> validPlayers = new ArrayList<>(playersList.stream().filter(it -> !taggers.contains(it)).toList());
             PlayerData randomPlayer;
             if (validPlayers.size() == 1) randomPlayer = validPlayers.get(0);
             else randomPlayer = validPlayers.get(new Random().nextInt(validPlayers.size()));
@@ -716,7 +716,7 @@ public class Arena implements TagArena {
             return;
         }
 
-        ArrayList<PlayerData> losers = new ArrayList<>();
+        List<PlayerData> losers = new ArrayList<>();
         if (arenaMode == ArenaMode.TIMED_HIT || arenaMode == ArenaMode.TIMED_TNT) {
             // Get tagger's start tagging time and see for how long he has been tagging. Add that time to the map.
             for (PlayerData tagger : taggers) {
@@ -744,7 +744,7 @@ public class Arena implements TagArena {
         for (PlayerData playerData : playersList) {
             playerData.startTaggerTime = 0L;
             playerData.tntThrowCooldown = 0L;
-            HashMap<String, String> playerPlaceholders = new HashMap<>(placeholders);
+            Map<String, String> playerPlaceholders = new HashMap<>(placeholders);
             playerPlaceholders.put("%player%", playerData.getPlayer().getName());
 
             if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
@@ -799,7 +799,7 @@ public class Arena implements TagArena {
     }
 
     public void setInitialTaggers(List<PlayerData> taggers) {
-        HashMap<String, String> taggersPlaceholders = new HashMap<>(placeholders);
+        Map<String, String> taggersPlaceholders = new HashMap<>(placeholders);
         taggersPlaceholders.put("%taggers%", taggers.stream().map(it -> it.getPlayer().getName()).collect(Collectors.joining(", ")));
 
         actionBarRunnable.sendToPlayers(taggers);
@@ -834,7 +834,7 @@ public class Arena implements TagArena {
         tagger.getStatsManager().mergeTempData();
         tagged.getStatsManager().mergeTempData();
 
-        HashMap<String, String> taggedPlaceholders = new HashMap<>(placeholders);
+        Map<String, String> taggedPlaceholders = new HashMap<>(placeholders);
         taggedPlaceholders.put("%tagged%", tagged.getPlayer().getName());
 
         // Get tagger's start tagging time and see for how long he has been tagging. Add that time to the map.

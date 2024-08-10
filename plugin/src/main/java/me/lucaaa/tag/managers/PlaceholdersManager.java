@@ -8,7 +8,7 @@ import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class PlaceholdersManager extends PlaceholderExpansion {
@@ -108,7 +108,7 @@ public class PlaceholdersManager extends PlaceholderExpansion {
             return "Arena not found: " + arenaName;
 
         } else {
-            HashMap<String, String> arenaPlaceholders = plugin.getArenasManager().getArena(arenaName).getPlaceholders();
+            Map<String, String> arenaPlaceholders = plugin.getArenasManager().getArena(arenaName).getPlaceholders();
             if (!arenaPlaceholders.containsKey("%" + property + "%")) return "Property not found: "+property;
             else return arenaPlaceholders.get("%" + property + "%");
         }

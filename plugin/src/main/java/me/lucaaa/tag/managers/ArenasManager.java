@@ -11,14 +11,12 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 
 public class ArenasManager {
     private final TagGame plugin;
-    public final HashMap<String, Arena> arenas = new HashMap<>();
+    public final Map<String, Arena> arenas = new HashMap<>();
 
     public ArenasManager(TagGame plugin) {
         this.plugin = plugin;
@@ -51,14 +49,14 @@ public class ArenasManager {
         waitingAreaSection.set("enabled", true);
         waitingAreaSection.set("corner1", "0.0;0.0;0.0");
         waitingAreaSection.set("corner2", "0.0;0.0;0.0");
-        waitingAreaSection.set("spawns", new ArrayList<String>());
+        waitingAreaSection.set("spawns", List.of());
 
         ConfigurationSection arenaAreaSection = newArenaConfig.getConfig().createSection("arena-area");
         arenaAreaSection.set("corner1", "0.0;0.0;0.0");
         arenaAreaSection.set("corner2", "0.0;0.0;0.0");
-        arenaAreaSection.set("spawns", new ArrayList<String>());
+        arenaAreaSection.set("spawns", List.of());
 
-        newArenaConfig.getConfig().set("signs", new ArrayList<String>());
+        newArenaConfig.getConfig().set("signs", List.of());
 
         newArenaConfig.getConfig().set("minPlayers", 2);
         newArenaConfig.getConfig().set("maxPlayers", 10);

@@ -13,6 +13,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class BlockBreakListener implements Listener {
     private final TagGame plugin;
@@ -46,7 +47,7 @@ public class BlockBreakListener implements Listener {
 
         if (playerData.isSettingUpArena()) {
             Arena editingArena = plugin.getArenasManager().getArena(playerData.settingUpArena.getName());
-            HashMap<String, String> placeholders = new HashMap<>();
+            Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", playerData.settingUpArena.getName());
             editingArena.checkWorlds(player);
             event.setCancelled(true);

@@ -11,12 +11,13 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 public class ActionsHandler {
     private final TagGame plugin;
-    private final Map<ActionSet, ArrayList<Action>> actionsMap = new EnumMap<>(ActionSet.class);
+    private final Map<ActionSet, List<Action>> actionsMap = new EnumMap<>(ActionSet.class);
 
     public ActionsHandler(TagGame plugin, YamlConfiguration config) {
         this.plugin = plugin;
@@ -78,7 +79,7 @@ public class ActionsHandler {
     }
 
     public void runActions(Arena arena, Player player, ActionSet clickType) {
-        ArrayList<Action> actionsToRun = actionsMap.get(clickType);
+        List<Action> actionsToRun = actionsMap.get(clickType);
         if (actionsToRun == null) return;
 
         for (Action action : actionsToRun) {

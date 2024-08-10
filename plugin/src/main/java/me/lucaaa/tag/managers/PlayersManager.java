@@ -7,11 +7,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class PlayersManager {
     private final TagGame plugin;
-    private final HashMap<String, PlayerData> playersData = new HashMap<>();
+    private final Map<String, PlayerData> playersData = new HashMap<>();
 
     public PlayersManager(TagGame plugin) {
         this.plugin = plugin;

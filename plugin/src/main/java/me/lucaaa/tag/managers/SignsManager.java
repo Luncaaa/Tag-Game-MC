@@ -4,9 +4,10 @@ import me.lucaaa.tag.game.Arena;
 import org.bukkit.Location;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class SignsManager {
-    private final HashMap<Location, Arena> signs = new HashMap<>();
+    private final Map<Location, Arena> signs = new HashMap<>();
 
     public void addSign(Location location, Arena arena) {
         signs.put(location, arena);

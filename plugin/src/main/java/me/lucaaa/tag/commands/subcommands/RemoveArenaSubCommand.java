@@ -4,8 +4,9 @@ import me.lucaaa.tag.TagGame;
 import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RemoveArenaSubCommand extends SubCommandsFormat {
     public RemoveArenaSubCommand(TagGame plugin) {
@@ -19,14 +20,14 @@ public class RemoveArenaSubCommand extends SubCommandsFormat {
     }
 
     @Override
-    public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
-        return new ArrayList<>(plugin.getArenasManager().arenas.keySet().stream().toList());
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
+        return plugin.getArenasManager().arenas.keySet().stream().toList();
     }
 
     @Override
     public void run(CommandSender sender, String[] args) throws IOException {
         boolean couldRemoveArena = plugin.getArenasManager().deleteArena(args[1]);
-        HashMap<String, String> placeholders = new HashMap<>();
+        Map<String, String> placeholders = new HashMap<>();
         placeholders.put("%arena%", args[1]);
 
         if (couldRemoveArena) {

@@ -4,7 +4,7 @@ import me.lucaaa.tag.TagGame;
 import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 public abstract class SubCommandsFormat {
     protected final TagGame plugin;
@@ -41,8 +41,8 @@ public abstract class SubCommandsFormat {
      * @param args The command's arguments to complete.
      * @return A list with the completions.
      */
-    public ArrayList<String> getTabCompletions(CommandSender sender, String[] args) {
-        return new ArrayList<>();
+    public List<String> getTabCompletions(CommandSender sender, String[] args) {
+        return List.of();
     }
 
     /**
