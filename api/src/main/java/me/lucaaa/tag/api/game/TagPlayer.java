@@ -15,20 +15,6 @@ public interface TagPlayer {
     Player getPlayer();
 
     /**
-     * Whether the player is setting up an arena or not.
-     *
-     * @return Whether the player is setting up an arena or not.
-     */
-    boolean isSettingUpArena();
-
-    /**
-     * Gets the arena a player is setting up.
-     *
-     * @return The arena that the player is setting up or null if he isn't setting up an arena.
-     */
-    TagArena getSettingUpArena();
-
-    /**
      * Whether the player is in an arena or not.<br>
      * WARNING - Returns true even if he is in the waiting area.
      *

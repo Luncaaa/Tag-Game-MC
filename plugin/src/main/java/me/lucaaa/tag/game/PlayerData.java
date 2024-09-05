@@ -57,14 +57,8 @@ public class PlayerData implements TagPlayer {
         return player;
     }
 
-    @Override
     public boolean isSettingUpArena() {
         return settingUpArena != null;
-    }
-
-    @Override
-    public TagArena getSettingUpArena() {
-        return settingUpArena;
     }
 
     @Override
