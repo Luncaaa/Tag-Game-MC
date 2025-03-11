@@ -1,7 +1,7 @@
 main: me.lucaaa.tag.TagGame
 description: "Play tag in your Minecraft server!"
 name: "TagGame"
-version: 1.3
+version: 1.4
 softdepend: [PlaceholderAPI]
 author: Lucaaa
 prefix: TAG

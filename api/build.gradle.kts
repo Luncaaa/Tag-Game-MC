@@ -33,7 +33,7 @@ publishing {
         val mavenJava by creating(MavenPublication::class) {
             groupId = "TagGameMC"
             artifactId = "taggame-api"
-            version = "1.3"
+            version = "${project.version}"
 
             from(components["java"])
         }
