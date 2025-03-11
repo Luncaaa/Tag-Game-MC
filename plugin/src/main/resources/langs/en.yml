@@ -124,6 +124,9 @@ placeholders:
     unlimited: "&aUnlimited" # If arena-time is unlimited.
     waiting: "&cWaiting" # If the time hasn't started yet.
 
+  taggers:
+    selecting: "&bSelecting..." # If the match started and taggers haven't been selected yet.
+
 # The format of the join signs.
 # Arena placeholders + %finishGameCountdown% - The time that is left until the game ends.
 signs:

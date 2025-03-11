@@ -1,14 +1,7 @@
 package me.lucaaa.tag.actions;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.game.Arena;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -57,27 +50,8 @@ public abstract class Action {
         return this.isCorrect;
     }
 
-    public BaseComponent[] getTextComponent(String message, Player player, Map<String, String> placeholders) {
+    public String getText(String message, Player player, Map<String, String> placeholders) {
         message = message.replace("%player%", player.getName());
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            message = PlaceholderAPI.setPlaceholders(player, message);
-        }
-
-        if (placeholders != null) {
-            message = plugin.getMessagesManager().replacePlaceholders(message, placeholders);
-        }
-
-        // From legacy and minimessage format to a component
-        Component legacy = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
-        // From component to Minimessage String. Replacing the "\" with nothing makes the minimessage formats work.
-        String minimessage = MiniMessage.miniMessage().serialize(legacy).replace("\\", "");
-        // From Minimessage String to Minimessage component
-        Component component = MiniMessage.miniMessage().deserialize(minimessage);
-        // From Minimessage component to legacy string.
-        return BungeeComponentSerializer.get().serialize(component);
-    }
-
-    public String getTextString(String message, Player player, Map<String, String> placeholders) {
-        return BaseComponent.toLegacyText(getTextComponent(message, player, placeholders));
+        return plugin.getMessagesManager().getColoredMessage(message, placeholders, player, false);
     }
 }

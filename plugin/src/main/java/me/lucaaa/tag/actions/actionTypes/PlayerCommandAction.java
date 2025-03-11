@@ -24,6 +24,6 @@ public class PlayerCommandAction extends Action {
 
     @Override
     public void runAction(Arena arena, Player player) {
-        player.performCommand(this.command + " " + getTextString(this.arguments, player, arena.getPlaceholders()));
+        player.performCommand(this.command + " " + getText(this.arguments, player, arena.getPlaceholders()));
     }
 }

@@ -124,6 +124,9 @@ placeholders:
     unlimited: "&aIlimitado" # Si arena-time es unlimited.
     waiting: "&cEsperando" # Si el tiempo todavía no ha empezado.
 
+  taggers:
+    selecting: "&bEligiendo..." # Si la partida ha empezado y los pilladores todavía no han sido elegidos.
+
 # El formato de los carteles para unirse.
 # Placeholders de la arena + %finishGameCountdown% - El tiempo que falta hasta que se termine el juego.
 signs:

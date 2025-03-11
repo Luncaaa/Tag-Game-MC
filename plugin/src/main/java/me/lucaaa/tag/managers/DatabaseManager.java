@@ -3,7 +3,6 @@ package me.lucaaa.tag.managers;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import me.lucaaa.tag.TagGame;
-import me.lucaaa.tag.utils.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.io.File;
@@ -15,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class DatabaseManager {
+    private final TagGame plugin;
     private final Map<String, CompletableFuture<Void>> savingData = new HashMap<>();
     private final CompletableFuture<Void> dataSourceInit;
     private boolean dataSourceInitDone = false;
@@ -24,6 +24,8 @@ public class DatabaseManager {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public DatabaseManager(TagGame plugin, boolean useMySQL) throws IOException, SQLException {
+        this.plugin = plugin;
+
         String url;
         String user;
         String password;
@@ -52,7 +54,7 @@ public class DatabaseManager {
             try(Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("CREATE TABLE IF NOT EXISTS player_stats(name TINYTEXT, games_played Int, times_lost Int, times_won Int, times_tagger Int, times_tagged Int, times_been_tagged Int, time_tagger Double)")) {
                 statement.executeUpdate();
             } catch (SQLException e) {
-                Logger.logError(Level.SEVERE, "An error occurred while creating the stats table.", e);
+                plugin.logError(Level.SEVERE, "An error occurred while creating the stats table.", e);
             }
         });
     }
@@ -87,7 +89,7 @@ public class DatabaseManager {
         try {
             return dataSource.getConnection();
         } catch (SQLException e) {
-            Logger.log(Level.SEVERE, "An error occurred while getting a database connection. Data won't be updated!");
+            plugin.log(Level.SEVERE, "An error occurred while getting a database connection. Data won't be updated!");
             throw new RuntimeException(e);
         }
     }
@@ -102,7 +104,7 @@ public class DatabaseManager {
             return exists;
 
         } catch (SQLException e) {
-            Logger.logError(Level.SEVERE, "An error occurred while checking if player " + playerName + " exists.", e);
+            plugin.logError(Level.SEVERE, "An error occurred while checking if player " + playerName + " exists.", e);
             return false;
         }
     }
@@ -113,7 +115,7 @@ public class DatabaseManager {
                 statement.executeUpdate();
 
             } catch (SQLException e) {
-                Logger.logError(Level.SEVERE, "An error occurred while creating stats for player " + playerName, e);
+                plugin.logError(Level.SEVERE, "An error occurred while creating stats for player " + playerName, e);
             }
         };
 
@@ -134,7 +136,7 @@ public class DatabaseManager {
             query.close();
             return result;
         } catch (SQLException e) {
-            Logger.logError(Level.SEVERE, "An error occurred while getting data \"" + dataToGet + "\" for player " + playerName, e);
+            plugin.logError(Level.SEVERE, "An error occurred while getting data \"" + dataToGet + "\" for player " + playerName, e);
             return 0;
         }
     }
@@ -148,7 +150,7 @@ public class DatabaseManager {
             query.close();
             return result;
         } catch (SQLException e) {
-            Logger.logError(Level.SEVERE, "An error occurred while getting data \"" + dataToGet + "\" for player " + playerName, e);
+            plugin.logError(Level.SEVERE, "An error occurred while getting data \"" + dataToGet + "\" for player " + playerName, e);
             return 0.0;
         }
     }
@@ -159,7 +161,7 @@ public class DatabaseManager {
             statement.setString(2, playerName);
             statement.executeUpdate();
         } catch (SQLException e) {
-            Logger.logError(Level.SEVERE, "An error occurred while saving data \"" + dataToUpdate + "\" for player " + playerName, e);
+            plugin.logError(Level.SEVERE, "An error occurred while saving data \"" + dataToUpdate + "\" for player " + playerName, e);
         }
     }
 
@@ -169,7 +171,7 @@ public class DatabaseManager {
             statement.setString(2, playerName);
             statement.executeUpdate();
         } catch (SQLException e) {
-            Logger.logError(Level.SEVERE, "An error occurred while saving data \"" + dataToUpdate + "\" for player " + playerName, e);
+            plugin.logError(Level.SEVERE, "An error occurred while saving data \"" + dataToUpdate + "\" for player " + playerName, e);
         }
     }
 

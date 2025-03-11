@@ -5,7 +5,6 @@ import me.lucaaa.tag.api.game.TagArena;
 import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.api.enums.ArenaMode;
 import me.lucaaa.tag.api.enums.ArenaTime;
-import me.lucaaa.tag.utils.Logger;
 import me.lucaaa.tag.api.enums.StopCause;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -30,8 +29,8 @@ public class ArenasManager {
         // If the arenas folder is not empty, load the arenas.
         Objects.requireNonNull(arenasFolder.listFiles());
         for (File file : Objects.requireNonNull(arenasFolder.listFiles())) {
-            Logger.log(Level.INFO, "Loading arena " + file.getName().replaceAll(".yml", "") + "...");
-            ConfigManager arenaConfig = new ConfigManager(plugin, "arenas" + File.separator + file.getName());
+            plugin.log(Level.INFO, "Loading arena " + file.getName().replaceAll(".yml", "") + "...");
+            ConfigManager arenaConfig = new ConfigManager(plugin, "arenas" + File.separator + file.getName(), false);
             this.arenas.put(arenaConfig.getFile().getName().replaceAll(".yml", ""), new Arena(plugin, arenaConfig.getFile().getName().replaceAll(".yml", ""), arenaConfig));
         }
     }
@@ -42,7 +41,7 @@ public class ArenasManager {
             return false;
         }
 
-        ConfigManager newArenaConfig = new ConfigManager(plugin, "arenas" + File.separator + name + ".yml");
+        ConfigManager newArenaConfig = new ConfigManager(plugin, "arenas" + File.separator + name + ".yml", false);
 
         // Set properties in the arena file.
         ConfigurationSection waitingAreaSection = newArenaConfig.getConfig().createSection("waiting-area");
@@ -77,7 +76,7 @@ public class ArenasManager {
             return false;
         }
 
-        File arenaFileConfig = new ConfigManager(plugin, "arenas" + File.separator + name +".yml").getFile();
+        File arenaFileConfig = new ConfigManager(plugin, "arenas" + File.separator + name +".yml", false).getFile();
         arenaFileConfig.delete();
         arenas.remove(name);
         return true;

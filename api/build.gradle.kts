@@ -6,6 +6,10 @@ java {
     withJavadocJar()
 }
 
+dependencies {
+    implementation("org.jetbrains:annotations:26.0.2")
+}
+
 tasks {
     javadoc {
         title = "TagGame API " + project.version

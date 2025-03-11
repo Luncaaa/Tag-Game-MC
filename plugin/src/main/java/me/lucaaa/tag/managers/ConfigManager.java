@@ -1,5 +1,6 @@
 package me.lucaaa.tag.managers;
 
+import me.lucaaa.tag.TagGame;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -10,9 +11,14 @@ public class ConfigManager {
     private final File file;
     private final YamlConfiguration config;
 
-    public ConfigManager(Plugin plugin, String path) {
+    public ConfigManager(Plugin plugin, String path, boolean createIfNotExists) {
         this.file = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + path);
-        this.config = YamlConfiguration.loadConfiguration(this.file);
+
+        if (!file.exists() && createIfNotExists) {
+            plugin.saveResource(path, false);
+        }
+
+        this.config = YamlConfiguration.loadConfiguration(file);
     }
 
     public void save() throws IOException {
@@ -25,5 +31,12 @@ public class ConfigManager {
 
     public YamlConfiguration getConfig() {
         return config;
+    }
+
+    public static void saveResource(TagGame plugin, String path) {
+        File file = new File(plugin.getDataFolder().getAbsolutePath() + File.separator + path);
+        if (!file.exists()) {
+            plugin.saveResource(path, false);
+        }
     }
 }

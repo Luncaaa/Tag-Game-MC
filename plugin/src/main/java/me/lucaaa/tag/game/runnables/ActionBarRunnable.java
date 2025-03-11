@@ -29,7 +29,8 @@ public class ActionBarRunnable {
             BukkitTask task = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagger.getPlayer(), false));
+                    String message = plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagger.getPlayer(), false);
+                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                 }
             }.runTaskTimer(plugin, 0L, 20L);
 
@@ -46,7 +47,8 @@ public class ActionBarRunnable {
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagged.getPlayer(), false));
+                String message = plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagged.getPlayer(), false);
+                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
             }
         }.runTaskTimer(plugin, 0L, 20L);
 

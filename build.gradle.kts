@@ -6,6 +6,22 @@ allprojects {
     apply(plugin = "java")
     group = "me.lucaaa"
     version = "1.3"
+
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(16))
+        }
+
+        sourceCompatibility = JavaVersion.VERSION_16
+        targetCompatibility = JavaVersion.VERSION_16
+    }
+
+    tasks {
+        compileJava {
+            options.release.set(16)
+        }
+    }
 }
 
 subprojects {
@@ -18,7 +34,5 @@ subprojects {
 
     dependencies {
         compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
-        implementation("org.jetbrains:annotations:24.1.0")
-
     }
 }

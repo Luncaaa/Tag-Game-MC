@@ -1,13 +1,10 @@
 package me.lucaaa.tag.managers;
 
 import me.clip.placeholderapi.PlaceholderAPI;
-import me.lucaaa.tag.utils.Logger;
+import me.lucaaa.tag.TagGame;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -19,14 +16,16 @@ import java.util.Map;
 import java.util.logging.Level;
 
 public class MessagesManager {
+    private final TagGame plugin;
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private final LegacyComponentSerializer legacyString = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
     private final Map<String, String> messages = new HashMap<>();
     private final Map<String, List<String>> messagesList = new HashMap<>();
     private final String prefix;
-    private final boolean isPapiInstalled;
 
-    public MessagesManager(YamlConfiguration langConfig, String prefix, boolean isPapiInstalled) {
+    public MessagesManager(TagGame plugin, YamlConfiguration langConfig, String prefix) {
+        this.plugin = plugin;
         this.prefix = prefix;
-        this.isPapiInstalled = isPapiInstalled;
 
         // Each key that is not a config section is added to the map along with its corresponding message
         for (String key : langConfig.getKeys(true)) {
@@ -44,12 +43,21 @@ public class MessagesManager {
     }
 
     public void sendMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        sender.spigot().sendMessage(getMessage(key, placeholders, sender, addPrefix));
+        sender.sendMessage(getMessage(key, placeholders, sender, addPrefix));
     }
-    
+
+    /**
+     * Gets a message from the config file without parsing the colors. Useful if it'll be combined with another unparsed message.
+     * Combining parsed and unparsed messages could result in an error when trying to parse it later.
+     * @param key The key from the language file.
+     * @param placeholders The placeholders to replace.
+     * @param sender To whom this message will be sent.
+     * @param addPrefix Whether the prefix should be added or not.
+     * @return The message without parsed colors.
+     */
     public String getUncoloredMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
         if (!messages.containsKey(key)) {
-            Logger.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
+            plugin.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
             return "Message not found.";
         }
 
@@ -57,17 +65,16 @@ public class MessagesManager {
     }
 
     public String getParsedMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        return BaseComponent.toLegacyText(getMessage(key, placeholders, sender, addPrefix));
+        return getMessage(key, placeholders, sender, addPrefix);
     }
 
     public String getMessageFromList(String key, int index, Map<String, String> placeholders, CommandSender sender) {
         if (!messagesList.containsKey(key) || index > messagesList.get(key).size() - 1) {
-            Logger.log(Level.WARNING, "The key \"" + key + "." + index + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
+            plugin.log(Level.WARNING, "The key \"" + key + "." + index + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
             return "Message not found.";
         }
 
-        String message = parseMessage(messagesList.get(key).get(index), placeholders, sender, false);
-        return BaseComponent.toLegacyText(parseMessage(message));
+        return getColoredMessage(messagesList.get(key).get(index), placeholders, sender, false);
     }
 
     public List<String> getMessagesList(String key) {
@@ -89,14 +96,13 @@ public class MessagesManager {
         return newMessage;
     }
 
-    public BaseComponent[] getMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+    public String getMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
         if (!messages.containsKey(key)) {
-            Logger.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
-            return new TextComponent[]{new TextComponent("Message not found.")};
+            plugin.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
+            return "Message not found.";
         }
 
-        String message = parseMessage(messages.get(key), placeholders, sender, addPrefix);
-        return parseMessage(message);
+        return getColoredMessage(messages.get(key), placeholders, sender, addPrefix);
     }
 
     public String getColoredMessage(String message, boolean addPrefix) {
@@ -104,55 +110,24 @@ public class MessagesManager {
     }
 
     public String getColoredMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        String msg = parseMessage(message, placeholders, sender, addPrefix);
-        return BaseComponent.toLegacyText(parseMessage(msg));
-    }
+        message = parseMessage(message, placeholders, sender, addPrefix);
 
-    private BaseComponent[] parseMessage(String message) {
         // From legacy and minimessage format to a component
         Component legacy = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
         // From component to Minimessage String. Replacing the "\" with nothing makes the minimessage formats work.
-        String minimessage = MiniMessage.miniMessage().serialize(legacy).replace("\\", "");
+        String minimessage = miniMessage.serialize(legacy).replace("\\", "");
         // From Minimessage String to Minimessage component
-        Component component = MiniMessage.miniMessage().deserialize(minimessage);
+        Component component = miniMessage.deserialize(minimessage);
         // From Minimessage component to legacy string.
-        return BungeeComponentSerializer.get().serialize(component);
+        return legacyString.serialize(component);
     }
 
     private String parseMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
         if (addPrefix) message = prefix + "&r " + message;
 
         if (placeholders != null) message = replacePlaceholders(message, placeholders);
-        if (sender instanceof Player && isPapiInstalled) message = PlaceholderAPI.setPlaceholders((Player) sender, message);
+        if (sender instanceof Player && plugin.isPAPIInstalled()) message = PlaceholderAPI.setPlaceholders((Player) sender, message);
+
         return message;
     }
-
-    /* Old method - only parses color (no click actions)
-    private String componentToString(TextComponent component, TextColor parentColor) {
-        StringBuilder componentString = new StringBuilder(component.content());
-
-        if (component.hasDecoration(TextDecoration.BOLD)) componentString.insert(0, ChatColor.BOLD);
-        if (component.hasDecoration(TextDecoration.UNDERLINED)) componentString.insert(0, ChatColor.UNDERLINE);
-        if (component.hasDecoration(TextDecoration.STRIKETHROUGH)) componentString.insert(0, ChatColor.STRIKETHROUGH);
-        if (component.hasDecoration(TextDecoration.OBFUSCATED)) componentString.insert(0, ChatColor.MAGIC);
-
-        ChatColor color;
-        if (component.color() == null && parentColor == null) {
-            color = ChatColor.WHITE;
-        } else if (component.color() != null) {
-            color = ChatColor.of(Objects.requireNonNull(component.color()).asHexString());
-        } else {
-            color = ChatColor.of(parentColor.asHexString());
-        }
-
-        componentString.insert(0, color).insert(0, "");
-
-        if (component.children().isEmpty()) return ChatColor.translateAlternateColorCodes('&', componentString.toString());
-
-        for (Component child : component.children()) {
-            componentString.append(componentToString((TextComponent) child, component.color()));
-        }
-
-        return ChatColor.translateAlternateColorCodes('&', componentString.toString());
-    }*/
 }

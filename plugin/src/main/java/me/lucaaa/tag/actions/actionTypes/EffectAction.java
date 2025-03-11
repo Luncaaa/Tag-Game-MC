@@ -3,7 +3,6 @@ package me.lucaaa.tag.actions.actionTypes;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.Action;
 import me.lucaaa.tag.game.Arena;
-import me.lucaaa.tag.utils.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -21,7 +20,7 @@ public class EffectAction extends Action {
         PotionEffectType type = PotionEffectType.getByName(Objects.requireNonNull(actionSection.getString("effect")));
 
         if (type == null) {
-            Logger.log(Level.WARNING, "Invalid effect type found on action \"" + actionSection.getName() + "\": " + actionSection.getString("effect"));
+            plugin.log(Level.WARNING, "Invalid effect type found on action \"" + actionSection.getName() + "\": " + actionSection.getString("effect"));
             this.effect = null;
             this.isCorrect = false;
             return;

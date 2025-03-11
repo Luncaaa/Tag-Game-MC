@@ -3,7 +3,6 @@ package me.lucaaa.tag.actions;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.actionTypes.*;
 import me.lucaaa.tag.game.Arena;
-import me.lucaaa.tag.utils.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -50,7 +49,7 @@ public class ActionsHandler {
             ActionType actionType = ActionType.getFromConfigName(actionSection.getString("type"));
 
             if (actionType == null) {
-                Logger.log(Level.WARNING, "Invalid action type detected in \"" + actionSection.getName() + "\" for click type " + actionSet.name() + actionSection.getString("type"));
+                plugin.log(Level.WARNING, "Invalid action type detected in \"" + actionSection.getName() + "\" for click type " + actionSet.name() + actionSection.getString("type"));
                 continue;
             }
 
@@ -66,7 +65,7 @@ public class ActionsHandler {
 
             if (!action.isFormatCorrect()) {
                 String missingFields = String.join(", ", action.getMissingFields());
-                Logger.log(Level.WARNING, "Your action \"" + actionSection.getName() + "\" is missing necessary fields: " + missingFields);
+                plugin.log(Level.WARNING, "Your action \"" + actionSection.getName() + "\" is missing necessary fields: " + missingFields);
                 continue;
             }
 

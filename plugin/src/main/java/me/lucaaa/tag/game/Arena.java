@@ -8,7 +8,6 @@ import me.lucaaa.tag.api.game.*;
 import me.lucaaa.tag.game.runnables.*;
 import me.lucaaa.tag.managers.ConfigManager;
 import me.lucaaa.tag.api.enums.*;
-import me.lucaaa.tag.utils.Logger;
 import me.lucaaa.tag.api.enums.StopCause;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -68,6 +67,7 @@ public class Arena implements TagArena {
     private final ActionsHandler actionsHandler;
 
     private boolean isRunning = false;
+    private boolean isSelectingTaggers = false;
 
     public Arena(TagGame plugin, String name, ConfigManager arenaConfig) {
         this.plugin = plugin;
@@ -156,7 +156,11 @@ public class Arena implements TagArena {
         placeholders.put("%time_mode%", plugin.getMessagesManager().getUncoloredMessage(arenaTime.getCustomNameKey(), null, null, false));
         placeholders.put("%mode%", plugin.getMessagesManager().getUncoloredMessage(arenaMode.getCustomNameKey(), null, null, false));
         placeholders.put("%finishTime%", String.valueOf(finishTime));
-        placeholders.put("%taggers%", taggers.stream().map(it -> it.getPlayer().getName()).collect(Collectors.joining(", ")));
+        if (taggers.isEmpty() && isSelectingTaggers) {
+            placeholders.put("%taggers%", plugin.getMessagesManager().getUncoloredMessage("placeholders.taggers.selecting", null, null, false));
+        } else {
+            placeholders.put("%taggers%", taggers.stream().map(it -> it.getPlayer().getName()).collect(Collectors.joining(", ")));
+        }
         placeholders.put("%finishGameCountdown%", timeLeft);
 
         return placeholders;
@@ -187,7 +191,7 @@ public class Arena implements TagArena {
     public void updateSigns() {
         for (Location location : signs) {
             if (!(world.getBlockAt(location).getState() instanceof Sign sign)) {
-                Logger.log(Level.WARNING, "A location inside the signs array in the arena config file \""+arenaFile.getName()+"\" is not a sign. Please, check if the coords are valid.");
+                plugin.log(Level.WARNING, "A location inside the signs array in the arena config file \""+arenaFile.getName()+"\" is not a sign. Please, check if the coords are valid.");
                 continue;
             }
             for (int index = 0; index < sign.getLines().length; index++) {
@@ -530,7 +534,7 @@ public class Arena implements TagArena {
         if (tp) {
             if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
                 if (plugin.getMainConfig().getConfig().getLocation("lobby") == null) {
-                    Logger.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
+                    plugin.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
                     player.teleport(playerData.getSavedLocation());
 
                 } else {
@@ -672,6 +676,7 @@ public class Arena implements TagArena {
             playerData.inWaitingArea = false;
         }
         isRunning = true;
+        isSelectingTaggers = true;
         selectTaggerCountdown.start();
 
         if (arenaTime == ArenaTime.LIMITED) {
@@ -701,7 +706,7 @@ public class Arena implements TagArena {
             for (PlayerData playerData : playersList) {
                 if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
                     if (plugin.getMainConfig().getConfig().getLocation("lobby") == null) {
-                        Logger.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
+                        plugin.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
                         playerData.getPlayer().teleport(playerData.getSavedLocation());
 
                     } else {
@@ -753,7 +758,7 @@ public class Arena implements TagArena {
 
             if (plugin.getMainConfig().getConfig().getBoolean("tp-to-lobby")) {
                 if (plugin.getMainConfig().getConfig().getLocation("lobby") == null) {
-                    Logger.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
+                    plugin.log(Level.WARNING, "The main lobby is not set but \"tp-to-lobby\" is true. The player has been teleported to his previous location.");
                     playerData.getPlayer().teleport(playerData.getSavedLocation());
 
                 } else {
@@ -822,6 +827,7 @@ public class Arena implements TagArena {
         }
         updateSigns();
         updateScoreboards();
+        isSelectingTaggers = false;
     }
 
     public void setTagger(PlayerData tagger, PlayerData tagged) {

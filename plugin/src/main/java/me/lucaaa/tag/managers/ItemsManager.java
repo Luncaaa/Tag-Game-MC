@@ -1,7 +1,6 @@
 package me.lucaaa.tag.managers;
 
 import me.lucaaa.tag.TagGame;
-import me.lucaaa.tag.utils.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -48,10 +47,10 @@ public class ItemsManager {
 
         assert itemConfigSection != null;
         if (itemConfigSection.getString("item") == null) {
-            Logger.log(Level.WARNING, "The item type was not specified for the item \"" + itemConfigSection.getName() + "\". Setting to stick by default.");
+            plugin.log(Level.WARNING, "The item type was not specified for the item \"" + itemConfigSection.getName() + "\". Setting to stick by default.");
             item = new ItemStack(Material.STICK);
         } else if ((Material.getMaterial(Objects.requireNonNull(itemConfigSection.getString("item"))) == null)) {
-            Logger.log(Level.WARNING, "The item type \"" + itemConfigSection.getString("item") + "\" specified for the item \"" + itemConfigSection.getName() + "\" does not exist. Setting to stick by default.");
+            plugin.log(Level.WARNING, "The item type \"" + itemConfigSection.getString("item") + "\" specified for the item \"" + itemConfigSection.getName() + "\" does not exist. Setting to stick by default.");
             item = new ItemStack(Material.STICK);
         } else {
             item = new ItemStack(Material.valueOf(itemConfigSection.getString("item")));

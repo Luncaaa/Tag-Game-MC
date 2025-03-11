@@ -6,7 +6,6 @@ import me.lucaaa.tag.api.APIProvider;
 import me.lucaaa.tag.commands.MainCommand;
 import me.lucaaa.tag.listeners.*;
 import me.lucaaa.tag.managers.*;
-import me.lucaaa.tag.utils.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,26 +34,40 @@ public class TagGame extends JavaPlugin {
 
     // Reload the config files.
     public void reloadConfigs() {
-        // Creates the config and lang files.
-        createConfigs();
-        mainConfig = new ConfigManager(this, "config.yml");
+        mainConfig = new ConfigManager(this, "config.yml", true);
 
         // If it detects the old commands-on-end section, send a warning.
         if (mainConfig.getConfig().isConfigurationSection("commands-on-end")) {
-            Logger.log(Level.WARNING, "\"commands-on-end\" section detected. This does not work since v1.3!");
-            Logger.log(Level.WARNING, "Update your config.yml (and arena files!) to the new actions system.");
-            Logger.log(Level.WARNING, "Learn more at https://lucaaa.gitbook.io/tag-game/usage/actions");
+            log(Level.WARNING, "\"commands-on-end\" section detected. This does not work since v1.3!");
+            log(Level.WARNING, "Update your config.yml (and arena files!) to the new actions system.");
+            log(Level.WARNING, "Learn more at https://lucaaa.gitbook.io/tag-game/usage/actions");
         }
 
+        ConfigManager.saveResource(this, "langs" + File.separator + "en.yml");
+        ConfigManager.saveResource(this, "langs" + File.separator + "es.yml");
+
         // Loads the lang file the user wants.
-        ConfigManager langConfig = new ConfigManager(this, "langs" + File.separator + mainConfig.getConfig().getString("language"));
+        ConfigManager langConfig;
+        String language = mainConfig.getConfig().getString("language");
+        if (language == null) {
+            log(Level.WARNING, "Language setting not specified in config.yml! Defaulting to en.yml");
+            langConfig = new ConfigManager(this, "langs" + File.separator + "en.yml", true);
+
+        } else {
+            try {
+                langConfig = new ConfigManager(this, "langs" + File.separator + language, false);
+            } catch(IllegalArgumentException e) {
+                log(Level.WARNING, "Language file \"" + language + "\" was not found! Defaulting to en.yml");
+                langConfig = new ConfigManager(this, "langs" + File.separator + "en.yml", true);
+            }
+        }
 
         // Managers
         Runnable startDB = () -> {
             try {
                 databaseManager = new DatabaseManager(TagGame.this, mainConfig.getConfig().getBoolean("database.use-mysql"));
             } catch (SQLException | IOException e) {
-                Logger.logError(Level.SEVERE, "An error occurred while initialising the database manager. Data won't be saved or read.", e);
+                logError(Level.SEVERE, "An error occurred while initialising the database manager. Data won't be saved or read.", e);
             }
         };
 
@@ -64,7 +77,7 @@ public class TagGame extends JavaPlugin {
             startDB.run();
         }
 
-        messagesManager = new MessagesManager(langConfig.getConfig(), mainConfig.getConfig().getString("prefix"), this.isPAPIInstalled);
+        messagesManager = new MessagesManager(this, langConfig.getConfig(), mainConfig.getConfig().getString("prefix"));
         signsManager = new SignsManager();
         itemsManager = new ItemsManager(this, mainConfig);
         if (arenasManager != null) arenasManager.stopAllArenas();
@@ -72,16 +85,6 @@ public class TagGame extends JavaPlugin {
         playersManager = new PlayersManager(this);
 
         actionsHandler = new ActionsHandler(this, mainConfig.getConfig());
-    }
-
-    // If the config files do not exist, create them.
-    private void createConfigs() {
-        if (!new File(getDataFolder().getAbsolutePath() + File.separator + "config.yml").exists())
-            saveResource("config.yml", false);
-        if (!new File(getDataFolder().getAbsolutePath() + File.separator + "langs" + File.separator + "en.yml").exists())
-            saveResource("langs" + File.separator + "en.yml", false);
-        if (!new File(getDataFolder().getAbsolutePath() + File.separator + "langs" + File.separator + "es.yml").exists())
-            saveResource("langs" + File.separator + "es.yml", false);
     }
 
     @Override
@@ -127,7 +130,19 @@ public class TagGame extends JavaPlugin {
         // Gives everyone that setting up an arena their saved inventory.
         playersManager.removeEveryone().thenRun(() -> databaseManager.closePool());
 
-        Logger.log(Level.INFO, "The plugin has been disabled.");
+        log(Level.INFO, "The plugin has been disabled.");
+    }
+
+    public void log(Level level, String message) {
+        getLogger().log(level, message);
+    }
+
+    public void logError(Level level, String message, Throwable error) {
+        getLogger().log(level, message, error);
+    }
+
+    public boolean isPAPIInstalled() {
+        return isPAPIInstalled;
     }
 
     public ConfigManager getMainConfig() {

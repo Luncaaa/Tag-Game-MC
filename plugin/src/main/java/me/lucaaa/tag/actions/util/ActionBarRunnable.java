@@ -4,7 +4,7 @@ import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.actionTypes.ActionbarAction;
 import me.lucaaa.tag.game.Arena;
 import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -22,12 +22,12 @@ public class ActionBarRunnable {
     }
 
     public void sendToPlayer(Arena arena, Player player) {
-        BaseComponent[] component = this.action.getTextComponent(this.message, player, arena.getPlaceholders());
+        String message = action.getText(this.message, player, arena.getPlaceholders());
         new BukkitRunnable() {
             private  int timeLeft = duration;
             @Override
             public void run() {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, component);
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
                 --timeLeft;
                 if (timeLeft == 0) this.cancel();
             }

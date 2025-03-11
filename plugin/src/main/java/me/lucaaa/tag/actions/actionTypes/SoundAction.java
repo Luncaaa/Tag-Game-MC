@@ -3,7 +3,6 @@ package me.lucaaa.tag.actions.actionTypes;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.actions.Action;
 import me.lucaaa.tag.game.Arena;
-import me.lucaaa.tag.utils.Logger;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -22,7 +21,7 @@ public class SoundAction extends Action {
         try {
             sound = Sound.valueOf(actionSection.getString("sound"));
         } catch (IllegalArgumentException exception) {
-            Logger.log(Level.WARNING, "Invalid sound found on action \"" + actionSection.getName() + "\": " + actionSection.getString("sound"));
+            plugin.log(Level.WARNING, "Invalid sound found on action \"" + actionSection.getName() + "\": " + actionSection.getString("sound"));
             this.isCorrect = false;
         }
 
