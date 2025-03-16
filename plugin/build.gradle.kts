@@ -12,6 +12,7 @@ dependencies {
     implementation("net.kyori:adventure-api:4.19.0")
     implementation("net.kyori:adventure-text-minimessage:4.19.0")
     implementation("net.kyori:adventure-text-serializer-legacy:4.19.0")
+    implementation("net.kyori:adventure-text-serializer-bungeecord:4.3.4")
     implementation("com.zaxxer:HikariCP:6.2.1")
     implementation(project(":api"))
 }

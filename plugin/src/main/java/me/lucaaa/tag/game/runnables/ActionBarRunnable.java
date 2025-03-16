@@ -3,7 +3,9 @@ package me.lucaaa.tag.game.runnables;
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.game.PlayerData;
+import me.lucaaa.tag.managers.MessagesManager;
 import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -25,12 +27,13 @@ public class ActionBarRunnable {
 
     // Called when the initial taggers are selected.
     public void sendToPlayers(List<PlayerData> taggers) {
+        MessagesManager manager = plugin.getMessagesManager();
         for (PlayerData tagger : taggers) {
             BukkitTask task = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    String message = plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagger.getPlayer(), false);
-                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+                    BaseComponent[] message = manager.toBungee(manager.getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagger.getPlayer(), false));
+                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
                 }
             }.runTaskTimer(plugin, 0L, 20L);
 
@@ -44,11 +47,13 @@ public class ActionBarRunnable {
         tagger.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(""));
         currentTaggers.remove(tagger);
 
+        MessagesManager manager = plugin.getMessagesManager();
+
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                String message = plugin.getMessagesManager().getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagged.getPlayer(), false);
-                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+                BaseComponent[] message = manager.toBungee(manager.getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagged.getPlayer(), false));
+                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
             }
         }.runTaskTimer(plugin, 0L, 20L);
 

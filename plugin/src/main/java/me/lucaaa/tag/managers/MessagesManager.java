@@ -4,7 +4,9 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucaaa.tag.TagGame;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -19,6 +21,7 @@ public class MessagesManager {
     private final TagGame plugin;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final LegacyComponentSerializer legacyString = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
+    private final BungeeComponentSerializer bungeeComponent = BungeeComponentSerializer.get();
     private final Map<String, String> messages = new HashMap<>();
     private final Map<String, List<String>> messagesList = new HashMap<>();
     private final String prefix;
@@ -43,7 +46,7 @@ public class MessagesManager {
     }
 
     public void sendMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        sender.sendMessage(getMessage(key, placeholders, sender, addPrefix));
+        sender.spigot().sendMessage(BungeeComponentSerializer.get().serialize(getMessage(key, placeholders, sender, addPrefix)));
     }
 
     /**
@@ -65,7 +68,7 @@ public class MessagesManager {
     }
 
     public String getParsedMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        return getMessage(key, placeholders, sender, addPrefix);
+        return legacyString.serialize(getMessage(key, placeholders, sender, addPrefix));
     }
 
     public String getMessageFromList(String key, int index, Map<String, String> placeholders, CommandSender sender) {
@@ -74,7 +77,7 @@ public class MessagesManager {
             return "Message not found.";
         }
 
-        return getColoredMessage(messagesList.get(key).get(index), placeholders, sender, false);
+        return legacyString.serialize(getColoredMessage(messagesList.get(key).get(index), placeholders, sender, false));
     }
 
     public List<String> getMessagesList(String key) {
@@ -96,20 +99,20 @@ public class MessagesManager {
         return newMessage;
     }
 
-    public String getMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+    public Component getMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
         if (!messages.containsKey(key)) {
             plugin.log(Level.WARNING, "The key \"" + key + "\" was not found in your language file. Try to delete the file and generate it again to solve this issue.");
-            return "Message not found.";
+            return miniMessage.deserialize("Message not found.");
         }
 
         return getColoredMessage(messages.get(key), placeholders, sender, addPrefix);
     }
 
     public String getColoredMessage(String message, boolean addPrefix) {
-        return getColoredMessage(message, null, null, addPrefix);
+        return legacyString.serialize(getColoredMessage(message, null, null, addPrefix));
     }
 
-    public String getColoredMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
+    public Component getColoredMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
         message = parseMessage(message, placeholders, sender, addPrefix);
 
         // From legacy and minimessage format to a component
@@ -117,9 +120,17 @@ public class MessagesManager {
         // From component to Minimessage String. Replacing the "\" with nothing makes the minimessage formats work.
         String minimessage = miniMessage.serialize(legacy).replace("\\", "");
         // From Minimessage String to Minimessage component
-        Component component = miniMessage.deserialize(minimessage);
+        return miniMessage.deserialize(minimessage);
         // From Minimessage component to legacy string.
+        // return legacyString.serialize(component);
+    }
+
+    public String toLegacy(Component component) {
         return legacyString.serialize(component);
+    }
+
+    public BaseComponent[] toBungee(Component component) {
+        return bungeeComponent.serialize(component);
     }
 
     private String parseMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {

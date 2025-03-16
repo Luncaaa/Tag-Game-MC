@@ -2,6 +2,8 @@ package me.lucaaa.tag.actions;
 
 import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.game.Arena;
+import me.lucaaa.tag.managers.MessagesManager;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -50,8 +52,14 @@ public abstract class Action {
         return this.isCorrect;
     }
 
-    public String getText(String message, Player player, Map<String, String> placeholders) {
+    public String getTextString(String message, Player player, Map<String, String> placeholders) {
         message = message.replace("%player%", player.getName());
-        return plugin.getMessagesManager().getColoredMessage(message, placeholders, player, false);
+        MessagesManager manager = plugin.getMessagesManager();
+        return manager.toLegacy(manager.getColoredMessage(message, placeholders, player, false));
+    }
+
+    public BaseComponent[] getTextComponent(String message, Player player, Map<String, String> placeholders) {
+        MessagesManager manager = plugin.getMessagesManager();
+        return manager.toBungee(manager.getColoredMessage(message, placeholders, player, false));
     }
 }

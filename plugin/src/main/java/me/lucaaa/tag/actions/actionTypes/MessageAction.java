@@ -18,6 +18,6 @@ public class MessageAction extends Action {
 
     @Override
     public void runAction(Arena arena, Player player) {
-        player.sendMessage(getText(message, player, arena.getPlaceholders()));
+        player.spigot().sendMessage(getTextComponent(message, player, arena.getPlaceholders()));
     }
 }
