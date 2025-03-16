@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class TagGame extends JavaPlugin {
@@ -72,7 +73,11 @@ public class TagGame extends JavaPlugin {
         };
 
         if (playersManager != null) {
-            playersManager.removeEveryone().thenRun(() -> databaseManager.closePool()).thenRun(startDB);
+            CompletableFuture.runAsync(() -> {
+                playersManager.removeEveryone();
+                databaseManager.closePool();
+                startDB.run();
+            });
         } else {
             startDB.run();
         }
@@ -128,7 +133,10 @@ public class TagGame extends JavaPlugin {
         // Stops all arenas.
         arenasManager.stopAllArenas();
         // Gives everyone that setting up an arena their saved inventory.
-        playersManager.removeEveryone().thenRun(() -> databaseManager.closePool());
+        CompletableFuture.runAsync(() -> {
+            playersManager.removeEveryone();
+            databaseManager.closePool();
+        });
 
         log(Level.INFO, "The plugin has been disabled.");
     }

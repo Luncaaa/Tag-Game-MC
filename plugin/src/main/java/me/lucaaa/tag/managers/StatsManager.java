@@ -14,13 +14,13 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
     private final CompletableFuture<Void> loading;
 
     // Stats
-    private int gamesPlayed;
-    private int timesLost;
-    private int timesWon;
-    private int timesTagger;
-    private int timesBeenTagged;
-    private int timesTagged;
-    private double timeTagger;
+    private int gamesPlayed = 0;
+    private int timesLost = 0;
+    private int timesWon = 0;
+    private int timesTagger = 0;
+    private int timesBeenTagged = 0;
+    private int timesTagged = 0;
+    private double timeTagger = 0.0;
 
     // Temporary data - if the tagged event is cancelled, it will be added to the data. Otherwise, it will be ignored.
     private int savedTimesTagger = 0;
@@ -37,15 +37,7 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
         this.loading = isPlayerSaved.thenAcceptAsync(exists -> {
             if (!exists && is3rdParty) return;
 
-            Runnable runnable = () -> {
-                gamesPlayed = db.getInt(playerName, "games_played");
-                timesLost = db.getInt(playerName, "times_lost");
-                timesWon = db.getInt(playerName, "times_won");
-                timesTagger = db.getInt(playerName, "times_tagger");
-                timesBeenTagged = db.getInt(playerName, "times_been_tagged");
-                timesTagged = db.getInt(playerName, "times_tagged");
-                timeTagger = db.getDouble(playerName, "time_tagger");
-            };
+            Runnable runnable = () -> db.loadData(this);
 
             CompletableFuture<Void> saving = plugin.getDatabaseManager().isSaving(playerName);
 
@@ -58,6 +50,7 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
                 } else {
                     runnable.run();
                 }
+                runnable.run();
             });
         });
     }
@@ -144,15 +137,7 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
     }
 
     public void saveData(boolean async) {
-        Runnable task = () -> {
-            db.updateInt(playerName, "games_played", gamesPlayed);
-            db.updateInt(playerName, "times_lost", timesLost);
-            db.updateInt(playerName, "times_won", timesWon);
-            db.updateInt(playerName, "times_tagger", timesTagger);
-            db.updateInt(playerName, "times_been_tagged", timesBeenTagged);
-            db.updateInt(playerName, "times_tagged", timesTagged);
-            db.updateDouble(playerName, "time_tagger", timeTagger);
-        };
+        Runnable task = () -> db.saveData(this);
 
         if (async) {
             plugin.getDatabaseManager().addSaving(playerName, CompletableFuture.runAsync(task));
@@ -167,5 +152,9 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
         // so it will not freeze anything.
         loading.join();
         return isPlayerSaved.join();
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 }

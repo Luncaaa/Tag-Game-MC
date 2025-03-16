@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 public class PlayersManager {
     private final TagGame plugin;
@@ -36,14 +35,12 @@ public class PlayersManager {
     }
 
     // Used for the onDisable method. If in-game or setting up an arena when plugin is disabled, it restores the inventories.
-    public CompletableFuture<Void> removeEveryone() {
-        return CompletableFuture.runAsync(() -> {
-            for (PlayerData playerData : playersData.values()) {
-                if (playerData.isSettingUpArena() || playerData.isInArena()) playerData.restoreSavedData();
-                playerData.getStatsManager().saveData(false);
-            }
-            playersData.clear();
-        });
+    public void removeEveryone() {
+        for (PlayerData playerData : playersData.values()) {
+            if (playerData.isSettingUpArena() || playerData.isInArena()) playerData.restoreSavedData();
+            playerData.getStatsManager().saveData(false);
+        }
+        playersData.clear();
     }
 
     public StatsManager getPlayerStats(OfflinePlayer player) {

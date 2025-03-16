@@ -124,10 +124,31 @@ public class DatabaseManager {
         } else {
             return CompletableFuture.runAsync(task);
         }
-
     }
 
-    public int getInt(String playerName, String dataToGet) {
+    public void loadData(StatsManager statsManager) {
+        String playerName = statsManager.getPlayerName();
+        statsManager.updateGamesPlayed(getInt(playerName, "games_played"));
+        statsManager.updateTimesLost(getInt(playerName, "times_lost"));
+        statsManager.updateTimesWon(getInt(playerName, "times_won"));
+        statsManager.updateTimesTagger(getInt(playerName, "times_tagger"));
+        statsManager.updateTimesBeenTagged(getInt(playerName, "times_been_tagged"));
+        statsManager.updateTimesTagged(getInt(playerName, "times_tagged"));
+        statsManager.updateTimeTagger(getDouble(playerName, "time_tagger"));
+    }
+
+    public void saveData(StatsManager statsManager) {
+        String playerName = statsManager.getPlayerName();
+        updateInt(playerName, "games_played", statsManager.getGamesPlayed());
+        updateInt(playerName, "times_lost", statsManager.getTimesLost());
+        updateInt(playerName, "times_won", statsManager.getTimesWon());
+        updateInt(playerName, "times_tagger", statsManager.getTimesTagger());
+        updateInt(playerName, "times_been_tagged", statsManager.getTimesBeenTagged());
+        updateInt(playerName, "times_tagged", statsManager.getTimesTagged());
+        updateDouble(playerName, "time_tagger", statsManager.getTimeTagger());
+    }
+
+    private int getInt(String playerName, String dataToGet) {
         try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
             statement.setString(1, playerName);
             ResultSet query = statement.executeQuery();
@@ -141,7 +162,7 @@ public class DatabaseManager {
         }
     }
 
-    public double getDouble(String playerName, String dataToGet) {
+    private double getDouble(String playerName, String dataToGet) {
         try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("SELECT * FROM player_stats WHERE name = ?")) {
             statement.setString(1, playerName);
             ResultSet query = statement.executeQuery();
@@ -155,7 +176,7 @@ public class DatabaseManager {
         }
     }
 
-    public void updateInt(String playerName, String dataToUpdate, int newValue) {
+    private void updateInt(String playerName, String dataToUpdate, int newValue) {
         try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE player_stats SET "+dataToUpdate+" = ? WHERE name = ?")) {
             statement.setInt(1, newValue);
             statement.setString(2, playerName);
@@ -165,7 +186,7 @@ public class DatabaseManager {
         }
     }
 
-    public void updateDouble(String playerName, String dataToUpdate, double newValue) {
+    private void updateDouble(String playerName, String dataToUpdate, double newValue) {
         try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("UPDATE player_stats SET "+dataToUpdate+" = ? WHERE name = ?")) {
             statement.setDouble(1, newValue);
             statement.setString(2, playerName);
