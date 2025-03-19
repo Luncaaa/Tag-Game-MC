@@ -17,7 +17,6 @@ public class DatabaseManager {
     private final TagGame plugin;
     private final Map<String, CompletableFuture<Void>> savingData = new HashMap<>();
     private final CompletableFuture<Void> dataSourceInit;
-    private boolean dataSourceInitDone = false;
 
     // Connection pool
     private HikariDataSource dataSource;
@@ -76,7 +75,6 @@ public class DatabaseManager {
         config.setConnectionTimeout(60000);
         config.setConnectionTestQuery("SELECT 1");
         dataSource = new HikariDataSource(config);
-        dataSourceInitDone = true;
     }
 
     public void closePool() {
@@ -109,43 +107,66 @@ public class DatabaseManager {
         }
     }
 
-    public CompletableFuture<Void> createPlayer(String playerName) {
-        Runnable task = () -> {
-            try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("INSERT INTO player_stats VALUES ('"+playerName+"', 0, 0, 0, 0, 0, 0, 0.0)")) {
-                statement.executeUpdate();
+    private void createPlayer(String playerName) {
+        try (Connection conn = getConnection(); PreparedStatement statement = conn.prepareStatement("INSERT INTO player_stats VALUES ('"+playerName+"', 0, 0, 0, 0, 0, 0, 0.0)")) {
+            statement.executeUpdate();
 
-            } catch (SQLException e) {
-                plugin.logError(Level.SEVERE, "An error occurred while creating stats for player " + playerName, e);
-            }
-        };
-
-        if (!dataSourceInitDone) {
-            return dataSourceInit.thenRun(task);
-        } else {
-            return CompletableFuture.runAsync(task);
+        } catch (SQLException e) {
+            plugin.logError(Level.SEVERE, "An error occurred while creating stats for player " + playerName, e);
         }
     }
 
-    public void loadData(StatsManager statsManager) {
+    public void loadData(StatsManager statsManager, boolean is3rdParty) {
         String playerName = statsManager.getPlayerName();
-        statsManager.updateGamesPlayed(getInt(playerName, "games_played"));
-        statsManager.updateTimesLost(getInt(playerName, "times_lost"));
-        statsManager.updateTimesWon(getInt(playerName, "times_won"));
-        statsManager.updateTimesTagger(getInt(playerName, "times_tagger"));
-        statsManager.updateTimesBeenTagged(getInt(playerName, "times_been_tagged"));
-        statsManager.updateTimesTagged(getInt(playerName, "times_tagged"));
-        statsManager.updateTimeTagger(getDouble(playerName, "time_tagger"));
+
+        Runnable load = () -> {
+            boolean exists = playerExists(playerName);
+
+            if (!exists && is3rdParty) return;
+
+            if (!exists) {
+                createPlayer(playerName);
+            }
+
+            statsManager.updateGamesPlayed(getInt(playerName, "games_played"));
+            statsManager.updateTimesLost(getInt(playerName, "times_lost"));
+            statsManager.updateTimesWon(getInt(playerName, "times_won"));
+            statsManager.updateTimesTagger(getInt(playerName, "times_tagger"));
+            statsManager.updateTimesBeenTagged(getInt(playerName, "times_been_tagged"));
+            statsManager.updateTimesTagged(getInt(playerName, "times_tagged"));
+            statsManager.updateTimeTagger(getDouble(playerName, "time_tagger"));
+        };
+
+        if (!dataSourceInit.isDone()) {
+            dataSourceInit.thenRun(load);
+        } else {
+            CompletableFuture<Void> saving = isSaving(playerName);
+            if (saving == null) {
+                CompletableFuture.runAsync(load);
+            } else {
+                saving.thenRun(load);
+            }
+        }
     }
 
-    public void saveData(StatsManager statsManager) {
+    public void saveData(StatsManager statsManager, boolean async) {
         String playerName = statsManager.getPlayerName();
-        updateInt(playerName, "games_played", statsManager.getGamesPlayed());
-        updateInt(playerName, "times_lost", statsManager.getTimesLost());
-        updateInt(playerName, "times_won", statsManager.getTimesWon());
-        updateInt(playerName, "times_tagger", statsManager.getTimesTagger());
-        updateInt(playerName, "times_been_tagged", statsManager.getTimesBeenTagged());
-        updateInt(playerName, "times_tagged", statsManager.getTimesTagged());
-        updateDouble(playerName, "time_tagger", statsManager.getTimeTagger());
+
+        Runnable task = () -> {
+            updateInt(playerName, "games_played", statsManager.getGamesPlayed());
+            updateInt(playerName, "times_lost", statsManager.getTimesLost());
+            updateInt(playerName, "times_won", statsManager.getTimesWon());
+            updateInt(playerName, "times_tagger", statsManager.getTimesTagger());
+            updateInt(playerName, "times_been_tagged", statsManager.getTimesBeenTagged());
+            updateInt(playerName, "times_tagged", statsManager.getTimesTagged());
+            updateDouble(playerName, "time_tagger", statsManager.getTimeTagger());
+        };
+
+        if (async) {
+            addSaving(playerName, CompletableFuture.runAsync(task));
+        } else {
+            task.run();
+        }
     }
 
     private int getInt(String playerName, String dataToGet) {
@@ -196,11 +217,11 @@ public class DatabaseManager {
         }
     }
 
-    public CompletableFuture<Void> isSaving(String playerName) {
+    private CompletableFuture<Void> isSaving(String playerName) {
         return savingData.get(playerName);
     }
 
-    public void addSaving(String playerName, CompletableFuture<Void> function) {
+    private void addSaving(String playerName, CompletableFuture<Void> function) {
         function.thenRun(() -> savingData.remove(playerName));
         savingData.put(playerName, function);
     }

@@ -604,6 +604,7 @@ public class Arena implements TagArena {
         Bukkit.getPluginManager().callEvent(leaveEvent);
         updateSigns();
         updateScoreboards();
+        playerData.getStatsManager().saveData(true);
     }
 
     // Sends the player to the waiting lobby. Once there are enough players, the game will start.

@@ -3,15 +3,9 @@ package me.lucaaa.tag.managers;
 import me.lucaaa.tag.TagGame;
 import org.bukkit.OfflinePlayer;
 
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
-
 public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
     private final String playerName;
-    private final TagGame plugin;
     private final DatabaseManager db;
-    private final CompletableFuture<Boolean> isPlayerSaved;
-    private final CompletableFuture<Void> loading;
 
     // Stats
     private int gamesPlayed = 0;
@@ -29,30 +23,9 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
 
     public StatsManager(OfflinePlayer player, TagGame plugin, boolean is3rdParty) {
         this.playerName = player.getName();
-        this.plugin = plugin;
         this.db = plugin.getDatabaseManager();
 
-        this.isPlayerSaved = CompletableFuture.supplyAsync(() -> db.playerExists(playerName));
-
-        this.loading = isPlayerSaved.thenAcceptAsync(exists -> {
-            if (!exists && is3rdParty) return;
-
-            Runnable runnable = () -> db.loadData(this);
-
-            CompletableFuture<Void> saving = plugin.getDatabaseManager().isSaving(playerName);
-
-            CompletableFuture<Void> afterSaving;
-            afterSaving = Objects.requireNonNullElseGet(saving, () -> CompletableFuture.completedFuture(null));
-
-            afterSaving.thenRun(() -> {
-                if (!exists) {
-                    db.createPlayer(playerName).thenRun(runnable);
-                } else {
-                    runnable.run();
-                }
-                runnable.run();
-            });
-        });
+        db.loadData(this, is3rdParty);
     }
 
     @Override
@@ -137,21 +110,14 @@ public class StatsManager implements me.lucaaa.tag.api.game.StatsManager {
     }
 
     public void saveData(boolean async) {
-        Runnable task = () -> db.saveData(this);
-
-        if (async) {
-            plugin.getDatabaseManager().addSaving(playerName, CompletableFuture.runAsync(task));
-        } else {
-            task.run();
-        }
+        db.saveData(this, async);
     }
 
     public boolean isPlayerSaved() {
         // Forces the data to load before returning anything.
         // This method will only be called by PAPI or the API,
         // so it will not freeze anything.
-        loading.join();
-        return isPlayerSaved.join();
+        return db.playerExists(playerName);
     }
 
     public String getPlayerName() {

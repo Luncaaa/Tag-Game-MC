@@ -27,19 +27,21 @@ public interface StatsManager {
     int getTimesWon();
     /**
      * Gets the number of times that the player has been a tagger.<br>
-     * Only arenas with limited time increase this number when they end.
+     * If called in a TagPlayerTaggedEvent, it will include that tag (won't be added to the stats if the event is cancelled later).
      *
      * @return The number of times that the player has been a tagger.
      */
     int getTimesTagger();
     /**
-     * Gets the number of times that the player has tagged someone.
+     * Gets the number of times that the player has tagged someone.<br>
+     * If called in a TagPlayerTaggedEvent, it will include that tag (won't be added to the stats if the event is cancelled later).
      *
      * @return The number of times that the player has tagged someone.
      */
     int getTimesTagged();
     /**
-     * Gets the number of times that the player has been tagged.
+     * Gets the number of times that the player has been tagged.<br>
+     * If called in a TagPlayerTaggedEvent, it will include that tag (won't be added to the stats if the event is cancelled later).
      *
      * @return The number of times that the player has been tagged.
      */
