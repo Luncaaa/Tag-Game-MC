@@ -168,33 +168,42 @@ public class PlayerData implements TagPlayer {
         player.getInventory().setItem(8, settingUpArena.getArenaModeItem());
     }
 
+    // Gives the inventory items defined in the config section "inventory".
+    public void giveGameItems() {
+        for (int i = 1; i <= 7; i++) {
+            if (!plugin.getItemsManager().itemExists("inventory." + i)) continue;
+            ItemStack slotItem = plugin.getItemsManager().getItem("inventory." + i);
+            player.getInventory().setItem(i, slotItem);
+        }
+    }
+
     // Gives the stick which he can use to tag other players
     public void giveTaggerInventory() {
         ItemsManager itemsManager = plugin.getItemsManager();
         ItemStack taggingStick;
         if (arena.getArenaMode() == ArenaMode.HIT || arena.getArenaMode() == ArenaMode.TIMED_HIT) {
             if (arena.getArenaTimeMode() == ArenaTime.LIMITED) {
-                taggingStick = itemsManager.getItem("tag-item-limited");
+                taggingStick = itemsManager.getItem("items.tag-item-limited");
             } else {
-                taggingStick = itemsManager.getItem("tag-item-unlimited");
+                taggingStick = itemsManager.getItem("items.tag-item-unlimited");
             }
         } else {
             if (arena.getArenaTimeMode() == ArenaTime.LIMITED) {
-                taggingStick = itemsManager.getItem("tnt-item-limited");
+                taggingStick = itemsManager.getItem("items.tnt-item-limited");
             } else {
-                taggingStick = itemsManager.getItem("tnt-item-unlimited");
+                taggingStick = itemsManager.getItem("items.tnt-item-unlimited");
             }
         }
         ItemMeta taggingStickMeta = taggingStick.getItemMeta();
         assert taggingStickMeta != null;
-        taggingStickMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING, "tag_stick");
+        taggingStickMeta.getPersistentDataContainer().set(plugin.key, PersistentDataType.STRING, "tag_stick");
         taggingStick.setItemMeta(taggingStickMeta);
 
         player.getInventory().setItem(0, taggingStick);
-        player.getInventory().setHelmet(itemsManager.getItem("helmet"));
-        player.getInventory().setChestplate(itemsManager.getItem("chestplate"));
-        player.getInventory().setLeggings(itemsManager.getItem("leggings"));
-        player.getInventory().setBoots(itemsManager.getItem("boots"));
+        player.getInventory().setHelmet(itemsManager.getItem("tagger-inventory.helmet"));
+        player.getInventory().setChestplate(itemsManager.getItem("tagger-inventory.chestplate"));
+        player.getInventory().setLeggings(itemsManager.getItem("tagger-inventory.leggings"));
+        player.getInventory().setBoots(itemsManager.getItem("tagger-inventory.boots"));
     }
     // ----------
 

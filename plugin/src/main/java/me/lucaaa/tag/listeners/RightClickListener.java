@@ -15,6 +15,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.Vector;
 
@@ -120,9 +122,13 @@ public class RightClickListener implements Listener {
             }
 
         } else {
-            if (itemInHand.getType() == plugin.getItemsManager().getItem("leave-item").getType()) {
-                playerData.arena.playerLeave(player, true);
-                return;
+            ItemMeta meta = Objects.requireNonNull(itemInHand.getItemMeta());
+            PersistentDataContainer pdc = meta.getPersistentDataContainer();
+            if (pdc.has(plugin.key, PersistentDataType.STRING)) {
+                if (Objects.equals(pdc.get(plugin.key, PersistentDataType.STRING), "leave_item")) {
+                    playerData.arena.playerLeave(player, true);
+                    return;
+                }
             }
 
             if (playerData.arena.getTaggers().contains(playerData) && (playerData.arena.getArenaMode() == ArenaMode.TNT || playerData.arena.getArenaMode() == ArenaMode.TIMED_TNT)) {

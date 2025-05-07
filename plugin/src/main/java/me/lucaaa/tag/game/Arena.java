@@ -502,10 +502,10 @@ public class Arena implements TagArena {
         PlayerData playerData = plugin.getPlayersManager().getPlayerData(player);
         player.getInventory().clear();
 
-        ItemStack leaveItem = plugin.getItemsManager().getItem("leave-item");
+        ItemStack leaveItem = plugin.getItemsManager().getItem("items.leave-item");
         ItemMeta leaveItemMeta = leaveItem.getItemMeta();
         assert leaveItemMeta != null;
-        leaveItemMeta.getPersistentDataContainer().set(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING, "leave_item");
+        leaveItemMeta.getPersistentDataContainer().set(plugin.key, PersistentDataType.STRING, "leave_item");
         leaveItem.setItemMeta(leaveItemMeta);
         player.getInventory().setItem(8, leaveItem);
 
@@ -659,6 +659,7 @@ public class Arena implements TagArena {
         player.teleport(randomSpawn);
 
         if (isRunning) {
+            playerData.giveGameItems();
             playerData.getStatsManager().updateGamesPlayed(1);
         } else if (playersList.size() >= minPlayers) {
             startGame();
@@ -673,6 +674,7 @@ public class Arena implements TagArena {
         Bukkit.getPluginManager().callEvent(startEvent);
 
         for (PlayerData playerData : playersList) {
+            playerData.giveGameItems();
             playerData.getStatsManager().updateGamesPlayed(1);
             playerData.inWaitingArea = false;
         }

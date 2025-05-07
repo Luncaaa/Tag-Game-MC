@@ -7,6 +7,7 @@ import me.lucaaa.tag.commands.MainCommand;
 import me.lucaaa.tag.listeners.*;
 import me.lucaaa.tag.managers.*;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.logging.Level;
 
 public class TagGame extends JavaPlugin {
     private boolean isPAPIInstalled = false;
+    public NamespacedKey key = new NamespacedKey(this, "TAG");
 
     // Config file.
     private ConfigManager mainConfig;

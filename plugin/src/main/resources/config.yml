@@ -157,3 +157,12 @@ tagger-inventory:
       - "&7Hit somebody with this"
       - "&7stick to tag them"
     glowing: true
+
+# Additional items every player will have in their inventory.
+# Their section name must be the inventory slot. Slots 1 & 9 will be ignored,
+# for they are reserved for the tagger's item and bed to leave the game.
+inventory:
+  # Example item:
+  # 1:
+  #   item: BARRIER
+  #   name: "&cTest item"
