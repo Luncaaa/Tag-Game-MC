@@ -26,7 +26,7 @@ public class ItemsManager {
         for (String key : config.getKeys(true)) {
             if (config.isConfigurationSection(key)) continue;
 
-            if (key.endsWith("material")) {
+            if (key.endsWith("item")) {
                 String sectionName = key.substring(0, key.lastIndexOf('.'));
                 if (items.containsKey(sectionName)) continue;
 
