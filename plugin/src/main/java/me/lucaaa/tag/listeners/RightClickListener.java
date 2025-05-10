@@ -45,8 +45,9 @@ public class RightClickListener implements Listener {
         }
         if (event.getHand() != EquipmentSlot.HAND || (!playerData.isSettingUpArena() && !playerData.isInArena())) return;
 
-        event.setCancelled(true);
         if (playerData.isSettingUpArena()) {
+            event.setCancelled(true);
+
             Arena editingArena = plugin.getArenasManager().getArena(playerData.settingUpArena.getName());
             Map<String, String> placeholders = new HashMap<>();
             placeholders.put("%arena%", playerData.settingUpArena.getName());
@@ -126,12 +127,14 @@ public class RightClickListener implements Listener {
             PersistentDataContainer pdc = meta.getPersistentDataContainer();
             if (pdc.has(plugin.key, PersistentDataType.STRING)) {
                 if (Objects.equals(pdc.get(plugin.key, PersistentDataType.STRING), "leave_item")) {
+                    event.setCancelled(true);
                     playerData.arena.playerLeave(player, true);
                     return;
                 }
             }
 
             if (playerData.arena.getTaggers().contains(playerData) && (playerData.arena.getArenaMode() == ArenaMode.TNT || playerData.arena.getArenaMode() == ArenaMode.TIMED_TNT)) {
+                event.setCancelled(true);
                 Long now = System.currentTimeMillis();
                 // Divide / 1000.0 to convert to seconds.
                 if ((now - playerData.tntThrowCooldown) / 1000.0 <= plugin.getMainConfig().getConfig().getDouble("tnt-cooldown")) return;
