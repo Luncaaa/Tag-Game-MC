@@ -1,4 +1,4 @@
 jdk:
-  - openjdk16
+  - openjdk21
 install:
   - ./gradlew :api:build
