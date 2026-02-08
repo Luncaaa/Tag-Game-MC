@@ -3,7 +3,7 @@ package me.lucaaa.tag.api.events;
 import org.bukkit.event.Cancellable;
 
 /**
- * Represents a {@link TagEvent} that can be cancelled.
+ * Represents a {@link TagEvent} that can be canceled.
  */
 public class CancellableTagEvent extends TagEvent implements Cancellable {
     private boolean isCancelled = false;

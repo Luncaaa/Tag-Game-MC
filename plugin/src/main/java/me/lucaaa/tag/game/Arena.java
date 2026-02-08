@@ -600,7 +600,7 @@ public class Arena implements TagArena {
             else randomPlayer = validPlayers.get(new Random().nextInt(validPlayers.size()));
             setTagger(playerData, randomPlayer);
         }
-        PlayerLeaveEvent leaveEvent = new PlayerLeaveEvent(playerData, this);
+        TagPlayerLeaveEvent leaveEvent = new TagPlayerLeaveEvent(playerData, this);
         Bukkit.getPluginManager().callEvent(leaveEvent);
         updateSigns();
         updateScoreboards();
@@ -615,7 +615,7 @@ public class Arena implements TagArena {
             return false;
         }
 
-        PlayerJoinEvent joinEvent = new PlayerJoinEvent(playerData, this);
+        TagPlayerJoinEvent joinEvent = new TagPlayerJoinEvent(playerData, this);
         Bukkit.getPluginManager().callEvent(joinEvent);
         if (joinEvent.isCancelled()) return false;
 
@@ -645,7 +645,7 @@ public class Arena implements TagArena {
             return false;
         }
 
-        PlayerJoinEvent joinEvent = new PlayerJoinEvent(playerData, this);
+        TagPlayerJoinEvent joinEvent = new TagPlayerJoinEvent(playerData, this);
         Bukkit.getPluginManager().callEvent(joinEvent);
         if (joinEvent.isCancelled()) return false;
 
@@ -670,7 +670,7 @@ public class Arena implements TagArena {
     // Starts the game
     @Override
     public void startGame() {
-        ArenaStartEvent startEvent = new ArenaStartEvent(this);
+        TagArenaStartEvent startEvent = new TagArenaStartEvent(this);
         Bukkit.getPluginManager().callEvent(startEvent);
 
         for (PlayerData playerData : playersList) {
@@ -696,7 +696,7 @@ public class Arena implements TagArena {
     }
 
     public void stopGame(StopCause cause, boolean executeActions) {
-        ArenaStopEvent stopEvent = new ArenaStopEvent(this, cause);
+        TagArenaStopEvent stopEvent = new TagArenaStopEvent(this, cause);
         Bukkit.getPluginManager().callEvent(stopEvent);
 
         if (waitingAreaCountdown.isRunning()) waitingAreaCountdown.stop();
@@ -837,7 +837,7 @@ public class Arena implements TagArena {
         tagger.getStatsManager().saveTempData(0, 1, 0);
         tagged.getStatsManager().saveTempData(1, 0, 1);
 
-        PlayerTaggedEvent tagEvent = new PlayerTaggedEvent(tagged, tagger, this);
+        TagPlayerTaggedEvent tagEvent = new TagPlayerTaggedEvent(tagged, tagger, this);
         Bukkit.getPluginManager().callEvent(tagEvent);
         if (tagEvent.isCancelled()) {
             tagged.getStatsManager().clearTempData();

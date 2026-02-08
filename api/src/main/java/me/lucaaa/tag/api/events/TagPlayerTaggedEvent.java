@@ -9,39 +9,65 @@ import org.bukkit.entity.Player;
  * WARNING! It Does not include initial taggers (selected when the game starts)
  */
 @SuppressWarnings("unused")
-public abstract class TagPlayerTaggedEvent extends CancellableTagEvent {
+public class TagPlayerTaggedEvent extends CancellableTagEvent {
+    private final TagPlayer tagged;
+    private final TagPlayer tagger;
+    private final TagArena arena;
+
+    /**
+     * Constructor for this event. Internal use only.
+     * @param tagged The player who was tagged.
+     * @param tagger The player who tagged another player.
+     * @param arena The arena where this occurred.
+     */
+    public TagPlayerTaggedEvent(TagPlayer tagged, TagPlayer tagger, TagArena arena) {
+        this.tagged = tagged;
+        this.tagger = tagger;
+        this.arena = arena;
+    }
+
     /**
      * Gets the tag tagged player involved in this event.
      *
      * @return The tag tagged player involved in this event.
      */
-    public abstract TagPlayer getTagPlayer();
+    public TagPlayer getTagPlayer() {
+        return this.tagged;
+    }
 
     /**
      * Gets the Spigot tagged player involved in this event.
      *
      * @return The Spigot tagged player involved in this event.
      */
-    public abstract Player getPlayer();
+    public Player getPlayer() {
+        return this.tagged.getPlayer();
+    }
 
     /**
      * Gets the tag tagger player involved in this event.
      *
      * @return The tag tagger player involved in this event.
      */
-    public abstract TagPlayer getTagTagger();
+    public TagPlayer getTagTagger() {
+        return this.tagger;
+    }
 
     /**
      * Gets the Spigot tagger player involved in this event.
      *
      * @return The Spigot tagger player involved in this event.
      */
-    public abstract Player getTagger();
+    public Player getTagger() {
+        return this.tagger.getPlayer();
+    }
 
     /**
      * Gets the arena involved in this event.
      *
      * @return The arena involved in this event.
      */
-    public abstract TagArena getArena();
+    public TagArena getArena() {
+        return this.arena;
+    }
 }
