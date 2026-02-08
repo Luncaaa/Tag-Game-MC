@@ -28,6 +28,9 @@ public enum ArenaMode {
      */
     TIMED_TNT("placeholders.arena-mode.timed-tnt");
 
+    /**
+     * The config's custom name key.
+     */
     private final String customNameKey;
 
     /**
@@ -39,6 +42,7 @@ public enum ArenaMode {
     }
 
     /**
+     * Returns the config's custom name key.
      * @hidden
      * @return The key to the custom name.
      */

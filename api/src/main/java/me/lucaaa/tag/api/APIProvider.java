@@ -1,6 +1,7 @@
 package me.lucaaa.tag.api;
 
 /**
+ * API Provider for the TagAPI class.
  * @hidden
  * INTERNAL USE ONLY - DO NOT USE!
  */

@@ -14,6 +14,9 @@ public enum ArenaTime {
      */
     UNLIMITED("placeholders.arena-time.unlimited");
 
+    /**
+     * The config's custom name key.
+     */
     private final String customNameKey;
 
     /**
@@ -25,10 +28,11 @@ public enum ArenaTime {
     }
 
     /**
+     * Returns the config's custom name key.
      * @hidden
      * @return The key to the custom name.
      */
     public String getCustomNameKey() {
-        return this.customNameKey;
+        return customNameKey;
     }
 }
