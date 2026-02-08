@@ -4,8 +4,8 @@ import me.lucaaa.tag.TagGame;
 import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.game.PlayerData;
 import me.lucaaa.tag.managers.MessagesManager;
+import net.kyori.adventure.audience.Audience;
 import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -29,11 +29,11 @@ public class ActionBarRunnable {
     public void sendToPlayers(List<PlayerData> taggers) {
         MessagesManager manager = plugin.getMessagesManager();
         for (PlayerData tagger : taggers) {
+            Audience taggerAudience = plugin.getAudience(tagger.getPlayer());
             BukkitTask task = new BukkitRunnable() {
                 @Override
                 public void run() {
-                    BaseComponent[] message = manager.toBungee(manager.getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagger.getPlayer(), false));
-                    tagger.getPlayer().spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
+                    taggerAudience.sendActionBar(manager.getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagger.getPlayer(), false));
                 }
             }.runTaskTimer(plugin, 0L, 20L);
 
@@ -49,11 +49,11 @@ public class ActionBarRunnable {
 
         MessagesManager manager = plugin.getMessagesManager();
 
+        Audience taggedAudience = plugin.getAudience(tagged);
         BukkitTask task = new BukkitRunnable() {
             @Override
             public void run() {
-                BaseComponent[] message = manager.toBungee(manager.getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagged.getPlayer(), false));
-                tagged.spigot().sendMessage(ChatMessageType.ACTION_BAR, message);
+                taggedAudience.sendActionBar(manager.getMessage("game.tagger-actionbar", arena.getPlaceholders(), tagged.getPlayer(), false));
             }
         }.runTaskTimer(plugin, 0L, 20L);
 

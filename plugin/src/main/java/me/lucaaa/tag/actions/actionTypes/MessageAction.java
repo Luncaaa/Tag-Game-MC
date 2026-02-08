@@ -18,6 +18,6 @@ public class MessageAction extends Action {
 
     @Override
     public void runAction(Arena arena, Player player) {
-        player.spigot().sendMessage(getTextComponent(message, player, arena.getPlaceholders()));
+        plugin.getAudience(player).sendMessage(plugin.getMessagesManager().getColoredMessage(message, arena.getPlaceholders(), player, false));
     }
 }

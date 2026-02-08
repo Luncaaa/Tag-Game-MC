@@ -4,9 +4,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import me.lucaaa.tag.TagGame;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -21,7 +19,6 @@ public class MessagesManager {
     private final TagGame plugin;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private final LegacyComponentSerializer legacyString = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build();
-    private final BungeeComponentSerializer bungeeComponent = BungeeComponentSerializer.get();
     private final Map<String, String> messages = new HashMap<>();
     private final Map<String, List<String>> messagesList = new HashMap<>();
     private final String prefix;
@@ -46,7 +43,7 @@ public class MessagesManager {
     }
 
     public void sendMessage(String key, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {
-        sender.spigot().sendMessage(BungeeComponentSerializer.get().serialize(getMessage(key, placeholders, sender, addPrefix)));
+        plugin.getAudience(sender).sendMessage(getMessage(key, placeholders, sender, addPrefix));
     }
 
     /**
@@ -127,10 +124,6 @@ public class MessagesManager {
 
     public String toLegacy(Component component) {
         return legacyString.serialize(component);
-    }
-
-    public BaseComponent[] toBungee(Component component) {
-        return bungeeComponent.serialize(component);
     }
 
     private String parseMessage(String message, Map<String, String> placeholders, CommandSender sender, boolean addPrefix) {

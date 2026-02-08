@@ -6,8 +6,11 @@ import me.lucaaa.tag.api.APIProvider;
 import me.lucaaa.tag.commands.MainCommand;
 import me.lucaaa.tag.listeners.*;
 import me.lucaaa.tag.managers.*;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -20,6 +23,7 @@ import java.util.logging.Level;
 public class TagGame extends JavaPlugin {
     private boolean isPAPIInstalled = false;
     public NamespacedKey key = new NamespacedKey(this, "TAG");
+    private BukkitAudiences audiences;
 
     // Config file.
     private ConfigManager mainConfig;
@@ -104,6 +108,7 @@ public class TagGame extends JavaPlugin {
 
         // Set up files and managers.
         reloadConfigs();
+        audiences = BukkitAudiences.create(this);
 
         // Look for updates.
         new UpdateManager(this).getVersion(v -> UpdateManager.sendStatus(this, v, getDescription().getVersion()));
@@ -139,6 +144,8 @@ public class TagGame extends JavaPlugin {
             playersManager.removeEveryone();
             databaseManager.closePool();
         });
+
+        if (audiences != null) audiences.close();
 
         log(Level.INFO, "The plugin has been disabled.");
     }
@@ -185,5 +192,9 @@ public class TagGame extends JavaPlugin {
 
     public ActionsHandler getActionsHandler() {
         return this.actionsHandler;
+    }
+
+    public Audience getAudience(CommandSender sender) {
+        return audiences.sender(sender);
     }
 }

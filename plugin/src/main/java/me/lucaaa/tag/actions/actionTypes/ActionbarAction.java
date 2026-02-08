@@ -16,7 +16,7 @@ public class ActionbarAction extends Action {
         super(plugin, List.of("message", "duration"), actionSection);
         String message = actionSection.getString("message");
         int duration = actionSection.getInt("duration");
-        this.runnable = new ActionBarRunnable(plugin, this, message, duration);
+        this.runnable = new ActionBarRunnable(plugin, message, duration);
     }
 
     @Override
