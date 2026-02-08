@@ -120,6 +120,15 @@ items:
       - "&7stick to tag them"
     glowing: true
 
+  # The item that non-taggers get so they can push the taggers away.
+  # You can remove this section to disable it.
+  push-stick:
+    push-non-taggers: true
+    item: STICK
+    name: "&cPusher"
+    lore:
+      - "&7Use it to push others away"
+
 # The inventory the tagger will have.
 tagger-inventory:
   helmet:

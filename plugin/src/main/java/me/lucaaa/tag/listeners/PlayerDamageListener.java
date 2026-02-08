@@ -5,8 +5,6 @@ import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.game.PlayerData;
 import me.lucaaa.tag.api.enums.ArenaMode;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -14,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -36,10 +35,10 @@ public class PlayerDamageListener implements Listener {
     public void onPlayerHit(EntityDamageByEntityEvent event) {
         if (!(event.getEntity() instanceof Player victim)) return;
 
-        NamespacedKey tagger = new NamespacedKey(plugin, "TAG");
-
         PlayerData victimData = plugin.getPlayersManager().getPlayerData(victim);
-        if (event.getDamager().getPersistentDataContainer().has(tagger, PersistentDataType.STRING)) event.setCancelled(true);
+        // If a TNT exploded and hurt someone, cancel the event
+        // This line is NOT redundant because that someone might not be in the arena (hence the next even.setCancelled(true) would not be called.
+        if (event.getDamager().getPersistentDataContainer().has(plugin.key, PersistentDataType.STRING)) event.setCancelled(true);
         if (!victimData.isInArena()) return;
 
         event.setCancelled(true);
@@ -52,22 +51,27 @@ public class PlayerDamageListener implements Listener {
         if (event.getDamager() instanceof Player attacker && (arena.getArenaMode() == ArenaMode.HIT || arena.getArenaMode() == ArenaMode.TIMED_HIT)) {
             PlayerData attackerData = plugin.getPlayersManager().getPlayerData(attacker);
 
-            if (!attackerData.isInArena()) return;
+            ItemStack itemInHand = attacker.getInventory().getItemInMainHand();
+            ItemMeta itemInHandMeta = Objects.requireNonNull(itemInHand.getItemMeta());
 
-            if (!arena.getTaggers().contains(attackerData) || arena.getTaggers().contains(victimData)) return;
+            if (!attackerData.isInArena() || !itemInHandMeta.getPersistentDataContainer().has(plugin.key, PersistentDataType.STRING)) return;
 
-            if (attacker.getInventory().getItemInMainHand().getType() == Material.AIR) return;
-            ItemMeta itemInHandMeta = attacker.getInventory().getItemInMainHand().getItemMeta();
-            assert itemInHandMeta != null;
-            if (!itemInHandMeta.getPersistentDataContainer().has(tagger, PersistentDataType.STRING)) return;
+            // The attacker is a tagger
+            if (arena.getTaggers().contains(attackerData)) {
+                arena.setTagger(attackerData, victimData);
 
-            arena.setTagger(attackerData, victimData);
+            } else {
+                if (!plugin.getItemsManager().itemExists("push-stick")) return;
+
+                // If neither are taggers, only push if enabled in config.
+                if (!arena.getTaggers().contains(victimData) && !plugin.getItemsManager().pushNonTaggers()) return;
+            }
 
         } else if (event.getDamager() instanceof TNTPrimed tagTNT) {
-            if (!tagTNT.getPersistentDataContainer().has(tagger, PersistentDataType.STRING)) return;
+            if (!tagTNT.getPersistentDataContainer().has(plugin.key, PersistentDataType.STRING)) return;
             if (arena.getTaggers().contains(victimData)) return;
 
-            Player player = Bukkit.getPlayer(Objects.requireNonNull(tagTNT.getPersistentDataContainer().get(tagger, PersistentDataType.STRING)));
+            Player player = Bukkit.getPlayer(Objects.requireNonNull(tagTNT.getPersistentDataContainer().get(plugin.key, PersistentDataType.STRING)));
             if (player == null) return;
 
             if (!arena.getTaggers().contains(plugin.getPlayersManager().getPlayerData(player))) return;

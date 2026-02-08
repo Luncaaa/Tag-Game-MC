@@ -18,11 +18,13 @@ import java.util.logging.Level;
 public class ItemsManager {
     private final TagGame plugin;
     private final Map<String, ItemStack> items = new HashMap<>();
+    private boolean pushNonTaggers = true;
 
     public ItemsManager(TagGame plugin, ConfigManager configManager) {
         this.plugin = plugin;
 
         YamlConfiguration config = configManager.getConfig();
+        // TODO: Improve performance (no need to check all keys from the same item).
         for (String key : config.getKeys(true)) {
             if (config.isConfigurationSection(key)) continue;
 
@@ -47,10 +49,10 @@ public class ItemsManager {
         ItemStack item;
 
         if (itemSection.getString("item") == null) {
-            plugin.log(Level.WARNING, "The item type was not specified for the item \"" + itemSection.getName() + "\". Setting to stick by default.");
+            plugin.log(Level.WARNING, "The item type was not specified for the item \"" + key + "\". Setting to stick by default.");
             item = new ItemStack(Material.STICK);
         } else if ((Material.getMaterial(Objects.requireNonNull(itemSection.getString("item"))) == null)) {
-            plugin.log(Level.WARNING, "The item type \"" + itemSection.getString("item") + "\" specified for the item \"" + itemSection.getName() + "\" does not exist. Setting to stick by default.");
+            plugin.log(Level.WARNING, "The item type \"" + itemSection.getString("item") + "\" specified for the item \"" + key + "\" does not exist. Setting to stick by default.");
             item = new ItemStack(Material.STICK);
         } else {
             item = new ItemStack(Material.valueOf(itemSection.getString("item")));
@@ -77,6 +79,10 @@ public class ItemsManager {
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         }
 
+        if (key.equalsIgnoreCase("push-stick")) {
+            pushNonTaggers = itemSection.getBoolean("push-non-taggers", true);
+        }
+
         itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         item.setItemMeta(itemMeta);
 
@@ -89,5 +95,9 @@ public class ItemsManager {
 
     public boolean itemExists(String itemName) {
         return items.containsKey(itemName);
+    }
+
+    public boolean pushNonTaggers() {
+        return pushNonTaggers;
     }
 }

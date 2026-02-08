@@ -170,6 +170,15 @@ public class PlayerData implements TagPlayer {
 
     // Gives the inventory items defined in the config section "inventory".
     public void giveGameItems() {
+        if (plugin.getItemsManager().itemExists("push-stick")) {
+            ItemStack pushStick = plugin.getItemsManager().getItem("push-stick");
+            ItemMeta pushStickMeta = Objects.requireNonNull(pushStick.getItemMeta());
+            pushStickMeta.getPersistentDataContainer().set(plugin.key, PersistentDataType.STRING, "push-stick");
+            pushStick.setItemMeta(pushStickMeta);
+
+            player.getInventory().setItem(0, pushStick);
+        }
+
         for (int i = 1; i <= 7; i++) {
             if (!plugin.getItemsManager().itemExists("inventory." + i)) continue;
             ItemStack slotItem = plugin.getItemsManager().getItem("inventory." + i);

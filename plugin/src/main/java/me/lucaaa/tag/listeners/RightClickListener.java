@@ -5,7 +5,6 @@ import me.lucaaa.tag.game.Arena;
 import me.lucaaa.tag.game.PlayerData;
 import me.lucaaa.tag.api.enums.ArenaMode;
 import me.lucaaa.tag.api.enums.ArenaTime;
-import org.bukkit.NamespacedKey;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -140,7 +139,7 @@ public class RightClickListener implements Listener {
                 if ((now - playerData.tntThrowCooldown) / 1000.0 <= plugin.getMainConfig().getConfig().getDouble("tnt-cooldown")) return;
 
                 TNTPrimed tagTNT = event.getPlayer().getWorld().spawn(event.getPlayer().getLocation().add(0.0, 1.0, 0.0), TNTPrimed.class);
-                tagTNT.getPersistentDataContainer().set(new NamespacedKey(plugin, "TAG"), PersistentDataType.STRING, event.getPlayer().getName());
+                tagTNT.getPersistentDataContainer().set(plugin.key, PersistentDataType.STRING, event.getPlayer().getName());
                 tagTNT.setVelocity(event.getPlayer().getLocation().getDirection().add(new Vector(0.0, 0.15, 0.0)));
                 tagTNT.setFuseTicks(plugin.getMainConfig().getConfig().getInt("tnt-fuse-time"));
 
